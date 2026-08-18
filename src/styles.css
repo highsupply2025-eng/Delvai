@@ -153,3 +153,27 @@
     color: var(--color-foreground);
   }
 }
+
+@layer base {
+  html {
+    font-family: var(--font-display);
+  }
+}
+
+@utility bg-stage {
+  background-image: var(--gradient-stage);
+}
+
+@utility bg-cine {
+  background-image: var(--gradient-cine);
+}
+
+@utility text-cine {
+  background-image: var(--gradient-cine);
+  background-clip: text;
+  color: transparent;
+}
+
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
