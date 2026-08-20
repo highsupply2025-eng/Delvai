@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { Loader2, Send } from "lucide-react";
+import { useRef, useState } from "react";
+import { Loader2, Send, ImagePlus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { ToolShell } from "@/components/ToolShell";
 import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
+
 
 export const Route = createFileRoute("/chat")({
   head: () => ({
