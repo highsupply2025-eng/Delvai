@@ -14,7 +14,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as ImageRouteImport } from './routes/image'
 import { Route as VideoRouteImport } from './routes/video'
+import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as WriteRouteImport } from './routes/write'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
 
@@ -43,9 +45,19 @@ const HistoryRoute = HistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImageRoute = ImageRouteImport.update({
+  id: '/image',
+  path: '/image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideoRoute = VideoRouteImport.update({
   id: '/video',
   path: '/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoiceRoute = VoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WriteRoute = WriteRouteImport.update({
@@ -65,7 +77,9 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
+  '/image': typeof ImageRoute
   '/video': typeof VideoRoute
+  '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
 }
@@ -75,7 +89,9 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
+  '/image': typeof ImageRoute
   '/video': typeof VideoRoute
+  '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
 }
@@ -86,7 +102,9 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
+  '/image': typeof ImageRoute
   '/video': typeof VideoRoute
+  '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
 }
@@ -98,7 +116,9 @@ export interface FileRouteTypes {
     | '/chat'
     | '/docs'
     | '/history'
+    | '/image'
     | '/video'
+    | '/voice'
     | '/write'
     | '/api/generate-image'
   fileRoutesByTo: FileRoutesByTo
@@ -108,7 +128,9 @@ export interface FileRouteTypes {
     | '/chat'
     | '/docs'
     | '/history'
+    | '/image'
     | '/video'
+    | '/voice'
     | '/write'
     | '/api/generate-image'
   id:
@@ -118,7 +140,9 @@ export interface FileRouteTypes {
     | '/chat'
     | '/docs'
     | '/history'
+    | '/image'
     | '/video'
+    | '/voice'
     | '/write'
     | '/api/generate-image'
   fileRoutesById: FileRoutesById
@@ -129,7 +153,9 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   DocsRoute: typeof DocsRoute
   HistoryRoute: typeof HistoryRoute
+  ImageRoute: typeof ImageRoute
   VideoRoute: typeof VideoRoute
+  VoiceRoute: typeof VoiceRoute
   WriteRoute: typeof WriteRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
 }
@@ -171,11 +197,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/image': {
+      id: '/image'
+      path: '/image'
+      fullPath: '/image'
+      preLoaderRoute: typeof ImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/video': {
       id: '/video'
       path: '/video'
       fullPath: '/video'
       preLoaderRoute: typeof VideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/voice': {
+      id: '/voice'
+      path: '/voice'
+      fullPath: '/voice'
+      preLoaderRoute: typeof VoiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/write': {
@@ -201,7 +241,9 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   DocsRoute: DocsRoute,
   HistoryRoute: HistoryRoute,
+  ImageRoute: ImageRoute,
   VideoRoute: VideoRoute,
+  VoiceRoute: VoiceRoute,
   WriteRoute: WriteRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
 }
