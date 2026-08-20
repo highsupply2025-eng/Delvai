@@ -10,12 +10,14 @@ const ChatInput = z.object({
       z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string().min(1).max(60000),
+        images: z.array(z.string().max(8_000_000)).max(4).optional(),
       }),
     )
     .min(1)
     .max(40),
   model: z.string().default("google/gemini-2.5-flash"),
 });
+
 
 export const chatComplete = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => ChatInput.parse(data))
@@ -30,10 +32,21 @@ export const chatComplete = createServerFn({ method: "POST" })
         model: data.model,
         messages: [
           ...(data.system ? [{ role: "system", content: data.system }] : []),
-          ...data.messages,
+          ...data.messages.map((m) =>
+            m.images && m.images.length > 0
+              ? {
+                  role: m.role,
+                  content: [
+                    { type: "text", text: m.content },
+                    ...m.images.map((url) => ({ type: "image_url", image_url: { url } })),
+                  ],
+                }
+              : { role: m.role, content: m.content },
+          ),
         ],
       }),
     });
+
 
     if (!res.ok) {
       const body = (await res.json().catch(() => null)) as {
