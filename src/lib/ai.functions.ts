@@ -32,10 +32,21 @@ export const chatComplete = createServerFn({ method: "POST" })
         model: data.model,
         messages: [
           ...(data.system ? [{ role: "system", content: data.system }] : []),
-          ...data.messages,
+          ...data.messages.map((m) =>
+            m.images && m.images.length > 0
+              ? {
+                  role: m.role,
+                  content: [
+                    { type: "text", text: m.content },
+                    ...m.images.map((url) => ({ type: "image_url", image_url: { url } })),
+                  ],
+                }
+              : { role: m.role, content: m.content },
+          ),
         ],
       }),
     });
+
 
     if (!res.ok) {
       const body = (await res.json().catch(() => null)) as {
