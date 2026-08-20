@@ -44,10 +44,11 @@ function ChatTool() {
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const addFiles = async (files: FileList | null) => {
-    if (!files?.length) return;
+  const addFiles = async (files: FileList | File[] | null) => {
+    if (!files || files.length === 0) return;
     setError(null);
     const picked = Array.from(files).slice(0, MAX_IMAGES - images.length);
+
     const encoded: string[] = [];
     for (const f of picked) {
       if (!f.type.startsWith("image/")) continue;
@@ -182,9 +183,30 @@ function ChatTool() {
             rows={2}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="اكتب رسالتك…"
+            onPaste={(e) => {
+              const files = Array.from(e.clipboardData?.items ?? [])
+                .filter((it) => it.kind === "file" && it.type.startsWith("image/"))
+                .map((it) => it.getAsFile())
+                .filter((f): f is File => Boolean(f));
+              if (files.length > 0) {
+                e.preventDefault();
+                void addFiles(files);
+              }
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              const files = Array.from(e.dataTransfer?.files ?? []).filter((f) =>
+                f.type.startsWith("image/"),
+              );
+              if (files.length > 0) {
+                e.preventDefault();
+                void addFiles(files);
+              }
+            }}
+            placeholder="اكتب رسالتك… أو الصق صورة (Ctrl+V)"
             className="resize-none bg-background/60"
           />
+
           <Button
             onClick={() => void send()}
             disabled={busy || (!input.trim() && images.length === 0)}
