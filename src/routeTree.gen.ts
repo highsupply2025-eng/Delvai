@@ -15,6 +15,7 @@ import { Route as ChatRouteImport } from './routes/chat'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as ImageRouteImport } from './routes/image'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as VideoRouteImport } from './routes/video'
 import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as WriteRouteImport } from './routes/write'
@@ -50,6 +51,11 @@ const ImageRoute = ImageRouteImport.update({
   path: '/image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideoRoute = VideoRouteImport.update({
   id: '/video',
   path: '/video',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
   '/image': typeof ImageRoute
+  '/pricing': typeof PricingRoute
   '/video': typeof VideoRoute
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
   '/image': typeof ImageRoute
+  '/pricing': typeof PricingRoute
   '/video': typeof VideoRoute
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
   '/image': typeof ImageRoute
+  '/pricing': typeof PricingRoute
   '/video': typeof VideoRoute
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/history'
     | '/image'
+    | '/pricing'
     | '/video'
     | '/voice'
     | '/write'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/history'
     | '/image'
+    | '/pricing'
     | '/video'
     | '/voice'
     | '/write'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/history'
     | '/image'
+    | '/pricing'
     | '/video'
     | '/voice'
     | '/write'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   DocsRoute: typeof DocsRoute
   HistoryRoute: typeof HistoryRoute
   ImageRoute: typeof ImageRoute
+  PricingRoute: typeof PricingRoute
   VideoRoute: typeof VideoRoute
   VoiceRoute: typeof VoiceRoute
   WriteRoute: typeof WriteRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/video': {
       id: '/video'
       path: '/video'
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocsRoute: DocsRoute,
   HistoryRoute: HistoryRoute,
   ImageRoute: ImageRoute,
+  PricingRoute: PricingRoute,
   VideoRoute: VideoRoute,
   VoiceRoute: VoiceRoute,
   WriteRoute: WriteRoute,

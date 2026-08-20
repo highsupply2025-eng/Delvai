@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LogIn, LogOut, History, Sparkles } from "lucide-react";
+import { LogIn, LogOut, History, Sparkles, CreditCard } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,6 +65,11 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ms-auto flex items-center gap-2">
+          <Link to="/pricing">
+            <Button variant="ghost" size="sm">
+              <CreditCard className="size-4" /> الاشتراك
+            </Button>
+          </Link>
           {!loading && user ? (
             <>
               <Link to="/history">
