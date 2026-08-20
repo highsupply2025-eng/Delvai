@@ -196,8 +196,4 @@ function ChatTool() {
       </div>
     </ToolShell>
   );
-
-      </div>
-    </ToolShell>
-  );
 }
