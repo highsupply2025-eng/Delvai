@@ -7,7 +7,7 @@ export function usePaddleCheckout() {
   const openCheckout = async (options: {
     priceId: string;
     quantity?: number;
-    customerEmail?: string;
+    customerEmail?: string | undefined;
     customData?: Record<string, string>;
     successUrl?: string;
   }) => {
