@@ -10,12 +10,14 @@ const ChatInput = z.object({
       z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string().min(1).max(60000),
+        images: z.array(z.string().max(8_000_000)).max(4).optional(),
       }),
     )
     .min(1)
     .max(40),
   model: z.string().default("google/gemini-2.5-flash"),
 });
+
 
 export const chatComplete = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => ChatInput.parse(data))
