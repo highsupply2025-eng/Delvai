@@ -44,10 +44,11 @@ function ChatTool() {
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const addFiles = async (files: FileList | null) => {
-    if (!files?.length) return;
+  const addFiles = async (files: FileList | File[] | null) => {
+    if (!files || files.length === 0) return;
     setError(null);
     const picked = Array.from(files).slice(0, MAX_IMAGES - images.length);
+
     const encoded: string[] = [];
     for (const f of picked) {
       if (!f.type.startsWith("image/")) continue;
