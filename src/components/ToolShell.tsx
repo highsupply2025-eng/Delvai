@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LogIn, LogOut, History, Sparkles, CreditCard } from "lucide-react";
+import { LogIn, LogOut, History, Sparkles, CreditCard, Languages } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useLang } from "@/lib/i18n";
 
 export const TOOLS = [
   { to: "/chat", label: "المساعد الذكي", desc: "دردشة ذكية للإجابة والتحليل وحل المهام اليومية." },
@@ -44,6 +45,7 @@ export function ToolShell({
 
 export function SiteHeader() {
   const { user, loading, signOut } = useAuth();
+  const { lang, toggle } = useLang();
 
   return (
     <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
@@ -65,6 +67,16 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ms-auto flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggle}
+            data-no-translate
+            aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+            title={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+          >
+            <Languages className="size-4" /> {lang === "ar" ? "EN" : "ع"}
+          </Button>
           <Link to="/pricing">
             <Button variant="ghost" size="sm">
               <CreditCard className="size-4" /> الاشتراك
