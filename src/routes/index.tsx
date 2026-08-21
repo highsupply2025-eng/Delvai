@@ -24,13 +24,13 @@ import { useReveal } from "@/hooks/useReveal";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "منصة الذكاء — كل أدوات الذكاء الاصطناعي بالعربية" },
+      { title: "uniai — كل أدوات الذكاء الاصطناعي في منصة واحدة" },
       {
         name: "description",
         content:
           "منصة عربية واحدة تجمع أقوى أدوات الذكاء الاصطناعي: مساعد فوري، استوديو صور، كتابة إعلانات، فيديو سينمائي، صوت ونص، وتحليل مستندات. شهر أول مجاني.",
       },
-      { property: "og:title", content: "منصة الذكاء — كل أدوات الذكاء الاصطناعي بالعربية" },
+      { property: "og:title", content: "uniai — كل أدوات الذكاء الاصطناعي في منصة واحدة" },
       {
         property: "og:description",
         content:
@@ -103,7 +103,7 @@ function Home() {
           <div className="reveal" data-reveal>
             <span className="mx-auto flex w-fit items-center gap-2 rounded-full glass px-4 py-1.5 text-xs text-muted-foreground">
               <Sparkles className="size-3.5 text-primary" />
-              الجيل الجديد من أدوات الذكاء الاصطناعي العربية
+              الجيل الجديد من أدوات الذكاء الاصطناعي
             </span>
           </div>
 
@@ -306,7 +306,9 @@ function Home() {
                 <span className="size-2.5 rounded-full bg-primary/80" />
                 <span className="size-2.5 rounded-full bg-accent/70" />
                 <span className="size-2.5 rounded-full bg-muted" />
-                <span className="ms-auto text-[11px] text-muted-foreground">منصة الذكاء</span>
+                <span className="ms-auto text-[11px] text-muted-foreground" data-no-translate>
+                  uniai
+                </span>
               </div>
               <div className="space-y-3 pt-4">
                 <div className="ms-auto w-fit max-w-[80%] rounded-2xl rounded-se-sm bg-secondary/70 px-4 py-2.5 text-sm">
@@ -361,7 +363,7 @@ function Home() {
       </section>
 
       <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-        مؤسسة التموين العالي للتجارة — منصة أدوات الذكاء الاصطناعي
+        uniai — منصة أدوات الذكاء الاصطناعي
       </footer>
     </div>
   );

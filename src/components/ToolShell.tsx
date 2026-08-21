@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LogIn, LogOut, History, Sparkles, CreditCard, Languages } from "lucide-react";
+import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLang } from "@/lib/i18n";
+import logoAsset from "@/assets/uniai-mark.png.asset.json";
 
 export const TOOLS = [
   { to: "/chat", label: "المساعد الذكي", desc: "دردشة ذكية للإجابة والتحليل وحل المهام اليومية." },
@@ -37,7 +38,7 @@ export function ToolShell({
         {children}
       </main>
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        مؤسسة التموين العالي للتجارة — منصة أدوات الذكاء الاصطناعي
+        uniai — منصة أدوات الذكاء الاصطناعي
       </footer>
     </div>
   );
@@ -50,9 +51,15 @@ export function SiteHeader() {
   return (
     <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-5 py-3">
-        <Link to="/" className="flex items-center gap-2 font-bold">
-          <Sparkles className="size-4 text-primary" />
-          <span className="text-cine">منصة الذكاء</span>
+        <Link to="/" className="flex items-center gap-2 font-bold" data-no-translate>
+          <img
+            src={logoAsset.url}
+            alt="uniai logo"
+            width={28}
+            height={28}
+            className="size-7 drop-shadow-[0_0_12px_oklch(0.82_0.14_82/0.5)]"
+          />
+          <span className="text-cine text-lg tracking-tight">uniai</span>
         </Link>
         <nav className="hidden flex-1 items-center gap-1 md:flex">
           {TOOLS.map((t) => (
