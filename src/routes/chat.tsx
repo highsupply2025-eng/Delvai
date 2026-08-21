@@ -118,10 +118,11 @@ const BASE_RULES =
   "أجب بالعربية الفصحى المبسّطة ما لم يطلب المستخدم غير ذلك. كن موجزًا ومنظّمًا: استخدم نقاطًا وعناوين قصيرة عند الحاجة، ولا تكرر السؤال. إن كان السؤال ناقص المعلومات فاسأل سؤالًا توضيحيًا واحدًا فقط.";
 
 function ChatTool() {
+  const { q } = Route.useSearch();
   const save = useServerFn(saveGeneration);
   const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(q ?? "");
   const [images, setImages] = useState<string[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
