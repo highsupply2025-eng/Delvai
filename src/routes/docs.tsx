@@ -530,3 +530,13 @@ function DocsStudio() {
     </ToolShell>
   );
 }
+
+/** ينظّف علامات ماركداون من النص لعرض عربي مرتب. */
+function tidy(text: string) {
+  return text
+    .replace(/```[a-z]*\n?|```/g, "")
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/^\s*[*-]\s+/gm, "• ")
+    .trim();
+}
