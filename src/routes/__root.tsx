@@ -79,12 +79,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "منصة الذكاء | AI Tools Platform" },
+      { title: "uniai | AI Tools Platform" },
       {
         name: "description",
         content: "منصة أدوات الذكاء الاصطناعي بالعربية والإنجليزية: محادثة، صور، فيديو، صوت، كتابة وتحليل مستندات.",
       },
-      { property: "og:title", content: "منصة الذكاء | AI Tools Platform" },
+      { property: "og:title", content: "uniai | AI Tools Platform" },
       {
         property: "og:description",
         content: "Arabic & English AI studio: chat, images, video, voice, copywriting and document analysis.",
@@ -104,7 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
