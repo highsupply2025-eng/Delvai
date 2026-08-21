@@ -1,6 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-type Body = { prompt?: string; image?: string | null };
+type Body = {
+  prompt?: string;
+  image?: string | null;
+  images?: string[] | null;
+  aspect?: string;
+  negative?: string;
+  quality?: string;
+  model?: string;
+};
+
+const ALLOWED_MODELS = new Set([
+  "google/gemini-3-pro-image",
+  "google/gemini-3.1-flash-image",
+  "google/gemini-2.5-flash-image",
+]);
 
 export const Route = createFileRoute("/api/generate-image")({
   server: {
@@ -9,27 +23,44 @@ export const Route = createFileRoute("/api/generate-image")({
         const key = process.env["LOVABLE_API_KEY"];
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
-        const { prompt, image } = (await request.json()) as Body;
+        const body = (await request.json()) as Body;
+        const prompt = body.prompt;
         if (!prompt || prompt.trim().length < 3) {
           return new Response(JSON.stringify({ message: "الوصف قصير جدًا" }), { status: 400 });
         }
 
-        const content = image
-          ? [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: image } },
-            ]
-          : prompt;
+        const refs = [...(body.images ?? []), ...(body.image ? [body.image] : [])].slice(0, 4);
+
+        const directives = [
+          prompt.trim(),
+          body.aspect ? `Aspect ratio: ${body.aspect} (compose and frame exactly for this ratio).` : "",
+          body.quality ? `Quality: ${body.quality}.` : "",
+          body.negative ? `Avoid: ${body.negative}.` : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
+
+        const content =
+          refs.length > 0
+            ? [
+                { type: "text", text: directives },
+                ...refs.map((url) => ({ type: "image_url", image_url: { url } })),
+              ]
+            : directives;
+
+        const model =
+          body.model && ALLOWED_MODELS.has(body.model) ? body.model : "google/gemini-3-pro-image";
 
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
           method: "POST",
           headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-3.1-flash-image",
+            model,
             messages: [{ role: "user", content }],
             modalities: ["image", "text"],
           }),
         });
+
 
         if (!upstream.ok) {
           const text = await upstream.text().catch(() => "");
