@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LogIn, LogOut, History, Sparkles, CreditCard, Languages } from "lucide-react";
+import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
