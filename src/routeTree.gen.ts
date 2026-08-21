@@ -20,6 +20,8 @@ import { Route as VideoRouteImport } from './routes/video'
 import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as WriteRouteImport } from './routes/write'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
+import { Route as ApiSpeechRouteImport } from './routes/api/speech'
+import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +78,16 @@ const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   path: '/api/generate-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSpeechRoute = ApiSpeechRouteImport.update({
+  id: '/api/speech',
+  path: '/api/speech',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
+  id: '/api/transcribe',
+  path: '/api/transcribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +101,8 @@ export interface FileRoutesByFullPath {
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/speech': typeof ApiSpeechRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +116,8 @@ export interface FileRoutesByTo {
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/speech': typeof ApiSpeechRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +132,8 @@ export interface FileRoutesById {
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/speech': typeof ApiSpeechRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +149,8 @@ export interface FileRouteTypes {
     | '/voice'
     | '/write'
     | '/api/generate-image'
+    | '/api/speech'
+    | '/api/transcribe'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +164,8 @@ export interface FileRouteTypes {
     | '/voice'
     | '/write'
     | '/api/generate-image'
+    | '/api/speech'
+    | '/api/transcribe'
   id:
     | '__root__'
     | '/'
@@ -157,6 +179,8 @@ export interface FileRouteTypes {
     | '/voice'
     | '/write'
     | '/api/generate-image'
+    | '/api/speech'
+    | '/api/transcribe'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +195,8 @@ export interface RootRouteChildren {
   VoiceRoute: typeof VoiceRoute
   WriteRoute: typeof WriteRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
+  ApiSpeechRoute: typeof ApiSpeechRoute
+  ApiTranscribeRoute: typeof ApiTranscribeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +278,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/speech': {
+      id: '/api/speech'
+      path: '/api/speech'
+      fullPath: '/api/speech'
+      preLoaderRoute: typeof ApiSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/transcribe': {
+      id: '/api/transcribe'
+      path: '/api/transcribe'
+      fullPath: '/api/transcribe'
+      preLoaderRoute: typeof ApiTranscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,6 +307,8 @@ const rootRouteChildren: RootRouteChildren = {
   VoiceRoute: VoiceRoute,
   WriteRoute: WriteRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
+  ApiSpeechRoute: ApiSpeechRoute,
+  ApiTranscribeRoute: ApiTranscribeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
