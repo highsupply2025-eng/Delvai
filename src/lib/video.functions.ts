@@ -3,30 +3,93 @@ import { z } from "zod";
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/videos";
 
-const CreateInput = z.object({
-  prompt: z.string().min(3).max(2000),
-  seconds: z.enum(["4", "6", "8"]).default("8"),
-  size: z.enum(["1280x720", "720x1280"]).default("1280x720"),
+const MODELS = ["google/veo-3.1-lite", "google/veo-3.1-fast", "google/veo-3.1"] as const;
+
+const MediaInput = z.object({
+  bytesBase64Encoded: z.string().min(10).max(24_000_000),
+  mimeType: z.string().min(3).max(40),
 });
+
+const CreateInput = z.object({
+  prompt: z.string().min(3).max(4000),
+  negativePrompt: z.string().max(1000).optional(),
+  model: z.enum(MODELS).default("google/veo-3.1-lite"),
+  durationSeconds: z.union([z.literal(4), z.literal(6), z.literal(8)]).default(8),
+  resolution: z.enum(["720p", "1080p", "4k"]).default("720p"),
+  aspectRatio: z.enum(["16:9", "9:16"]).default("16:9"),
+  generateAudio: z.boolean().default(true),
+  seed: z.number().int().min(0).max(4294967295).optional(),
+  image: MediaInput.optional(),
+  lastFrame: MediaInput.optional(),
+  // Extension: continue a previously generated clip (fetched server-side from its URL).
+  extendFromUrl: z.string().max(200000).optional(),
+});
+
+function gatewayMessage(status: number, fallback: string) {
+  if (status === 429) return "الطلبات كثيرة الآن أو هناك فيديو قيد التوليد. انتظر قليلًا ثم أعد المحاولة.";
+  if (status === 402) return "لا يوجد رصيد كافٍ لتوليد الفيديو. يرجى إضافة رصيد ثم المحاولة.";
+  if (status === 401 || status === 403) return "خدمة الفيديو غير مفعّلة لهذا المشروع.";
+  return fallback;
+}
+
+async function toBase64(url: string): Promise<{ bytesBase64Encoded: string; mimeType: string } | null> {
+  try {
+    if (url.startsWith("data:")) {
+      const [head, b64] = url.split(",");
+      if (!b64) return null;
+      return { bytesBase64Encoded: b64, mimeType: head?.slice(5).split(";")[0] || "video/mp4" };
+    }
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    if (bytes.byteLength > 22_000_000) return null;
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]!);
+    return { bytesBase64Encoded: btoa(binary), mimeType: "video/mp4" };
+  } catch {
+    return null;
+  }
+}
 
 export const createVideoJob = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => CreateInput.parse(data))
   .handler(async ({ data }) => {
     const key = process.env["LOVABLE_API_KEY"];
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+    if (!key) return { ok: false as const, status: 500, message: "خدمة الفيديو غير مهيأة" };
+
+    const instance: Record<string, unknown> = { prompt: data.prompt };
+    const parameters: Record<string, unknown> = {
+      durationSeconds: data.durationSeconds,
+      resolution: data.resolution,
+      sampleCount: 1,
+      generateAudio: data.generateAudio,
+    };
+
+    if (data.negativePrompt?.trim()) parameters["negativePrompt"] = data.negativePrompt.trim();
+    if (typeof data.seed === "number") parameters["seed"] = data.seed;
+
+    if (data.extendFromUrl) {
+      const media = await toBase64(data.extendFromUrl);
+      if (!media) {
+        return {
+          ok: false as const,
+          status: 400,
+          message: "تعذّر قراءة الفيديو السابق للتمديد. جرّب توليدًا جديدًا.",
+        };
+      }
+      instance["video"] = media;
+      parameters["durationSeconds"] = 7;
+    } else if (data.image) {
+      instance["image"] = data.image;
+      if (data.lastFrame && data.model !== "google/veo-3.1-lite") instance["lastFrame"] = data.lastFrame;
+    } else {
+      parameters["aspectRatio"] = data.aspectRatio;
+    }
 
     const res = await fetch(GATEWAY, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/veo-3.1-lite",
-        prompt: data.prompt,
-        seconds: data.seconds,
-        size: data.size,
-      }),
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: data.model, instances: [instance], parameters }),
     });
 
     if (!res.ok) {
@@ -34,7 +97,7 @@ export const createVideoJob = createServerFn({ method: "POST" })
       return {
         ok: false as const,
         status: res.status,
-        message: err?.message ?? "تعذّر بدء توليد الفيديو",
+        message: err?.message ?? gatewayMessage(res.status, "تعذّر بدء توليد الفيديو"),
       };
     }
 
@@ -48,7 +111,7 @@ export const getVideoJob = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => StatusInput.parse(data))
   .handler(async ({ data }) => {
     const key = process.env["LOVABLE_API_KEY"];
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+    if (!key) return { ok: false as const, status: 500, message: "خدمة الفيديو غير مهيأة" };
 
     const res = await fetch(`${GATEWAY}/${data.id}`, {
       headers: { Authorization: `Bearer ${key}` },
@@ -59,7 +122,7 @@ export const getVideoJob = createServerFn({ method: "POST" })
       return {
         ok: false as const,
         status: res.status,
-        message: err?.message ?? "تعذّر جلب حالة المهمة",
+        message: err?.message ?? gatewayMessage(res.status, "تعذّر جلب حالة المهمة"),
       };
     }
 
@@ -74,19 +137,17 @@ export const getVideoJob = createServerFn({ method: "POST" })
       return {
         ok: false as const,
         status: 200,
-        message: job.error?.message ?? "فشل توليد الفيديو",
+        message:
+          job.error?.code === "moderation_blocked"
+            ? "تم حظر المشهد بواسطة فلاتر الأمان. عدّل الوصف أو الصورة المرجعية ثم أعد المحاولة."
+            : (job.error?.message ?? "فشل توليد الفيديو"),
       };
     }
 
     if (job.status !== "completed") {
-      return {
-        ok: true as const,
-        done: false as const,
-        progress: job.progress ?? 0,
-      };
+      return { ok: true as const, done: false as const, progress: job.progress ?? 0 };
     }
 
-    // Completed: resolve the short-lived signed download URL for playback.
     const contentRes = await fetch(`${GATEWAY}/${job.id}/content`, {
       headers: { Authorization: `Bearer ${key}` },
       redirect: "manual",
@@ -96,15 +157,13 @@ export const getVideoJob = createServerFn({ method: "POST" })
       return { ok: true as const, done: true as const, progress: 100, url: location };
     }
 
-    // Fallback: inline the bytes as a data URL.
     const bytes = new Uint8Array(await contentRes.arrayBuffer());
     let binary = "";
     for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]!);
-    const base64 = btoa(binary);
     return {
       ok: true as const,
       done: true as const,
       progress: 100,
-      url: `data:video/mp4;base64,${base64}`,
+      url: `data:video/mp4;base64,${btoa(binary)}`,
     };
   });
