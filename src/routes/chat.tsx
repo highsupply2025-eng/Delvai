@@ -23,6 +23,9 @@ import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/chat")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search["q"] === "string" ? search["q"] : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "المساعد الذكي | دردشة ذكاء اصطناعي سريعة بالعربية" },
