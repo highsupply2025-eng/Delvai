@@ -5,6 +5,7 @@ import { LogIn, LogOut, History, Sparkles, CreditCard, Languages } from "lucide-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLang } from "@/lib/i18n";
+import logoAsset from "@/assets/uniai-mark.png.asset.json";
 
 export const TOOLS = [
   { to: "/chat", label: "المساعد الذكي", desc: "دردشة ذكية للإجابة والتحليل وحل المهام اليومية." },
