@@ -23,9 +23,8 @@ import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/chat")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search["q"] === "string" ? search["q"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { q?: string } =>
+    typeof search["q"] === "string" ? { q: search["q"] } : {},
   head: () => ({
     meta: [
       { title: "المساعد الذكي | دردشة ذكاء اصطناعي سريعة بالعربية" },

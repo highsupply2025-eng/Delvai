@@ -86,7 +86,7 @@ function Home() {
 
   const go = (text?: string) => {
     const value = (text ?? prompt).trim();
-    void navigate({ to: "/chat", search: value ? { q: value } : undefined });
+    void navigate({ to: "/chat", search: value ? { q: value } : {} });
   };
 
   return (
