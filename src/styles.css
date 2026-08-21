@@ -177,3 +177,130 @@
 @utility shadow-glow {
   box-shadow: var(--shadow-glow);
 }
+
+/* ============================================================
+ * Futuristic landing layer — aurora mesh, glass, reveal, glow
+ * ============================================================ */
+
+:root {
+  --aurora-1: oklch(0.82 0.14 82 / 0.55);
+  --aurora-2: oklch(0.62 0.15 25 / 0.45);
+  --aurora-3: oklch(0.6 0.13 250 / 0.4);
+  --glass-border: oklch(0.85 0.05 85 / 0.16);
+  --shadow-float: 0 30px 90px -40px oklch(0.82 0.14 82 / 0.55);
+}
+
+@utility bg-aurora {
+  background-image:
+    radial-gradient(45rem 28rem at 15% 0%, var(--aurora-1), transparent 65%),
+    radial-gradient(40rem 26rem at 85% 10%, var(--aurora-3), transparent 62%),
+    radial-gradient(38rem 24rem at 50% 100%, var(--aurora-2), transparent 66%);
+}
+
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, oklch(0.85 0.05 85 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.85 0.05 85 / 0.07) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(70% 60% at 50% 30%, black, transparent 100%);
+}
+
+@utility glass {
+  background-color: oklch(0.24 0.024 275 / 0.55);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+@utility shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
+@utility ring-glow {
+  box-shadow:
+    0 0 0 1px oklch(0.82 0.14 82 / 0.28),
+    0 0 60px -20px oklch(0.82 0.14 82 / 0.45);
+}
+
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(2%, -3%, 0) scale(1.08); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes beam {
+  0% { opacity: 0; transform: translateY(-100%); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(100%); }
+}
+
+@utility animate-drift {
+  animation: drift 18s ease-in-out infinite;
+}
+
+@utility animate-floaty {
+  animation: floaty 6s ease-in-out infinite;
+}
+
+@utility animate-marquee {
+  animation: marquee-x 32s linear infinite;
+}
+
+@utility animate-beam {
+  animation: beam 3.4s ease-in-out infinite;
+}
+
+@utility text-shine {
+  background-image: linear-gradient(
+    100deg,
+    oklch(0.96 0.008 90) 20%,
+    oklch(0.9 0.15 85) 40%,
+    oklch(0.7 0.16 30) 55%,
+    oklch(0.96 0.008 90) 75%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite;
+}
+
+@utility reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@utility reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift,
+  .animate-floaty,
+  .animate-marquee,
+  .animate-beam,
+  .text-shine {
+    animation: none !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
