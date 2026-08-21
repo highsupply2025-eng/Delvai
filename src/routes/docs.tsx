@@ -465,7 +465,7 @@ function DocsStudio() {
                     </Button>
                   </div>
                   {audioUrl && <audio src={audioUrl} controls className="mb-4 w-full" />}
-                  <p className="whitespace-pre-wrap text-sm leading-7">{out}</p>
+                  <p className="whitespace-pre-wrap text-sm leading-7">{tidy(out)}</p>
                 </>
               ) : (
                 <p className="py-24 text-center text-sm text-muted-foreground">
