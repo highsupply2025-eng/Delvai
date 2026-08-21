@@ -19,6 +19,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as VideoRouteImport } from './routes/video'
 import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as WriteRouteImport } from './routes/write'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
 import { Route as ApiSpeechRouteImport } from './routes/api/speech'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
@@ -73,6 +74,11 @@ const WriteRoute = WriteRouteImport.update({
   path: '/write',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   id: '/api/generate-image',
   path: '/api/generate-image',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/video': typeof VideoRoute
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
+  '/api/chat': typeof ApiChatRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/video': typeof VideoRoute
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
+  '/api/chat': typeof ApiChatRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/video': typeof VideoRoute
   '/voice': typeof VoiceRoute
   '/write': typeof WriteRoute
+  '/api/chat': typeof ApiChatRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/speech': typeof ApiSpeechRoute
   '/api/transcribe': typeof ApiTranscribeRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/video'
     | '/voice'
     | '/write'
+    | '/api/chat'
     | '/api/generate-image'
     | '/api/speech'
     | '/api/transcribe'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/video'
     | '/voice'
     | '/write'
+    | '/api/chat'
     | '/api/generate-image'
     | '/api/speech'
     | '/api/transcribe'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/video'
     | '/voice'
     | '/write'
+    | '/api/chat'
     | '/api/generate-image'
     | '/api/speech'
     | '/api/transcribe'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   VideoRoute: typeof VideoRoute
   VoiceRoute: typeof VoiceRoute
   WriteRoute: typeof WriteRoute
+  ApiChatRoute: typeof ApiChatRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WriteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/generate-image': {
       id: '/api/generate-image'
       path: '/api/generate-image'
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideoRoute: VideoRoute,
   VoiceRoute: VoiceRoute,
   WriteRoute: WriteRoute,
+  ApiChatRoute: ApiChatRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
