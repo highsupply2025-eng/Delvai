@@ -24,13 +24,13 @@ import { useReveal } from "@/hooks/useReveal";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "uniai — كل أدوات الذكاء الاصطناعي في منصة واحدة" },
+      { title: "Delvai — كل أدوات الذكاء الاصطناعي في منصة واحدة" },
       {
         name: "description",
         content:
           "منصة عربية واحدة تجمع أقوى أدوات الذكاء الاصطناعي: مساعد فوري، استوديو صور، كتابة إعلانات، فيديو سينمائي، صوت ونص، وتحليل مستندات. شهر أول مجاني.",
       },
-      { property: "og:title", content: "uniai — كل أدوات الذكاء الاصطناعي في منصة واحدة" },
+      { property: "og:title", content: "Delvai — كل أدوات الذكاء الاصطناعي في منصة واحدة" },
       {
         property: "og:description",
         content:
@@ -307,7 +307,7 @@ function Home() {
                 <span className="size-2.5 rounded-full bg-accent/70" />
                 <span className="size-2.5 rounded-full bg-muted" />
                 <span className="ms-auto text-[11px] text-muted-foreground" data-no-translate>
-                  uniai
+                  Delvai
                 </span>
               </div>
               <div className="space-y-3 pt-4">
@@ -363,7 +363,7 @@ function Home() {
       </section>
 
       <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-        uniai — منصة أدوات الذكاء الاصطناعي
+        Delvai — منصة أدوات الذكاء الاصطناعي
       </footer>
     </div>
   );
