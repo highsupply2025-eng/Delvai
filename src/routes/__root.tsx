@@ -79,12 +79,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "uniai | AI Tools Platform" },
+      { title: "Delvai | AI Tools Platform" },
       {
         name: "description",
         content: "منصة أدوات الذكاء الاصطناعي بالعربية والإنجليزية: محادثة، صور، فيديو، صوت، كتابة وتحليل مستندات.",
       },
-      { property: "og:title", content: "uniai | AI Tools Platform" },
+      { property: "og:title", content: "Delvai | AI Tools Platform" },
       {
         property: "og:description",
         content: "Arabic & English AI studio: chat, images, video, voice, copywriting and document analysis.",

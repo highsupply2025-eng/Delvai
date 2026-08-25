@@ -5,7 +5,37 @@ import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLang } from "@/lib/i18n";
-import logoAsset from "@/assets/uniai-mark.png.asset.json";
+
+function DelvaiLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-label="Delvai logo"
+    >
+      <defs>
+        <linearGradient id="delvai-glow" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#f59e0b" />
+          <stop offset="1" stopColor="#ec4899" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M20 2L4 11v18l16 9 16-9V11L20 2z"
+        stroke="url(#delvai-glow)"
+        strokeWidth="2.5"
+        fill="none"
+      />
+      <path
+        d="M20 8L10 13.5v11L20 30l10-5.5v-11L20 8z"
+        fill="url(#delvai-glow)"
+        opacity="0.25"
+      />
+      <circle cx="20" cy="20" r="4" fill="url(#delvai-glow)" />
+    </svg>
+  );
+}
 
 export const TOOLS = [
   { to: "/chat", label: "المساعد الذكي", desc: "دردشة ذكية للإجابة والتحليل وحل المهام اليومية." },
@@ -38,7 +68,7 @@ export function ToolShell({
         {children}
       </main>
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        uniai — منصة أدوات الذكاء الاصطناعي
+        Delvai — منصة أدوات الذكاء الاصطناعي
       </footer>
     </div>
   );
@@ -52,14 +82,8 @@ export function SiteHeader() {
     <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-5 py-3">
         <Link to="/" className="flex items-center gap-2 font-bold" data-no-translate>
-          <img
-            src={logoAsset.url}
-            alt="uniai logo"
-            width={28}
-            height={28}
-            className="size-7 drop-shadow-[0_0_12px_oklch(0.82_0.14_82/0.5)]"
-          />
-          <span className="text-cine text-lg tracking-tight">uniai</span>
+          <DelvaiLogo className="size-7 drop-shadow-[0_0_12px_oklch(0.82_0.14_82/0.5)]" />
+          <span className="text-cine text-lg tracking-tight">Delvai</span>
         </Link>
         <nav className="hidden flex-1 items-center gap-1 md:flex">
           {TOOLS.map((t) => (

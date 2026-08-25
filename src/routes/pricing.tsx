@@ -11,13 +11,13 @@ import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "الاشتراك والأسعار — uniai" },
+      { title: "الاشتراك والأسعار — Delvai" },
       {
         name: "description",
         content:
           "اشترك في منصة أدوات الذكاء الاصطناعي: شهر أول مجاني ثم ٦ دولار شهريًا مع تجديد تلقائي وإمكانية الإلغاء في أي وقت.",
       },
-      { property: "og:title", content: "الاشتراك والأسعار — uniai" },
+      { property: "og:title", content: "الاشتراك والأسعار — Delvai" },
       {
         property: "og:description",
         content: "شهر مجاني كامل، ثم ٦ دولار شهريًا لوصول غير محدود لجميع أدوات الذكاء الاصطناعي.",
