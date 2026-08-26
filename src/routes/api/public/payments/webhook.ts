@@ -35,7 +35,7 @@ function verify(signatureHeader: string | null, body: string, secret: string): b
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-export const Route = createFileRoute("/api/public/paddle-webhook")({
+export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
