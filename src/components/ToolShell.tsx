@@ -8,34 +8,7 @@ import { useLang } from "@/lib/i18n";
 import { AccessGate } from "@/components/AccessGate";
 
 function DelvaiLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-label="Delvai logo"
-    >
-      <defs>
-        <linearGradient id="delvai-glow" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#f59e0b" />
-          <stop offset="1" stopColor="#ec4899" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M20 2L4 11v18l16 9 16-9V11L20 2z"
-        stroke="url(#delvai-glow)"
-        strokeWidth="2.5"
-        fill="none"
-      />
-      <path
-        d="M20 8L10 13.5v11L20 30l10-5.5v-11L20 8z"
-        fill="url(#delvai-glow)"
-        opacity="0.25"
-      />
-      <circle cx="20" cy="20" r="4" fill="url(#delvai-glow)" />
-    </svg>
-  );
+  return <img src={delvaiMark} alt="Delvai" className={className} loading="eager" />;
 }
 
 export const TOOLS = [
