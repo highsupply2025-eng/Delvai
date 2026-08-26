@@ -5,6 +5,7 @@ import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLang } from "@/lib/i18n";
+import { AccessGate } from "@/components/AccessGate";
 
 function DelvaiLogo({ className }: { className?: string }) {
   return (
@@ -49,10 +50,12 @@ export const TOOLS = [
 export function ToolShell({
   title,
   subtitle,
+  gated = true,
   children,
 }: {
   title: string;
   subtitle?: string;
+  gated?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -65,7 +68,7 @@ export function ToolShell({
           </h1>
           {subtitle && <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p>}
         </header>
-        {children}
+        {gated ? <AccessGate>{children}</AccessGate> : children}
       </main>
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
         Delvai — منصة أدوات الذكاء الاصطناعي
