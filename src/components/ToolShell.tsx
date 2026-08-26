@@ -49,10 +49,12 @@ export const TOOLS = [
 export function ToolShell({
   title,
   subtitle,
+  gated = true,
   children,
 }: {
   title: string;
   subtitle?: string;
+  gated?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -65,7 +67,7 @@ export function ToolShell({
           </h1>
           {subtitle && <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p>}
         </header>
-        {children}
+        {gated ? <AccessGate>{children}</AccessGate> : children}
       </main>
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
         Delvai — منصة أدوات الذكاء الاصطناعي
