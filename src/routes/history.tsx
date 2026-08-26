@@ -36,7 +36,7 @@ function HistoryPage() {
 
   if (!loading && !user) {
     return (
-      <ToolShell title="سجلّي" subtitle="سجّل الدخول لعرض نتائجك المحفوظة.">
+      <ToolShell gated={false} title="سجلّي" subtitle="سجّل الدخول لعرض نتائجك المحفوظة.">
         <Link to="/auth">
           <Button className="bg-cine text-primary-foreground">تسجيل الدخول</Button>
         </Link>
@@ -45,7 +45,7 @@ function HistoryPage() {
   }
 
   return (
-    <ToolShell title="سجلّي" subtitle="كل ما ولّدته عبر أدوات المنصة.">
+    <ToolShell gated={false} title="سجلّي" subtitle="كل ما ولّدته عبر أدوات المنصة.">
       <div className="space-y-3">
         {(data?.items ?? []).map((item) => (
           <div key={item.id} className="rounded-2xl border border-border bg-card/70 p-4">

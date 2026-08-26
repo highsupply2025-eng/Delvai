@@ -5,6 +5,7 @@ import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLang } from "@/lib/i18n";
+import { AccessGate } from "@/components/AccessGate";
 
 function DelvaiLogo({ className }: { className?: string }) {
   return (

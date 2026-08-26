@@ -64,6 +64,7 @@ function PricingPage() {
     <>
       <PaymentTestModeBanner />
       <ToolShell
+        gated={false}
         title="الاشتراك والأسعار"
         subtitle="خطة واحدة بسيطة تفتح لك كل أدوات المنصة. الشهر الأول مجاني، ثم يتجدد الاشتراك تلقائيًا."
       >
