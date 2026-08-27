@@ -100,39 +100,49 @@ export function SiteHeader() {
           </nav>
 
           <div className="ms-auto flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggle}
-            data-no-translate
-            aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
-            title={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
-          >
-            <Languages className="size-4" /> {lang === "ar" ? "EN" : "ع"}
-          </Button>
-          <Link to="/pricing">
-            <Button variant="ghost" size="sm">
-              <CreditCard className="size-4" /> الاشتراك
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggle}
+              data-no-translate
+              aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+              title={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+              className="rounded-full glass"
+            >
+              <Languages className="size-4" /> {lang === "ar" ? "EN" : "ع"}
             </Button>
-          </Link>
-          {!loading && user ? (
-            <>
-              <Link to="/history">
-                <Button variant="ghost" size="sm">
-                  <History className="size-4" /> سجلّي
-                </Button>
-              </Link>
-              <Button variant="outline" size="sm" onClick={() => void signOut()}>
-                <LogOut className="size-4" /> خروج
-              </Button>
-            </>
-          ) : (
-            <Link to="/auth">
-              <Button size="sm" className="bg-cine text-primary-foreground">
-                <LogIn className="size-4" /> دخول
+            <Link to="/pricing" className="hidden sm:block">
+              <Button variant="ghost" size="sm" className="rounded-full">
+                <CreditCard className="size-4" /> الاشتراك
               </Button>
             </Link>
-          )}
+            {!loading && user ? (
+              <>
+                <Link to="/history">
+                  <Button variant="ghost" size="sm" className="rounded-full">
+                    <History className="size-4" /> سجلّي
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => void signOut()}
+                >
+                  <LogOut className="size-4" /> خروج
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button
+                  size="sm"
+                  className="rounded-full bg-cine text-primary-foreground shadow-glow transition-transform duration-300 hover:scale-105"
+                >
+                  <LogIn className="size-4" /> دخول
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>
