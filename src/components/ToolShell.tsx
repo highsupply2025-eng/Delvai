@@ -69,12 +69,10 @@ export function SiteHeader() {
         <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-5 py-2.5">
           <Link
             to="/"
-            className="group flex items-center gap-2.5 font-bold"
+            className="group flex items-center gap-2 font-bold"
             data-no-translate
           >
-            <span className="relative grid size-9 place-items-center rounded-xl glass ring-glow transition-transform duration-300 group-hover:scale-105">
-              <DelvaiLogo className="size-6 drop-shadow-[0_0_12px_oklch(0.82_0.14_82/0.55)]" />
-            </span>
+            <DelvaiLogo className="size-8 transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_12px_oklch(0.82_0.14_82/0.55)]" />
             <span className="text-shine text-lg font-extrabold tracking-tight">Delvai</span>
           </Link>
 
