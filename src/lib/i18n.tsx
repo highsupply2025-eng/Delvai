@@ -11,7 +11,28 @@ import {
 
 import { AR_EN } from "./i18n-dict";
 
-export type Lang = "ar" | "en";
+export type Lang = "ar" | "en" | "fr" | "es" | "de" | "tr" | "zh" | "ja";
+
+export interface LanguageOption {
+  code: Lang;
+  name: string;
+  nativeName: string;
+  flag: string;
+  dir: "rtl" | "ltr";
+}
+
+export const SUPPORTED_LANGUAGES: LanguageOption[] = [
+  { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇸🇦", dir: "rtl" },
+  { code: "en", name: "English", nativeName: "English", flag: "🇺🇸", dir: "ltr" },
+  { code: "fr", name: "French", nativeName: "Français", flag: "🇫🇷", dir: "ltr" },
+  { code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸", dir: "ltr" },
+  { code: "de", name: "German", nativeName: "Deutsch", flag: "🇩🇪", dir: "ltr" },
+  { code: "tr", name: "Turkish", nativeName: "Türkçe", flag: "🇹🇷", dir: "ltr" },
+  { code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳", dir: "ltr" },
+  { code: "ja", name: "Japanese", nativeName: "日本語", flag: "🇯🇵", dir: "ltr" },
+];
+
+import { MULTI_DICT } from "./multilingual-dict";
 
 const STORAGE_KEY = "app.lang";
 const ATTRS = ["placeholder", "title", "aria-label", "alt"] as const;
@@ -21,9 +42,20 @@ const norm = (s: string) => s.replace(/\s+/g, " ").trim();
 const MAP = new Map<string, string>();
 for (const [ar, en] of Object.entries(AR_EN)) MAP.set(norm(ar), en);
 
-function translate(value: string): string | null {
+function translate(value: string, targetLang: Lang = "en"): string | null {
   const key = norm(value);
   if (!key) return null;
+
+  // 1. Check target language dict if not english
+  if (targetLang !== "en" && targetLang !== "ar") {
+    const directHit = MULTI_DICT[targetLang]?.[key];
+    if (directHit) return directHit;
+    const stripped = key.replace(/[،.:!?]+$/u, "");
+    const altHit = MULTI_DICT[targetLang]?.[stripped];
+    if (altHit) return altHit + key.slice(stripped.length);
+  }
+
+  // 2. Fall back to English dictionary
   const hit = MAP.get(key);
   if (hit) return hit;
   // strings that end with punctuation variations
@@ -37,7 +69,12 @@ function translate(value: string): string | null {
     let translated = false;
     const rebuilt = parts.map((part) => {
       if (/^[—:|·]$/.test(part)) return part === ":" ? ": " : ` ${part} `;
-      const piece = MAP.get(norm(part));
+      const normPart = norm(part);
+      if (targetLang !== "en" && targetLang !== "ar" && MULTI_DICT[targetLang]?.[normPart]) {
+        translated = true;
+        return MULTI_DICT[targetLang][normPart];
+      }
+      const piece = MAP.get(normPart);
       if (piece) translated = true;
       return piece ?? part;
     });
@@ -70,11 +107,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const attrNodes = useRef(new Map<Element, Record<string, string>>());
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === "en" || saved === "ar") setLangState(saved);
+    const saved = localStorage.getItem(STORAGE_KEY) as Lang | null;
+    if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
+      setLangState(saved);
+    }
   }, []);
 
-  const applyEnglish = useCallback((root: Node) => {
+  const applyLanguage = useCallback((root: Node, currentLang: Lang) => {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         const parent = (node as Text).parentElement;
@@ -87,7 +126,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     let node = walker.nextNode() as Text | null;
     while (node) {
       const original = textNodes.current.get(node) ?? node.nodeValue ?? "";
-      const next = translate(original);
+      const next = translate(original, currentLang);
       if (next) {
         const lead = /^\s*/.exec(original)?.[0] ?? "";
         const trail = /\s*$/.exec(original)?.[0] ?? "";
@@ -111,7 +150,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         const current = el.getAttribute(attr);
         if (!current) continue;
         const saved = attrNodes.current.get(el)?.[attr] ?? current;
-        const next = translate(saved);
+        const next = translate(saved, currentLang);
         if (next && current !== next) {
           const bucket = attrNodes.current.get(el) ?? {};
           bucket[attr] = saved;
@@ -145,10 +184,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Always reset back to original Arabic first if switching between non-Arabic languages
+    restoreArabic();
+
     let frame = 0;
     const run = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => applyEnglish(document.body));
+      frame = requestAnimationFrame(() => applyLanguage(document.body, lang));
     };
     run();
     const observer = new MutationObserver(run);
@@ -163,7 +205,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, [lang, applyEnglish, restoreArabic]);
+  }, [lang, applyLanguage, restoreArabic]);
 
   const setLang = useCallback((next: Lang) => {
     localStorage.setItem(STORAGE_KEY, next);
@@ -176,7 +218,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       dir: lang === "ar" ? "rtl" : "ltr",
       setLang,
       toggle: () => setLang(lang === "ar" ? "en" : "ar"),
-      t: (ar: string) => (lang === "en" ? (translate(ar) ?? ar) : ar),
+      t: (ar: string) => (lang === "ar" ? ar : (translate(ar, lang) ?? ar)),
     }),
     [lang, setLang],
   );

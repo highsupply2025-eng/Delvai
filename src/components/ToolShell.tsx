@@ -7,8 +7,13 @@ import type { ReactNode } from "react";
 import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { useLang } from "@/lib/i18n";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { SUPPORTED_LANGUAGES, useLang } from "@/lib/i18n";
 import { AccessGate } from "@/components/AccessGate";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -99,17 +104,41 @@ export function SiteHeader() {
           </nav>
 
           <div className="ms-auto flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggle}
-              data-no-translate
-              aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
-              title={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
-              className="rounded-full glass"
-            >
-              <Languages className="size-4" /> {lang === "ar" ? "EN" : "ع"}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  data-no-translate
+                  className="rounded-full glass gap-1.5 px-3"
+                  aria-label="Select Language"
+                >
+                  <Languages className="size-4 text-primary" />
+                  <span className="font-semibold text-xs">
+                    {SUPPORTED_LANGUAGES.find((l) => l.code === lang)?.flag}{" "}
+                    {SUPPORTED_LANGUAGES.find((l) => l.code === lang)?.nativeName ?? "العربية"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="glass border-border/80 min-w-[10.5rem] p-1 shadow-float">
+                {SUPPORTED_LANGUAGES.map((l) => (
+                  <DropdownMenuItem
+                    key={l.code}
+                    onClick={() => setLang(l.code)}
+                    data-no-translate
+                    className={`flex items-center justify-between gap-3 text-xs cursor-pointer rounded-lg px-2.5 py-1.5 ${
+                      lang === l.code ? "bg-primary/15 text-primary font-bold" : "text-foreground hover:bg-card/70"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="text-base">{l.flag}</span>
+                      <span>{l.nativeName}</span>
+                    </span>
+                    <span className="text-[10px] text-muted-foreground uppercase">{l.code}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Link to="/pricing" className="hidden sm:block">
               <Button variant="ghost" size="sm" className="rounded-full">
                 <CreditCard className="size-4" /> الاشتراك
