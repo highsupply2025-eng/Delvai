@@ -1,40 +1,18 @@
 import { Link } from "@tanstack/react-router";
+
+import delvaiMarkAsset from "@/assets/uniai-mark.png.asset.json";
+
+const delvaiMark = delvaiMarkAsset.url;
 import type { ReactNode } from "react";
 import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLang } from "@/lib/i18n";
+import { AccessGate } from "@/components/AccessGate";
 
 function DelvaiLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-label="Delvai logo"
-    >
-      <defs>
-        <linearGradient id="delvai-glow" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#f59e0b" />
-          <stop offset="1" stopColor="#ec4899" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M20 2L4 11v18l16 9 16-9V11L20 2z"
-        stroke="url(#delvai-glow)"
-        strokeWidth="2.5"
-        fill="none"
-      />
-      <path
-        d="M20 8L10 13.5v11L20 30l10-5.5v-11L20 8z"
-        fill="url(#delvai-glow)"
-        opacity="0.25"
-      />
-      <circle cx="20" cy="20" r="4" fill="url(#delvai-glow)" />
-    </svg>
-  );
+  return <img src={delvaiMark} alt="Delvai" className={className} loading="eager" />;
 }
 
 export const TOOLS = [
@@ -49,10 +27,12 @@ export const TOOLS = [
 export function ToolShell({
   title,
   subtitle,
+  gated = true,
   children,
 }: {
   title: string;
   subtitle?: string;
+  gated?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -65,7 +45,7 @@ export function ToolShell({
           </h1>
           {subtitle && <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p>}
         </header>
-        {children}
+        {gated ? <AccessGate>{children}</AccessGate> : children}
       </main>
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
         Delvai — منصة أدوات الذكاء الاصطناعي
@@ -79,58 +59,90 @@ export function SiteHeader() {
   const { lang, toggle } = useLang();
 
   return (
-    <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-5 py-3">
-        <Link to="/" className="flex items-center gap-2 font-bold" data-no-translate>
-          <DelvaiLogo className="size-7 drop-shadow-[0_0_12px_oklch(0.82_0.14_82/0.5)]" />
-          <span className="text-cine text-lg tracking-tight">Delvai</span>
-        </Link>
-        <nav className="hidden flex-1 items-center gap-1 md:flex">
-          {TOOLS.map((t) => (
-            <Link
-              key={t.to}
-              to={t.to}
-              className="rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
-              activeProps={{ className: "bg-card text-primary" }}
-            >
-              {t.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="ms-auto flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggle}
+    <div className="sticky top-0 z-30">
+      {/* ambient aurora glow behind the bar */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-16 h-40 bg-aurora opacity-[0.18] blur-2xl"
+      />
+      <div className="relative border-b border-[var(--glass-border)] bg-background/60 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-5 py-2.5">
+          <Link
+            to="/"
+            className="group flex items-center gap-2.5 font-bold"
             data-no-translate
-            aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
-            title={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
           >
-            <Languages className="size-4" /> {lang === "ar" ? "EN" : "ع"}
-          </Button>
-          <Link to="/pricing">
-            <Button variant="ghost" size="sm">
-              <CreditCard className="size-4" /> الاشتراك
-            </Button>
+            <span className="relative grid size-9 place-items-center rounded-xl glass ring-glow transition-transform duration-300 group-hover:scale-105">
+              <DelvaiLogo className="size-6 drop-shadow-[0_0_12px_oklch(0.82_0.14_82/0.55)]" />
+            </span>
+            <span className="text-shine text-lg font-extrabold tracking-tight">Delvai</span>
           </Link>
-          {!loading && user ? (
-            <>
-              <Link to="/history">
-                <Button variant="ghost" size="sm">
-                  <History className="size-4" /> سجلّي
+
+          <nav className="hidden flex-1 items-center justify-center gap-0.5 md:flex">
+            {TOOLS.map((t) => (
+              <Link
+                key={t.to}
+                to={t.to}
+                className="group relative rounded-full px-3 py-1.5 text-xs text-muted-foreground transition-all duration-300 hover:text-foreground"
+                activeProps={{ className: "text-primary" }}
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border border-transparent bg-transparent transition-all duration-300 group-hover:border-[var(--glass-border)] group-hover:bg-card/60 group-hover:shadow-[0_0_24px_-10px_oklch(0.82_0.14_82/0.7)]"
+                />
+                <span className="relative">{t.label}</span>
+                <span
+                  aria-hidden
+                  className="absolute inset-x-3 -bottom-0.5 h-px scale-x-0 bg-cine opacity-0 transition-all duration-300 group-hover:scale-x-100 group-hover:opacity-100"
+                />
+              </Link>
+            ))}
+          </nav>
+
+          <div className="ms-auto flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggle}
+              data-no-translate
+              aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+              title={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+              className="rounded-full glass"
+            >
+              <Languages className="size-4" /> {lang === "ar" ? "EN" : "ع"}
+            </Button>
+            <Link to="/pricing" className="hidden sm:block">
+              <Button variant="ghost" size="sm" className="rounded-full">
+                <CreditCard className="size-4" /> الاشتراك
+              </Button>
+            </Link>
+            {!loading && user ? (
+              <>
+                <Link to="/history">
+                  <Button variant="ghost" size="sm" className="rounded-full">
+                    <History className="size-4" /> سجلّي
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => void signOut()}
+                >
+                  <LogOut className="size-4" /> خروج
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button
+                  size="sm"
+                  className="rounded-full bg-cine text-primary-foreground shadow-glow transition-transform duration-300 hover:scale-105"
+                >
+                  <LogIn className="size-4" /> دخول
                 </Button>
               </Link>
-              <Button variant="outline" size="sm" onClick={() => void signOut()}>
-                <LogOut className="size-4" /> خروج
-              </Button>
-            </>
-          ) : (
-            <Link to="/auth">
-              <Button size="sm" className="bg-cine text-primary-foreground">
-                <LogIn className="size-4" /> دخول
-              </Button>
-            </Link>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
