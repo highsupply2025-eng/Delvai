@@ -82,9 +82,9 @@ const LIGHTS = [
 ];
 
 const MODELS = [
-  { id: "google/veo-3.1-lite" as const, label: "سريع اقتصادي", note: "الأفضل للتجارب" },
-  { id: "google/veo-3.1-fast" as const, label: "متوازن", note: "جودة أعلى" },
-  { id: "google/veo-3.1" as const, label: "أعلى جودة", note: "الأغلى" },
+  { id: "google/veo-3.1" as const, label: "Veo 3.1 4K سينمائي", note: "أعلى جودة إخراج وتفاصيل سينمائية" },
+  { id: "google/veo-3.1-fast" as const, label: "Veo 3.1 متوازن", note: "توليد سريع بجودة سينمائية ممتازة" },
+  { id: "google/veo-3.1-lite" as const, label: "Veo 3.1 Lite اقتصادي", note: "سريع وخفيف للتجارب والمسودات" },
 ];
 
 const RATIOS = [
