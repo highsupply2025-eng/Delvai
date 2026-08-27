@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLang } from "@/lib/i18n";
 import { AccessGate } from "@/components/AccessGate";
+import { SiteFooter } from "@/components/SiteFooter";
 
 function DelvaiLogo({ className }: { className?: string }) {
   return <img src={delvaiMark} alt="Delvai" className={className} loading="eager" />;
@@ -36,20 +37,20 @@ export function ToolShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-stage">
-      <SiteHeader />
-      <main className="mx-auto w-full max-w-5xl px-5 py-10">
-        <header className="mb-8">
-          <h1 className="text-3xl font-extrabold sm:text-4xl">
-            <span className="text-cine">{title}</span>
-          </h1>
-          {subtitle && <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p>}
-        </header>
-        {gated ? <AccessGate>{children}</AccessGate> : children}
-      </main>
-      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        Delvai — منصة أدوات الذكاء الاصطناعي
-      </footer>
+    <div className="min-h-screen bg-stage flex flex-col justify-between">
+      <div>
+        <SiteHeader />
+        <main className="mx-auto w-full max-w-5xl px-5 py-10">
+          <header className="mb-8">
+            <h1 className="text-3xl font-extrabold sm:text-4xl">
+              <span className="text-cine">{title}</span>
+            </h1>
+            {subtitle && <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p>}
+          </header>
+          {gated ? <AccessGate>{children}</AccessGate> : children}
+        </main>
+      </div>
+      <SiteFooter />
     </div>
   );
 }
