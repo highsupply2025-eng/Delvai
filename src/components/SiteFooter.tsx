@@ -1,4 +1,4 @@
-﻿import { Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   ShieldCheck,
@@ -100,7 +100,7 @@ export function SiteFooter() {
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
                 <Sparkles className="size-3.5 text-primary" />
-                نماذج الجيل القادم Veo & Gemini
+                نماذج ذكاء اصطناعي فائقة التطور
               </span>
             </div>
           </div>
@@ -115,7 +115,7 @@ export function SiteFooter() {
                   className="flex items-center gap-1.5 transition-colors hover:text-primary"
                 >
                   <Clapperboard className="size-3.5 text-primary/80" />
-                  الفيديو السينمائي (Veo 3.1)
+                  استوديو الفيديو السينمائي 4K
                 </Link>
               </li>
               <li>

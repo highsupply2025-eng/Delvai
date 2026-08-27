@@ -67,9 +67,9 @@ const TOOL_META: Record<
   string,
   { icon: ComponentType<{ className?: string }>; tag: string; highlight: string }
 > = {
-  "/video": { icon: Clapperboard, tag: "Veo 3.1 · 4K", highlight: "فيديو سينمائي مع حركة كاميرا وصوت متزامن" },
-  "/image": { icon: ImageIcon, tag: "Imagen 3 Pro", highlight: "صور فائقة الواقعية بدقة وإضاءة احترافية" },
-  "/chat": { icon: Bot, tag: "Gemini 3.7 Thinking", highlight: "مساعد ذكي يحلل ويفكر خطوة بخطوة بلحظات" },
+  "/video": { icon: Clapperboard, tag: "فيديو سينمائي 4K", highlight: "فيديو سينمائي مع حركة كاميرا وصوت متزامن" },
+  "/image": { icon: ImageIcon, tag: "استوديو الصور", highlight: "صور فائقة الواقعية بدقة وإضاءة احترافية" },
+  "/chat": { icon: Bot, tag: "المساعد الفوري", highlight: "مساعد ذكي يحلل ويفكر خطوة بخطوة بلحظات" },
   "/write": { icon: PenLine, tag: "أطر تسويقية AIDA", highlight: "صياغة إعلانات مقنعة وتدوينات ترفع المبيعات" },
   "/voice": { icon: Mic, tag: "١٠ أصوات طبيعية", highlight: "تفريغ التسجيلات وتحويل النصوص إلى صوت عربي مبهر" },
   "/docs": { icon: FileSpreadsheet, tag: "PDF · Word · Excel", highlight: "استخراج الجداول وتلخيص العقود والبيانات المعقدة" },
@@ -156,8 +156,6 @@ function Home() {
                   <span className="relative inline-flex size-2 rounded-full bg-primary" />
                 </span>
                 <span>الجيل القادم من الذكاء الاصطناعي الإبداعي</span>
-                <span className="text-primary/70">·</span>
-                <span className="font-semibold text-primary">Veo 3.1 & Gemini 3.7</span>
               </div>
             </div>
 
