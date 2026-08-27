@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router";
+
+import delvaiMark from "@/assets/uniai-mark.png";
 import type { ReactNode } from "react";
 import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 
