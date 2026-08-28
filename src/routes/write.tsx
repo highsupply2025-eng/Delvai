@@ -1,32 +1,51 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Copy, Languages, PenLine, RefreshCcw, Search, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Cpu,
+  Download,
+  Languages,
+  Mic,
+  MicOff,
+  PenLine,
+  RefreshCcw,
+  Rocket,
+  Search,
+  Share2,
+  ShieldCheck,
+  Sparkles,
+  Volume2,
+  VolumeX,
+  Wand2,
+  Zap,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { ToolShell } from "@/components/ToolShell";
 import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
-import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
+import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoader";
 
 export const Route = createFileRoute("/write")({
   head: () => ({
     meta: [
-      { title: "استوديو الكتابة والإعلانات بالذكاء الاصطناعي" },
+      { title: "استوديو كتابة المحتوى وصناعة الإعلانات (Delvai Copy) | ذكاء اصطناعي فائق" },
       {
         name: "description",
         content:
-          "استوديو كتابة متكامل: منشورات وإعلانات وأوصاف منتجات وإيميلات ومقالات SEO، مع إعادة صياغة وتدقيق لغوي وترجمة وتحليل قوة النص.",
+          "استوديو كتابة متكامل: صياغة إعلانات تسويقية فيروسية، مقالات SEO، أوصاف منتجات، خطابات بريد إلكتروني، تدقيق لغوي وتحليل معدل التحويل بأحدث محركات Gemini 3.7.",
       },
-      { property: "og:title", content: "استوديو الكتابة والإعلانات" },
+      { property: "og:title", content: "استوديو كتابة المحتوى وصناعة الإعلانات — Delvai Copy" },
       {
         property: "og:description",
-        content: "محتوى تسويقي احترافي بالعربية: أطر إعلانية، نسخ متعددة، SEO، تدقيق وإعادة صياغة.",
+        content: "محتوى تسويقي فائق التأثير بالعربية بأحدث أطر الإعلانات العالمية AIDA و PAS و 4P.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -36,87 +55,79 @@ export const Route = createFileRoute("/write")({
 });
 
 const TABS = [
-  { id: "generate", label: "توليد المحتوى", icon: PenLine },
-  { id: "rewrite", label: "إعادة الصياغة", icon: RefreshCcw },
-  { id: "polish", label: "تدقيق وتحسين", icon: ShieldCheck },
-  { id: "seo", label: "تحسين SEO", icon: Search },
-  { id: "translate", label: "ترجمة", icon: Languages },
-  { id: "score", label: "تحليل قوة النص", icon: Sparkles },
+  { id: "generate", label: "توليد المحتوى والإعلانات", icon: PenLine },
+  { id: "rewrite", label: "إعادة الصياغة الذكية", icon: RefreshCcw },
+  { id: "polish", label: "تدقيق لغوي وبلاغي", icon: ShieldCheck },
+  { id: "seo", label: "تحسين محركات البحث SEO", icon: Search },
+  { id: "translate", label: "ترجمة تسويقية متقنة", icon: Languages },
+  { id: "score", label: "تحليل قوة الإقناع والتحويل", icon: Sparkles },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
+const ENGINES = [
+  { id: "google/gemini-3.7-flash", label: "Gemini 3.7 اللحظي", tag: "بث فوري" },
+  { id: "google/gemini-3.7-pro", label: "Gemini 3.7 تفكير عميق", tag: "تفكير استراتيجي" },
+  { id: "google/gemini-2.5-pro", label: "Gemini Pro المتخصص", tag: "دقة لغوية قصوى" },
+];
+
 const KINDS = [
-  { id: "social", label: "منشور سوشيال ميديا" },
-  { id: "ad", label: "نص إعلاني مدفوع" },
-  { id: "product", label: "وصف منتج" },
-  { id: "email", label: "إيميل تسويقي" },
-  { id: "landing", label: "صفحة هبوط" },
-  { id: "article", label: "مقال SEO" },
-  { id: "script", label: "سكربت فيديو / ريلز" },
-  { id: "headline", label: "عناوين وسلوجان" },
-  { id: "bio", label: "نبذة تعريفية / Bio" },
-  { id: "whatsapp", label: "رسالة واتساب / SMS" },
-  { id: "press", label: "بيان صحفي" },
-  { id: "reply", label: "ردّ على عميل" },
+  { id: "ad", label: "إعلان ممول عالي التحويل 🚀" },
+  { id: "social", label: "منشور سوشيال ميديا فيروسي 🔥" },
+  { id: "script", label: "سيناريو فيديو / ريلز وتيك توك 🎬" },
+  { id: "product", label: "وصف منتج لمتجر إلكتروني 🛍️" },
+  { id: "landing", label: "نص صفحة هبوط كاملة 💎" },
+  { id: "email", label: "إيميل تسويقي مقنع 📩" },
+  { id: "article", label: "مقال متوافق مع SEO 📑" },
+  { id: "headline", label: "عناوين وسلوجان خاطف للأنظار 🎯" },
 ] as const;
 
-const TONES = ["احترافي", "ودود", "فاخر", "مباشر وقوي", "مرح", "تعليمي", "عاطفي", "رسمي"];
-
-const PLATFORMS = ["عام", "انستغرام", "تيك توك", "إكس (تويتر)", "لينكدإن", "سناب شات", "يوتيوب", "متجر إلكتروني"];
-
-const LENGTHS = [
-  { id: "short", label: "قصير" },
-  { id: "medium", label: "متوسط" },
-  { id: "long", label: "طويل" },
-];
-
+const TONES = ["مقنع وجذاب", "فاخر وراقي", "مباشر وقوي", "حماسي وفيروسي", "احترافي رسمي", "قصصي ومؤثر", "تعليمي مبسط"];
+const PLATFORMS = ["عام", "إنستغرام", "تيك توك", "إكس (تويتر)", "لينكدإن", "سناب شات", "يوتيوب", "متجر إلكتروني"];
 const FRAMEWORKS = [
-  { id: "auto", label: "تلقائي", hint: "" },
-  { id: "aida", label: "AIDA", hint: "استخدم إطار AIDA: انتباه، اهتمام، رغبة، إجراء." },
-  { id: "pas", label: "PAS", hint: "استخدم إطار PAS: مشكلة، تهييج، حل." },
-  { id: "fab", label: "FAB", hint: "استخدم إطار FAB: ميزة، فائدة، منفعة للعميل." },
-  { id: "bab", label: "BAB", hint: "استخدم إطار Before-After-Bridge." },
-  { id: "4p", label: "4P", hint: "استخدم إطار 4P: Picture, Promise, Prove, Push." },
+  { id: "auto", label: "تلقائي ذكي" },
+  { id: "aida", label: "نموذج AIDA (انتباه، اهتمام، رغبة، إجراء)" },
+  { id: "pas", label: "نموذج PAS (مشكلة، تهييج، حل)" },
+  { id: "fab", label: "نموذج FAB (ميزة، فائدة، منفعة)" },
+  { id: "4p", label: "نموذج 4P (صورة، وعد، إثبات، دفع)" },
 ];
-
-const DIALECTS = ["فصحى", "سعودي", "خليجي", "مصري", "إنجليزي", "عربي + إنجليزي"];
-
+const DIALECTS = ["فصحى تسويقية راقية", "لهجة سعودية / خليجية", "لهجة مصرية جذابة", "عربي + مصطلحات إنجليزية"];
 const REWRITE_MODES = [
-  "إعادة صياغة بنفس المعنى",
-  "تبسيط اللغة",
-  "جعله أكثر احترافية",
-  "جعله أقصر وأقوى",
-  "توسيع النص بتفاصيل",
-  "تحويله لنبرة إعلانية",
+  "إعادة صياغة باحترافية تسويقية أعلى",
+  "جعله أكثر إقناعاً وقوة للتحويل",
+  "تبسيط الفكرة واختصارها",
+  "توسيع النص بأمثلة وحجج قوية",
+  "تحويله لأسلوب قصصي مشوق",
 ];
+const LANGS = ["الإنجليزية", "الفرنسية", "الإسبانية", "التركية", "الألمانية", "الصينية"];
 
-const LANGS = ["الإنجليزية", "العربية", "الفرنسية", "الإسبانية", "التركية", "الأردية", "الصينية"];
+const INSPIRATION_COPY = [
+  {
+    title: "خطة إعلان ممول لزيادة المبيعات",
+    topic: "إطلاق تشكيلة ساعات ذكية جديدة فاخرة مقاومة للماء مع بطارية تدوم أسبوعين.",
+    kind: "ad",
+    tone: "فاخر وراقي",
+  },
+  {
+    title: "منشور فيروسي لـ LinkedIn",
+    topic: "5 أخطاء يقع فيها 90% من رواد الأعمال في أول سنة وكيف تتجنبها لبناء مشروع ناجح.",
+    kind: "social",
+    tone: "احترافي رسمي",
+  },
+  {
+    title: "سيناريو ريلز جذاب لـ TikTok",
+    topic: "طريقة سحرية لمضاعفة تركيزك وإنتاجيتك اليومية في 3 خطوات بسيطة.",
+    kind: "script",
+    tone: "حماسي وفيروسي",
+  },
+  {
+    title: "وصف منتج جذاب لمتجر شوبيفاي",
+    topic: "قهوة عربية مختصة مع حبوب الهيل والزعفران الطبيعي بنكهة أصيلة تفوح في الأرجاء.",
+    kind: "product",
+    tone: "مقنع وجذاب",
+  },
+];
 
 const SEP = "-----";
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
-        active
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-border bg-background/40 text-muted-foreground hover:border-primary/40"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
 
 function WriteTool() {
   const ask = useServerFn(chatComplete);
@@ -124,13 +135,13 @@ function WriteTool() {
   const { user } = useAuth();
 
   const [tab, setTab] = useState<TabId>("generate");
+  const [model, setModel] = useState(ENGINES[0].id);
 
-  // generate
+  // Generate controls
   const [topic, setTopic] = useState("");
   const [kind, setKind] = useState<string>(KINDS[0].id);
   const [tone, setTone] = useState(TONES[0]!);
   const [platform, setPlatform] = useState(PLATFORMS[0]!);
-  const [length, setLength] = useState("medium");
   const [framework, setFramework] = useState("auto");
   const [dialect, setDialect] = useState(DIALECTS[0]!);
   const [audience, setAudience] = useState("");
@@ -138,374 +149,589 @@ function WriteTool() {
   const [keywords, setKeywords] = useState("");
   const [cta, setCta] = useState("");
   const [emoji, setEmoji] = useState(true);
-  const [hashtags, setHashtags] = useState(true);
   const [variants, setVariants] = useState(2);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // shared source text
+  // Shared source for other tabs
   const [source, setSource] = useState("");
   const [rewriteMode, setRewriteMode] = useState(REWRITE_MODES[0]!);
   const [targetLang, setTargetLang] = useState(LANGS[0]!);
   const [seoKeyword, setSeoKeyword] = useState("");
 
   const [results, setResults] = useState<string[]>([]);
+  const [activeVariant, setActiveVariant] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const toggleSpeak = (text: string) => {
+    if (speaking) {
+      window.speechSynthesis?.cancel();
+      setSpeaking(false);
+      return;
+    }
+    if (!window.speechSynthesis) {
+      toast.error("القراءة الصوتية غير مدعومة في جهازك");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[\*#`_~]/g, "");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = "ar";
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const copyText = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    toast.success("تم نسخ المحتوى");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const downloadText = (text: string) => {
+    const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `delvai-copy-${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("تم تنزيل المحتوى كملف Markdown");
+  };
+
+  const applyStarter = (s: (typeof INSPIRATION_COPY)[number]) => {
+    setTopic(s.topic);
+    setKind(s.kind);
+    setTone(s.tone);
+    toast.success(`تم اختيار قالب: ${s.title}`);
+  };
 
   const run = async () => {
     if (busy) return;
     const needsSource = tab !== "generate";
-    if (needsSource && !source.trim()) return;
-    if (!needsSource && !topic.trim()) return;
+    if (needsSource && !source.trim()) {
+      setError("يرجى إدخال النص المصدر أولاً.");
+      return;
+    }
+    if (!needsSource && !topic.trim()) {
+      setError("يرجى كتابة موضوع أو تفاصيل المحتوى المطلوب.");
+      return;
+    }
 
     setBusy(true);
     setError(null);
     setResults([]);
 
-    const system =
-      "أنت كاتب محتوى تسويقي ومحرر عربي محترف بخبرة وكالات إعلانية. اكتب نصًا جاهزًا للنشر بلغة سليمة وبدون أي مقدمات أو شروح أو علامات ماركداون زائدة.";
-
-    let prompt = "";
-    let n = 1;
+    let system = "";
+    let userPrompt = "";
 
     if (tab === "generate") {
-      n = variants;
-      const kindLabel = KINDS.find((k) => k.id === kind)?.label ?? "";
-      const lengthLabel = LENGTHS.find((l) => l.id === length)?.label ?? "";
-      const fw = FRAMEWORKS.find((f) => f.id === framework)?.hint ?? "";
-      prompt = [
-        `اكتب ${kindLabel} بنبرة ${tone} وبلغة ${dialect}.`,
-        `الموضوع: ${topic.trim()}`,
-        platform !== "عام" ? `المنصة المستهدفة: ${platform} (التزم بأسلوبها وطول نصوصها).` : "",
-        `الطول: ${lengthLabel}.`,
-        audience.trim() ? `الجمهور المستهدف: ${audience.trim()}.` : "",
-        brand.trim() ? `اسم العلامة التجارية: ${brand.trim()} (اذكرها بشكل طبيعي).` : "",
-        keywords.trim() ? `أدرج هذه الكلمات المفتاحية بسلاسة: ${keywords.trim()}.` : "",
-        cta.trim() ? `دعوة الإجراء: ${cta.trim()}.` : "أنهِ بدعوة واضحة لاتخاذ إجراء.",
-        fw,
-        emoji ? "استخدم إيموجي بشكل متوازن." : "لا تستخدم أي إيموجي.",
-        hashtags ? "أضف هاشتاقات مناسبة في النهاية." : "لا تضف هاشتاقات.",
-        n > 1
-          ? `اكتب ${n} نسخ مختلفة تمامًا في الزاوية والصياغة، وافصل بين كل نسخة والأخرى بسطر يحتوي فقط على ${SEP}`
-          : "",
-      ]
-        .filter(Boolean)
-        .join("\n");
+      const selectedKind = KINDS.find((k) => k.id === kind)?.label ?? kind;
+      const selectedFw = FRAMEWORKS.find((f) => f.id === framework)?.label ?? "";
+      system = `أنت كبير مسؤولي التسويق وصناع الإعلانات (Chief Copywriter) في منصة Delvai. صياغتك عبقرية، مقنعة جداً، خالية من الحشو والابتذال، وتستخدم علم النفس التسويقي لمضاعفة المبيعات والتفاعل.
+مهمتك كتابة ${variants} نسخ تسويقية مختلفة ومبتكرة. افصل بين كل نسخة وأخرى تماماً بسطر يحتوي على "${SEP}" فقط.`;
+
+      userPrompt = `المطلوب: ${selectedKind}
+الموضوع والمنتج: ${topic}
+النبرة: ${tone}
+المنصة: ${platform}
+إطار العمل التسويقي: ${selectedFw}
+اللهجة: ${dialect}
+${brand ? `اسم العلامة التجارية: ${brand}` : ""}
+${audience ? `الجمهور المستهدف: ${audience}` : ""}
+${keywords ? `الكلمات المفتاحية: ${keywords}` : ""}
+${cta ? `الدعوة لاتخاذ إجراء (CTA): ${cta}` : ""}
+${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." : "بدون رموز تعبيرية."}
+اكتب الآن ${variants} نسخ تسويقية فريدة وافصل بينها بـ "${SEP}".`;
     } else if (tab === "rewrite") {
-      n = variants;
-      prompt = [
-        `أعد كتابة النص التالي: ${rewriteMode}. بنبرة ${tone} وبلغة ${dialect}.`,
-        n > 1 ? `قدّم ${n} صياغات مختلفة مفصولة بسطر يحتوي فقط على ${SEP}` : "",
-        "\nالنص:\n" + source.trim(),
-      ]
-        .filter(Boolean)
-        .join("\n");
+      system = "أنت محرر تسويقي محترف. أعد صياغة النص المعطى بأعلى مستويات الجودة والتأثير.";
+      userPrompt = `النمط المطلوب: ${rewriteMode}\n\nالنص الأصلي:\n${source}`;
     } else if (tab === "polish") {
-      prompt = `دقّق النص التالي لغويًا وإملائيًا ونحويًا وحسّن أسلوبه مع الحفاظ على المعنى. أعد أولًا النص المصحّح جاهزًا، ثم بعد سطر يحتوي فقط على ${SEP} اذكر قائمة مختصرة بأهم التعديلات.\n\nالنص:\n${source.trim()}`;
+      system = "أنت مدقق لغوي وبلاغي خبير. دقّق النص نحوياً وإملائياً وبلاغياً واذكر قائمة التحسينات التي قمت بها ثم قدّم النسخة المنقحة النهائية.";
+      userPrompt = `دقّق وحسّن هذا النص:\n${source}`;
     } else if (tab === "seo") {
-      prompt = `حسّن النص التالي لمحركات البحث${seoKeyword.trim() ? ` مستهدفًا الكلمة المفتاحية: ${seoKeyword.trim()}` : ""}.\nأعد النتيجة بهذا الترتيب: عنوان SEO (أقل من 60 حرفًا)، وصف Meta (أقل من 155 حرفًا)، عناوين فرعية H2 مقترحة، النص المحسّن، كلمات مفتاحية ثانوية.\n\nالنص:\n${source.trim()}`;
+      system = "أنت خبير سيو (SEO Specialist). حسّن النص ليتصدر نتائج البحث في Google مع الحفاظ على القراءة الطبيعية الجذابة.";
+      userPrompt = `الكلمة المفتاحية المستهدفة: ${seoKeyword || "تلقائي حسب النص"}\n\nالنص:\n${source}`;
     } else if (tab === "translate") {
-      prompt = `ترجم النص التالي إلى ${targetLang} ترجمة تسويقية طبيعية (Transcreation) وليست حرفية، مع الحفاظ على النبرة وقوة الرسالة. أعد الترجمة فقط.\n\nالنص:\n${source.trim()}`;
-    } else {
-      prompt = `حلّل النص الإعلاني التالي كخبير أداء تسويقي. أعطِ:\n1) درجة من 100 للوضوح، الإقناع، قوة العنوان، دعوة الإجراء، والملاءمة للمنصة.\n2) الدرجة الإجمالية.\n3) أهم ٣ نقاط ضعف مع اقتراح بديل مباشر لكل نقطة.\n4) نسخة محسّنة جاهزة للنشر.\n\nالنص:\n${source.trim()}`;
+      system = `أنت مترجم تسويقي خبير (Localization Copywriter). ترجم النص إلى ${targetLang} مع تكييف الصياغة لتكون طبيعية ومقنعة جداً للجمهور المحلي.`;
+      userPrompt = `ترجم إلى ${targetLang}:\n\n${source}`;
+    } else if (tab === "score") {
+      system = "أنت مستشار تسويق وخبير معدلات تحويل (CRO Expert). حلّل النص وقدّم تقييماً رقمياً من 100 لقوة الإقناع مع تفصيل نقاط القوة ونقاط الضعف واقتراحات محددة لمضاعفة التأثير.";
+      userPrompt = `حلّل قوة هذا النص التسويقي:\n\n${source}`;
     }
 
-    const res = await ask({
-      data: { system, messages: [{ role: "user", content: prompt }], model: "google/gemini-2.5-flash" },
-    });
-    setBusy(false);
-    if (!res.ok) {
-      setError(res.message);
-      return;
-    }
-    const parts = res.text
-      .split(new RegExp(`^\\s*${SEP}\\s*$`, "m"))
-      .map((p) => p.trim())
-      .filter(Boolean);
-    setResults(parts.length > 0 ? parts : [res.text]);
-    if (user)
-      void save({
-        data: { tool: "محتوى", prompt: tab === "generate" ? topic : source.slice(0, 500), result_text: res.text },
+    try {
+      const res = await ask({
+        data: {
+          system,
+          messages: [{ role: "user", content: userPrompt }],
+          model,
+        },
       });
-  };
 
-  const canRun = tab === "generate" ? topic.trim().length > 0 : source.trim().length > 0;
+      if (!res.ok || !res.text) {
+        setError(res.error || "تعذّر إتمام توليد المحتوى، حاول مجدداً.");
+        return;
+      }
+
+      const raw = res.text.trim();
+      const parts = tab === "generate" ? raw.split(SEP).map((p) => p.trim()).filter(Boolean) : [raw];
+      setResults(parts);
+      setActiveVariant(0);
+      toast.success("تم تجهيز المحتوى التسويقي بنجاح!");
+      if (user) {
+        void save({ data: { tool: "كتابة", prompt: topic || source, result_text: raw } });
+      }
+    } catch {
+      setError("تعذّر الاتصال بخادم الذكاء الاصطناعي.");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <ToolShell
-      title="استوديو الكتابة والإعلانات"
-      subtitle="توليد محتوى بأطر إعلانية احترافية، إعادة صياغة، تدقيق لغوي، تحسين SEO، ترجمة تسويقية، وتحليل قوة النص."
+      title="استوديو كتابة المحتوى وصناعة الإعلانات — Delvai Copy"
+      subtitle="عقل الكتابة والتسويق لمنصة Delvai — صياغة إعلانات فيروسية، خطط محتوى، مقالات SEO، وتحليل معدل التحويل بأحدث محركات Gemini 3.7."
     >
-      <div className="mb-6 flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => {
-              setTab(t.id);
-              setResults([]);
-              setError(null);
-            }}
-            className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm transition-colors ${
-              tab === t.id
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-card/60 text-muted-foreground hover:border-primary/40"
-            }`}
-          >
-            <t.icon className="size-4" />
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-card/70 p-6 backdrop-blur">
-          {tab === "generate" ? (
-            <>
-              <Label htmlFor="topic">الموضوع أو المنتج</Label>
-              <Textarea
-                id="topic"
-                rows={3}
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="مثال: عرض خاص على مواد التموين للمطاعم خلال شهر رمضان"
-                className="mt-2 resize-none bg-background/60"
-              />
-
-              <Label className="mt-6 block">نوع المحتوى</Label>
-              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {KINDS.map((k) => (
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
+        {/* ================= TOP CYBER HUD BAR ================= */}
+        <div className="relative overflow-hidden rounded-3xl glass p-3 sm:p-4 shadow-float border-primary/25 ring-glow">
+          <div className="relative flex flex-wrap items-center justify-between gap-3">
+            {/* Tab Switchers */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              {TABS.map((t) => {
+                const isSelected = tab === t.id;
+                const Icon = t.icon;
+                return (
                   <button
-                    key={k.id}
+                    key={t.id}
                     type="button"
-                    onClick={() => setKind(k.id)}
-                    className={`rounded-xl border px-3 py-2 text-xs transition-colors ${
-                      kind === k.id
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-background/40 text-muted-foreground hover:border-primary/40"
+                    onClick={() => {
+                      setTab(t.id);
+                      setError(null);
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
+                      isSelected
+                        ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.35)] scale-105"
+                        : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
                     }`}
                   >
-                    {k.label}
+                    <Icon className="size-3.5" />
+                    <span>{t.label}</span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
+            </div>
 
-              <Label className="mt-6 block">المنصة</Label>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {PLATFORMS.map((p) => (
-                  <Chip key={p} active={platform === p} onClick={() => setPlatform(p)}>
-                    {p}
-                  </Chip>
-                ))}
-              </div>
-
-              <Label className="mt-6 block">الإطار الإعلاني</Label>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {FRAMEWORKS.map((f) => (
-                  <Chip key={f.id} active={framework === f.id} onClick={() => setFramework(f.id)}>
-                    {f.label}
-                  </Chip>
-                ))}
-              </div>
-
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <Label htmlFor="aud">الجمهور المستهدف</Label>
-                  <Input
-                    id="aud"
-                    value={audience}
-                    onChange={(e) => setAudience(e.target.value)}
-                    placeholder="أصحاب المطاعم والمقاهي"
-                    className="mt-2 bg-background/60"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="brand">اسم العلامة</Label>
-                  <Input
-                    id="brand"
-                    value={brand}
-                    onChange={(e) => setBrand(e.target.value)}
-                    placeholder="التموين العالي"
-                    className="mt-2 bg-background/60"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="kw">كلمات مفتاحية</Label>
-                  <Input
-                    id="kw"
-                    value={keywords}
-                    onChange={(e) => setKeywords(e.target.value)}
-                    placeholder="جملة، توصيل، أسعار الجملة"
-                    className="mt-2 bg-background/60"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="cta">دعوة الإجراء</Label>
-                  <Input
-                    id="cta"
-                    value={cta}
-                    onChange={(e) => setCta(e.target.value)}
-                    placeholder="اطلب عرض سعر الآن"
-                    className="mt-2 bg-background/60"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-2">
-                <Chip active={emoji} onClick={() => setEmoji((v) => !v)}>
-                  إيموجي {emoji ? "✓" : "✕"}
-                </Chip>
-                <Chip active={hashtags} onClick={() => setHashtags((v) => !v)}>
-                  هاشتاقات {hashtags ? "✓" : "✕"}
-                </Chip>
-              </div>
-            </>
-          ) : (
-            <>
-              <Label htmlFor="src">النص</Label>
-              <Textarea
-                id="src"
-                rows={8}
-                value={source}
-                onChange={(e) => setSource(e.target.value)}
-                placeholder="ألصق النص هنا..."
-                className="mt-2 resize-none bg-background/60"
-              />
-              {tab === "rewrite" && (
-                <>
-                  <Label className="mt-6 block">أسلوب إعادة الصياغة</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {REWRITE_MODES.map((m) => (
-                      <Chip key={m} active={rewriteMode === m} onClick={() => setRewriteMode(m)}>
-                        {m}
-                      </Chip>
-                    ))}
-                  </div>
-                </>
-              )}
-              {tab === "seo" && (
-                <div className="mt-6">
-                  <Label htmlFor="seokw">الكلمة المفتاحية المستهدفة</Label>
-                  <Input
-                    id="seokw"
-                    value={seoKeyword}
-                    onChange={(e) => setSeoKeyword(e.target.value)}
-                    placeholder="مواد تموينية بالجملة"
-                    className="mt-2 bg-background/60"
-                  />
-                </div>
-              )}
-              {tab === "translate" && (
-                <>
-                  <Label className="mt-6 block">اللغة الهدف</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {LANGS.map((l) => (
-                      <Chip key={l} active={targetLang === l} onClick={() => setTargetLang(l)}>
-                        {l}
-                      </Chip>
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
-          )}
-
-          {(tab === "generate" || tab === "rewrite") && (
-            <>
-              <Label className="mt-6 block">النبرة واللهجة</Label>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {TONES.map((t) => (
-                  <Chip key={t} active={tone === t} onClick={() => setTone(t)}>
-                    {t}
-                  </Chip>
-                ))}
-              </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {DIALECTS.map((d) => (
-                  <Chip key={d} active={dialect === d} onClick={() => setDialect(d)}>
-                    {d}
-                  </Chip>
-                ))}
-              </div>
-
-              {tab === "generate" && (
-                <>
-                  <Label className="mt-6 block">الطول</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {LENGTHS.map((l) => (
-                      <Chip key={l.id} active={length === l.id} onClick={() => setLength(l.id)}>
-                        {l.label}
-                      </Chip>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              <Label className="mt-6 block">عدد النسخ</Label>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {[1, 2, 3, 4].map((v) => (
-                  <Chip key={v} active={variants === v} onClick={() => setVariants(v)}>
-                    {v}
-                  </Chip>
-                ))}
-              </div>
-            </>
-          )}
-
-          <Button
-            onClick={() => void run()}
-            disabled={busy || !canRun}
-            className="mt-7 w-full bg-cine text-primary-foreground"
-          >
-            {busy ? <DelvaiThinkingLoader size="xs" /> : <PenLine className="size-4" />}
-            {busy ? "دلفاي يفكّر ويكتب…" : "تنفيذ"}
-          </Button>
-
-          {error && (
-            <p className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm">
-              {error}
-            </p>
-          )}
+            {/* Model Engine Selector */}
+            <div className="ms-auto flex items-center gap-1.5 rounded-2xl border border-primary/30 bg-card/60 p-1">
+              <span className="ps-2 pe-1 text-[10px] font-bold text-muted-foreground font-mono uppercase">
+                المحرك:
+              </span>
+              {ENGINES.map((e) => {
+                const isSelected = model === e.id;
+                return (
+                  <button
+                    key={e.id}
+                    type="button"
+                    onClick={() => setModel(e.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground shadow-sm font-bold scale-105"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Zap className="size-3" />
+                    <span>{e.label.split(" ")[0]} {e.label.split(" ")[1]}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-4">
-          {results.length > 0 ? (
-            results.map((r, i) => (
-              <div key={i} className="rounded-2xl border border-border bg-card/70 p-6 backdrop-blur">
-                {results.length > 1 && (
-                  <p className="mb-3 text-xs font-semibold text-primary">النسخة {i + 1}</p>
-                )}
-                <p className="whitespace-pre-wrap text-sm leading-7">{r}</p>
-                <div className="mt-5 flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      void navigator.clipboard.writeText(r);
-                      toast.success("تم النسخ");
-                    }}
-                  >
-                    <Copy className="size-4" /> نسخ
-                  </Button>
-                  {tab !== "generate" ? null : (
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setSource(r);
-                        setTab("polish");
-                        setResults([]);
-                      }}
+        {/* ================= MAIN STUDIO CANVAS ================= */}
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* ================= LEFT CONTROLS ================= */}
+          <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
+            {tab === "generate" ? (
+              <>
+                {/* Content Kind */}
+                <div>
+                  <span className="mb-2 block text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    نوع المحتوى التسويقي المطلوب:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {KINDS.map((k) => {
+                      const isSelected = kind === k.id;
+                      return (
+                        <button
+                          key={k.id}
+                          type="button"
+                          onClick={() => setKind(k.id)}
+                          className={`flex items-center gap-2 rounded-2xl border p-2.5 text-xs font-semibold text-start transition-all ${
+                            isSelected
+                              ? "border-primary bg-primary/15 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.25)] font-bold scale-[1.02]"
+                              : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                          }`}
+                        >
+                          <span className="truncate">{k.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Topic / Prompt */}
+                <div>
+                  <span className="mb-1.5 block text-xs font-bold text-foreground">
+                    موضوع المحتوى أو وصف المنتج والمشروع:
+                  </span>
+                  <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-inner focus-within:border-primary/80 focus-within:shadow-[0_0_20px_oklch(0.82_0.14_82/0.2)] transition-all">
+                    <Textarea
+                      rows={3}
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                      placeholder="مثال: إطلاق خدمة ذكاء اصطناعي جديدة للأعمال توفر 80% من وقت صناعة المحتوى وتحليل السوق…"
+                      className="w-full resize-none border-none bg-transparent p-0 text-sm leading-6 placeholder:text-muted-foreground/60 outline-none focus-visible:ring-0"
+                    />
+                  </div>
+                </div>
+
+                {/* Tone, Platform & Framework */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 border-t border-border/40 pt-3">
+                  {/* Tone */}
+                  <div>
+                    <span className="mb-1 block text-xs font-bold text-muted-foreground">النبرة:</span>
+                    <select
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value)}
+                      className="w-full rounded-xl border border-border/80 bg-background/80 px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary/80"
                     >
-                      <ShieldCheck className="size-4" /> تحسين
-                    </Button>
-                  )}
+                      {TONES.map((t) => (
+                        <option key={t} value={t} className="bg-card text-foreground">
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Platform */}
+                  <div>
+                    <span className="mb-1 block text-xs font-bold text-muted-foreground">المنصة:</span>
+                    <select
+                      value={platform}
+                      onChange={(e) => setPlatform(e.target.value)}
+                      className="w-full rounded-xl border border-border/80 bg-background/80 px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary/80"
+                    >
+                      {PLATFORMS.map((p) => (
+                        <option key={p} value={p} className="bg-card text-foreground">
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Framework */}
+                  <div>
+                    <span className="mb-1 block text-xs font-bold text-muted-foreground">إطار العمل:</span>
+                    <select
+                      value={framework}
+                      onChange={(e) => setFramework(e.target.value)}
+                      className="w-full rounded-xl border border-border/80 bg-background/80 px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary/80"
+                    >
+                      {FRAMEWORKS.map((f) => (
+                        <option key={f.id} value={f.id} className="bg-card text-foreground">
+                          {f.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Variants & Advanced Drawer */}
+                <div className="flex items-center justify-between border-t border-border/40 pt-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">النسخ المقترحة:</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setVariants(n)}
+                          className={`size-7 rounded-xl border text-xs font-bold transition-all ${
+                            variants === n
+                              ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                              : "border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <span>تفاصيل الجمهور والـ CTA</span>
+                  </button>
+                </div>
+
+                {/* Advanced Fields */}
+                {showAdvanced && (
+                  <div className="grid grid-cols-2 gap-2.5 rounded-2xl border border-border/60 bg-background/50 p-3 text-xs">
+                    <div>
+                      <label className="mb-1 block text-muted-foreground">اسم العلامة التجارية:</label>
+                      <Input
+                        value={brand}
+                        onChange={(e) => setBrand(e.target.value)}
+                        placeholder="مثال: متجر دلفاي"
+                        className="h-8 rounded-xl bg-background/70 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-muted-foreground">الجمهور المستهدف:</label>
+                      <Input
+                        value={audience}
+                        onChange={(e) => setAudience(e.target.value)}
+                        placeholder="مثال: رواد الأعمال وأصحاب المتاجر"
+                        className="h-8 rounded-xl bg-background/70 text-xs"
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Other Tabs: Rewrite, Polish, SEO, Translate, Score */
+              <div className="space-y-3">
+                <div>
+                  <span className="mb-1.5 block text-xs font-bold text-foreground">
+                    النص المصدر المراد معالجته:
+                  </span>
+                  <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-inner focus-within:border-primary/80 focus-within:shadow-[0_0_20px_oklch(0.82_0.14_82/0.2)] transition-all">
+                    <Textarea
+                      rows={6}
+                      value={source}
+                      onChange={(e) => setSource(e.target.value)}
+                      placeholder="الصق نصك التسويقي هنا للتدقيق والتحسين وإعادة الصياغة بالذكاء الاصطناعي…"
+                      className="w-full resize-none border-none bg-transparent p-0 text-sm leading-6 placeholder:text-muted-foreground/60 outline-none focus-visible:ring-0"
+                    />
+                  </div>
+                </div>
+
+                {tab === "rewrite" && (
+                  <div>
+                    <span className="mb-1 block text-xs font-bold text-muted-foreground">أسلوب إعادة الصياغة:</span>
+                    <select
+                      value={rewriteMode}
+                      onChange={(e) => setRewriteMode(e.target.value)}
+                      className="w-full rounded-xl border border-border/80 bg-background/80 px-3 py-2 text-xs text-foreground outline-none"
+                    >
+                      {REWRITE_MODES.map((m) => (
+                        <option key={m} value={m} className="bg-card text-foreground">
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {tab === "translate" && (
+                  <div>
+                    <span className="mb-1 block text-xs font-bold text-muted-foreground">اللغة المستهدفة:</span>
+                    <select
+                      value={targetLang}
+                      onChange={(e) => setTargetLang(e.target.value)}
+                      className="w-full rounded-xl border border-border/80 bg-background/80 px-3 py-2 text-xs text-foreground outline-none"
+                    >
+                      {LANGS.map((l) => (
+                        <option key={l} value={l} className="bg-card text-foreground">
+                          {l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {tab === "seo" && (
+                  <div>
+                    <span className="mb-1 block text-xs font-bold text-muted-foreground">الكلمة المفتاحية المستهدفة:</span>
+                    <Input
+                      value={seoKeyword}
+                      onChange={(e) => setSeoKeyword(e.target.value)}
+                      placeholder="مثال: أفضل متجر إلكتروني، تصميم مواقع"
+                      className="rounded-xl bg-background/70 text-xs"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Launch Action */}
+            <Button
+              onClick={() => void run()}
+              disabled={busy || (tab === "generate" ? !topic.trim() : !source.trim())}
+              className="mt-2 h-12 w-full rounded-2xl bg-cine text-primary-foreground shadow-glow font-bold text-sm transition-transform hover:scale-[1.01]"
+            >
+              {busy ? (
+                <div className="flex items-center gap-2">
+                  <DelvaiThinkingLoader size="xs" inline />
+                  <span>دلفاي يحلل ويصيغ المحتوى التسويقي…</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Sparkles className="size-4" />
+                  <span>إطلاق الصياغة بالذكاء الاصطناعي</span>
+                </div>
+              )}
+            </Button>
+
+            {error && (
+              <p className="rounded-2xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                {error}
+              </p>
+            )}
+          </div>
+
+          {/* ================= RIGHT / OUTPUT VIEWPORT ================= */}
+          <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
+            {/* Variants Switcher (If multiple versions) */}
+            {results.length > 1 && (
+              <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                <span className="text-xs font-bold text-muted-foreground">النسخ المولدة:</span>
+                <div className="flex gap-1.5">
+                  {results.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setActiveVariant(i)}
+                      className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${
+                        activeVariant === i
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "border border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      النسخة #{i + 1}
+                    </button>
+                  ))}
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="rounded-2xl border border-border bg-card/70 p-6 backdrop-blur">
-              <p className="py-20 text-center text-sm text-muted-foreground">ستظهر النتائج هنا</p>
+            )}
+
+            {/* Output Display Box */}
+            <div className="relative min-h-[380px] max-h-[60vh] overflow-y-auto rounded-2xl border border-border/80 bg-background/80 p-5 shadow-inner leading-7 text-sm">
+              {busy ? (
+                <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
+                  <DelvaiThinkingLoader size="lg" text="دلفاي يصيغ أفكارك بأعلى مستويات الإقناع…" />
+                  <p className="mt-3 text-xs text-muted-foreground animate-pulse">
+                    تطبيق الأطر التسويقية وضبط النبرة ومعدل التحويل…
+                  </p>
+                </div>
+              ) : results.length > 0 ? (
+                <div className="whitespace-pre-wrap font-sans text-foreground/95 space-y-2">
+                  {results[activeVariant]}
+                </div>
+              ) : (
+                <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
+                  <div className="relative mx-auto mb-3 flex size-16 items-center justify-center">
+                    <div className="pointer-events-none absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                    <div
+                      className="pointer-events-none absolute size-16 rounded-full border border-dashed border-primary/40 animate-spin"
+                      style={{ animationDuration: "7s" }}
+                    />
+                    <DelvaiLogo className="size-10 drop-shadow-[0_0_15px_oklch(0.82_0.14_82/0.8)]" />
+                  </div>
+
+                  <h3 className="text-sm sm:text-base font-bold text-foreground">
+                    استوديو دلفاي <span className="text-shine">لكتابة المحتوى والإعلانات</span>
+                  </h3>
+                  <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
+                    اختر قالباً تسويقياً أدناه أو اكتب فكرتك وسيقوم دلفاي بصياغتها بأسلوب عالمي.
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Output Actions Toolbar */}
+            {results.length > 0 && !busy && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void copyText(results[activeVariant]!)}
+                  className="rounded-xl text-xs gap-1.5"
+                >
+                  {copied ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
+                  <span>{copied ? "تم النسخ" : "نسخ النص"}</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleSpeak(results[activeVariant]!)}
+                  className={`rounded-xl text-xs gap-1.5 ${
+                    speaking ? "bg-primary/20 text-primary animate-pulse font-bold" : ""
+                  }`}
+                >
+                  {speaking ? <VolumeX className="size-3.5" /> : <Volume2 className="size-3.5" />}
+                  <span>{speaking ? "إيقاف الصوت" : "قراءة صوتية"}</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadText(results[activeVariant]!)}
+                  className="rounded-xl text-xs gap-1.5"
+                >
+                  <Download className="size-3.5" /> تنزيل .md
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void run()}
+                  className="rounded-xl text-xs gap-1.5"
+                >
+                  <RefreshCcw className="size-3.5" /> إعادة صياغة
+                </Button>
+              </div>
+            )}
+
+            {/* Inspiration Presets (When Empty) */}
+            {results.length === 0 && !busy && (
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  قوالب إلهامية جاهزة:
+                </span>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {INSPIRATION_COPY.map((c, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => applyStarter(c)}
+                      className="group flex flex-col items-start rounded-2xl border border-border/70 bg-card/40 p-2.5 text-start transition-all hover:border-primary/50 hover:bg-card/80 hover:shadow-sm"
+                    >
+                      <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
+                        {c.title}
+                      </span>
+                      <span className="mt-0.5 text-[10px] text-muted-foreground line-clamp-1">
+                        {c.topic}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </ToolShell>

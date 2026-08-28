@@ -3,49 +3,55 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useRef, useState } from "react";
 import {
   BarChart3,
+  Check,
   Copy,
   Download,
   FileSpreadsheet,
   FileText,
+  HelpCircle,
   Image as ImageIcon,
   Languages,
   ListChecks,
+  MessageSquare,
   Mic,
+  Plus,
+  RefreshCw,
+  Rocket,
+  Search,
   Send,
   Sparkles,
   Table2,
   Trash2,
   Upload,
   Volume2,
+  VolumeX,
   X,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToolShell } from "@/components/ToolShell";
-import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
+import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoader";
 import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { extractFile, toCsvDownload, type ExtractedDoc } from "@/lib/extract";
-import { chunkText } from "@/lib/wav";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
     meta: [
-      { title: "استوديو المستندات — تحليل PDF وWord وExcel بالذكاء الاصطناعي" },
+      { title: "استوديو تحليل المستندات والبيانات (Delvai Docs) | ذكاء اصطناعي فائق" },
       {
         name: "description",
         content:
-          "ارفع ملفات PDF وWord وExcel والصور، ولخّصها واستخرج جداولها وقارن بينها واسألها بالمحادثة، ثم استمع إلى الملخص بصوت طبيعي.",
+          "تحليل وفحص ملفات PDF وWord وExcel والصور بالذكاء الاصطناعي: تلخيص تنفيذي، استخراج جداول CSV، مراجعة العقود، محادثة وسؤال وجواب مع مستنداتك.",
       },
-      { property: "og:title", content: "استوديو تحليل المستندات" },
+      { property: "og:title", content: "استوديو تحليل المستندات والبيانات — Delvai Docs" },
       {
         property: "og:description",
-        content: "تلخيص، استخراج جداول CSV، مقارنة مستندات، محادثة مع ملفاتك، وقراءة صوتية.",
+        content: "تحليل ذكي فوري للمستندات والتقارير المالية والعقود مع استخراج الجداول وقراءة صوتية.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -57,64 +63,48 @@ export const Route = createFileRoute("/docs")({
 const PRESETS = [
   {
     id: "summary",
-    label: "ملخص تنفيذي",
+    label: "ملخص تنفيذي شامل ⚡",
     icon: Sparkles,
-    prompt: "اكتب ملخصًا تنفيذيًا منظمًا: الفكرة العامة، أهم النقاط، الأرقام الرئيسية، والخلاصة.",
-  },
-  {
-    id: "bullets",
-    label: "نقاط وقرارات",
-    icon: ListChecks,
-    prompt: "استخرج النقاط الرئيسية والقرارات والمهام المطلوبة مع المسؤول والمُدد إن وُجدت.",
+    prompt: "اكتب ملخصاً تنفيذياً دقيقاً ومنظماً: الفكرة العامة، أهم النقاط الرئيسية، الأرقام والإحصائيات، والخلاصة الاستراتيجية.",
   },
   {
     id: "tables",
-    label: "استخراج جدول CSV",
+    label: "استخراج جداول CSV 📊",
     icon: Table2,
-    prompt:
-      "استخرج كل البيانات الجدولية من المستند وأعدها بصيغة CSV صالحة فقط (سطر عناوين ثم الصفوف)، دون أي شرح أو أسوار كود.",
+    prompt: "استخرج كل البيانات الجدولية والأرقام من المستند وأعدها بصيغة CSV صالحة تماماً فقط (سطر عناوين ثم الصفوف) لتنزيلها مباشرة دون أي شروحات إضافية.",
   },
   {
     id: "insights",
-    label: "رؤى ومخاطر",
+    label: "رؤى ومخاطر استراتيجية 📈",
     icon: BarChart3,
-    prompt: "حلّل المحتوى واذكر أهم الرؤى، الفرص، المخاطر، والتوصيات القابلة للتنفيذ.",
-  },
-  {
-    id: "compare",
-    label: "مقارنة المستندات",
-    icon: FileSpreadsheet,
-    prompt:
-      "قارن بين المستندات المرفوعة: أوجه التشابه، الاختلافات الجوهرية، والتناقضات في الأرقام أو الشروط، في جدول نصي.",
-  },
-  {
-    id: "translate",
-    label: "ترجمة للعربية",
-    icon: Languages,
-    prompt: "ترجم محتوى المستند إلى عربية فصحى واضحة مع الحفاظ على المصطلحات والأرقام.",
+    prompt: "حلّل المحتوى واذكر أهم الرؤى، الفرص الاستثمارية، المخاطر المحتملة، والتوصيات العملية القابلة للتنفيذ الفوري.",
   },
   {
     id: "contract",
-    label: "مراجعة عقد",
+    label: "مراجعة وتدقيق العقود 📜",
     icon: FileText,
-    prompt:
-      "راجع المستند كعقد: الأطراف، الالتزامات، المدة، الغرامات، البنود الخطرة أو غير المتوازنة، والتوصيات.",
+    prompt: "راجع المستند كخبير قانوني: الأطراف، الالتزامات المالية والزمنية، البنود الخطرة أو غير المتوازنة، التوصيات القانونية.",
   },
   {
-    id: "podcast",
-    label: "سكربت صوتي",
-    icon: Mic,
-    prompt:
-      "حوّل المستند إلى سكربت صوتي بأسلوب بودكاست عربي قصير (٢-٣ دقائق) بجمل قصيرة صالحة للقراءة الصوتية.",
+    id: "bullets",
+    label: "نقاط وقرارات سريعة 📋",
+    icon: ListChecks,
+    prompt: "استخرج أهم القرارات والمهام المطلوبة مع الجهة المسؤولة والمُدد الزمنية المحددة في نقاط مرتبة.",
+  },
+  {
+    id: "translate",
+    label: "ترجمة لفصحى راقية 🌐",
+    icon: Languages,
+    prompt: "ترجم محتوى المستند بالكامل إلى لغة عربية فصحى احترافية ودقيقة مع الحفاظ التام على الأرقام والمصطلحات التقنية.",
   },
 ] as const;
 
 const KIND_LABEL: Record<ExtractedDoc["kind"], string> = {
   pdf: "PDF",
   word: "Word",
-  sheet: "جدول",
+  sheet: "Excel / جدول",
   text: "نص",
-  image: "صورة",
+  image: "صورة OCR",
 };
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
@@ -132,7 +122,7 @@ function DocsStudio() {
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [question, setQuestion] = useState("");
   const [speaking, setSpeaking] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const totalChars = useMemo(
@@ -146,19 +136,19 @@ function DocsStudio() {
     setLoadingFiles(true);
     try {
       for (const file of Array.from(list).slice(0, 8)) {
-        if (file.size > 20 * 1024 * 1024) {
-          toast.error(`${file.name}: الحجم أكبر من ٢٠ ميجابايت`);
+        if (file.size > 25 * 1024 * 1024) {
+          toast.error(`${file.name}: الحجم أكبر من 25 ميجابايت`);
           continue;
         }
         try {
           const doc = await extractFile(file);
           if (!doc.text && doc.kind !== "image") {
-            toast.error(`${file.name}: لم يُعثر على نص قابل للقراءة (قد يكون ملفًا ممسوحًا ضوئيًا).`);
+            toast.error(`${file.name}: لم يُعثر على نص قابل للقراءة`);
             continue;
           }
           setDocs((prev) => [...prev, doc]);
         } catch {
-          toast.error(`تعذّر قراءة ${file.name}`);
+          toast.error(`تعذّر استخراج محتوى ${file.name}`);
         }
       }
     } finally {
@@ -166,377 +156,360 @@ function DocsStudio() {
     }
   };
 
-  const buildContext = (limit = 90000) => {
+  const removeDoc = (idx: number) => {
+    setDocs((p) => p.filter((_, i) => i !== idx));
+  };
+
+  const buildContext = () => {
     const parts: string[] = [];
-    for (const d of docs) {
-      if (d.kind === "image" || !d.text) continue;
-      parts.push(`### المستند: ${d.name} (${KIND_LABEL[d.kind]})\n${d.text}`);
+    docs.forEach((d) => {
+      if (d.text) parts.push(`--- بداية مستند: ${d.name} (${KIND_LABEL[d.kind]}) ---\n${d.text}\n--- نهاية المستند ---`);
+    });
+    if (pasted.trim()) {
+      parts.push(`--- نص مدخل يدويًا ---\n${pasted.trim()}\n--- نهاية النص ---`);
     }
-    if (pasted.trim()) parts.push(`### نص ملصوق\n${pasted.trim()}`);
-    return parts.join("\n\n").slice(0, limit);
+    return parts.join("\n\n");
   };
 
-  const images = useMemo(
-    () => docs.filter((d) => d.image).map((d) => d.image!) as string[],
-    [docs],
-  );
-
-  const runPreset = async (preset: (typeof PRESETS)[number]) => {
+  const runPreset = async (p: (typeof PRESETS)[number]) => {
     if (!hasContent || busy) return;
+    setActivePreset(p.id);
     setBusy(true);
-    setActivePreset(preset.id);
     setOut("");
+
+    const context = buildContext();
+    const system =
+      "أنت خبير فائق في تحليل الوثائق والبيانات المالية والقانونية والتقارير في منصة Delvai. قدّم تحليلاً دقيقاً، واضحاً، منسقاً بعناوين ونقاط، واعتمد فقط على البيانات الموجودة في المستندات المرفقة.";
+
     try {
-      const context = buildContext();
       const res = await ask({
         data: {
-          system:
-            "أنت محلل مستندات خبير. اعتمد حصرًا على المحتوى المُعطى (بما فيه الصور المرفقة)، واذكر اسم المستند ورقم الصفحة عند الاستناد إلى معلومة. إن كانت المعلومة غير موجودة فقل ذلك صريحًا.",
-          messages: [
-            {
-              role: "user",
-              content: `${preset.prompt}\n\n${context || "(المحتوى في الصور المرفقة)"}`,
-              ...(images.length > 0 ? { images: images.slice(0, 4) } : {}),
-            },
-          ],
+          system,
+          messages: [{ role: "user", content: `${p.prompt}\n\nالمستندات:\n${context}` }],
+          model: "google/gemini-3.7-flash",
         },
       });
-      if (!res.ok) {
-        toast.error(res.message);
+
+      if (!res.ok || !res.text) {
+        toast.error(res.error || "تعذّر إتمام التحليل، حاول مجدداً.");
         return;
       }
-      setOut(res.text);
-      void save({
-        data: {
-          tool: "تحليل مستند",
-          prompt: preset.label,
-          result_text: res.text.slice(0, 20000),
-        },
-      }).catch(() => {});
+
+      setOut(res.text.trim());
+      toast.success(`تم إتمام تحليل: ${p.label}`);
+    } catch {
+      toast.error("تعذّر الاتصال بخادم الذكاء الاصطناعي.");
     } finally {
       setBusy(false);
     }
   };
 
-  const sendQuestion = async () => {
+  const askDoc = async () => {
+    if (!question.trim() || !hasContent || busy) return;
     const q = question.trim();
-    if (!q || busy || !hasContent) return;
     setQuestion("");
-    const next: ChatMsg[] = [...messages, { role: "user", content: q }];
-    setMessages(next);
+    const newMsgs: ChatMsg[] = [...messages, { role: "user", content: q }];
+    setMessages(newMsgs);
     setBusy(true);
+
+    const context = buildContext();
+    const system =
+      "أنت مساعد تحليلي ذكي لمستندات المستخدم في منصة Delvai. أجب بدقة وموضوعية اعتماداً على محتوى المستندات المرفقة مع ذكر أرقام الصفحات أو الأقسام إن وُجدت.";
+
     try {
-      const context = buildContext(70000);
+      const history = newMsgs.map((m) => ({ role: m.role, content: m.content }));
       const res = await ask({
         data: {
-          system: `أنت مساعد للأسئلة والأجوبة على مستندات المستخدم. أجب بالعربية بدقة واستند إلى المستندات التالية فقط، مع ذكر اسم المستند والصفحة. إن لم تتوفر المعلومة فاذكر ذلك.\n\n${context}`,
-          messages: next.slice(-10).map((m, i, arr) =>
-            i === arr.length - 1 && images.length > 0
-              ? { role: m.role, content: m.content, images: images.slice(0, 4) }
-              : { role: m.role, content: m.content },
-          ),
+          system: `${system}\n\nمحتوى المستندات:\n${context}`,
+          messages: history,
+          model: "google/gemini-3.7-flash",
         },
       });
-      if (!res.ok) {
-        toast.error(res.message);
-        setMessages(next);
+
+      if (!res.ok || !res.text) {
+        toast.error("تعذّر استلام الإجابة");
         return;
       }
-      setMessages([...next, { role: "assistant", content: res.text }]);
+
+      setMessages([...newMsgs, { role: "assistant", content: res.text.trim() }]);
+    } catch {
+      toast.error("حدث خطأ أثناء المحادثة مع المستند.");
     } finally {
       setBusy(false);
     }
   };
 
-  const listen = async () => {
-    const value = out.trim();
-    if (!value) return;
-    setSpeaking(true);
-    try {
-      const blobs: Blob[] = [];
-      for (const part of chunkText(value.slice(0, 6000))) {
-        const res = await fetch("/api/speech", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text: part,
-            voice: "sage",
-            instructions: "Read as a calm, professional Arabic narrator.",
-          }),
-        });
-        if (!res.ok) {
-          const data = (await res.json().catch(() => null)) as { message?: string } | null;
-          toast.error(data?.message ?? "تعذّر توليد الصوت");
-          return;
-        }
-        blobs.push(await res.blob());
-      }
-      const url = URL.createObjectURL(new Blob(blobs, { type: "audio/mpeg" }));
-      if (audioUrl) URL.revokeObjectURL(audioUrl);
-      setAudioUrl(url);
-      void new Audio(url).play().catch(() => {});
-    } finally {
+  const toggleSpeak = (text: string) => {
+    if (speaking) {
+      window.speechSynthesis?.cancel();
       setSpeaking(false);
+      return;
     }
+    if (!window.speechSynthesis) {
+      toast.error("القراءة الصوتية غير مدعومة في جهازك");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[\*#`_~]/g, "");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = "ar";
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(utterance);
   };
-
-  const looksLikeCsv = out.includes(",") && out.split("\n").length > 2 && activePreset === "tables";
 
   return (
     <ToolShell
-      title="استوديو المستندات"
-      subtitle="ارفع PDF أو Word أو Excel أو صورًا — ثم لخّص، استخرج الجداول، قارن، اسأل بالمحادثة، واستمع إلى النتيجة بصوت طبيعي."
+      title="استوديو تحليل المستندات والبيانات — Delvai Docs"
+      subtitle="عقل التحليل واستخراج البيانات لمنصة Delvai — تحليل ملفات PDF وWord وExcel، استخراج الجداول، مراجعة العقود، ومحادثة ذكية مع مستنداتك."
     >
-      <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
-        {/* مكتبة المستندات */}
-        <div className="space-y-4 rounded-2xl border border-border bg-card/70 p-5 backdrop-blur">
-          <div
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              void addFiles(e.dataTransfer.files);
-            }}
-            onClick={() => fileRef.current?.click()}
-            className="cursor-pointer rounded-xl border border-dashed border-border bg-background/50 px-4 py-8 text-center transition-colors hover:border-primary/50"
-          >
-            {loadingFiles ? (
-              <DelvaiThinkingLoader size="xs" className="mx-auto" />
-            ) : (
-              <Upload className="mx-auto size-5 text-primary" />
-            )}
-            <p className="mt-2 text-sm font-medium">اسحب الملفات أو اضغط للرفع</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              PDF · DOCX · XLSX · CSV · TXT · صور — حتى ٢٠MB للملف
-            </p>
-          </div>
-          <input
-            ref={fileRef}
-            type="file"
-            multiple
-            accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.tsv,.txt,.md,.json,image/*"
-            className="hidden"
-            onChange={(e) => {
-              void addFiles(e.target.files);
-              e.target.value = "";
-            }}
-          />
-
-          {docs.length > 0 && (
-            <div className="space-y-2">
-              {docs.map((d) => (
-                <div
-                  key={d.id}
-                  className="flex items-center gap-2 rounded-xl border border-border bg-background/50 px-3 py-2"
-                >
-                  {d.kind === "image" ? (
-                    <ImageIcon className="size-4 shrink-0 text-primary" />
-                  ) : d.kind === "sheet" ? (
-                    <FileSpreadsheet className="size-4 shrink-0 text-primary" />
-                  ) : (
-                    <FileText className="size-4 shrink-0 text-primary" />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium">{d.name}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {KIND_LABEL[d.kind]}
-                      {d.pages ? ` · ${d.pages} صفحة` : ""}
-                      {d.chars ? ` · ${d.chars.toLocaleString("en")} حرف` : ""}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setDocs((prev) => prev.filter((x) => x.id !== d.id))}
-                    className="text-muted-foreground transition-colors hover:text-destructive"
-                    aria-label="حذف"
-                  >
-                    <X className="size-4" />
-                  </button>
-                </div>
-              ))}
-              <Button variant="ghost" size="sm" className="w-full" onClick={() => setDocs([])}>
-                <Trash2 className="size-3.5" /> إفراغ المكتبة
-              </Button>
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
+        {/* ================= TOP CYBER HUD BAR ================= */}
+        <div className="relative overflow-hidden rounded-3xl glass p-3 sm:p-4 shadow-float border-primary/25 ring-glow">
+          <div className="relative flex flex-wrap items-center justify-between gap-3">
+            {/* Live Status Badge */}
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3.5 py-1 text-xs font-bold text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.25)]">
+                <Sparkles className="size-3.5 animate-pulse" />
+                <span>محرك Multimodal Gemini 3.7 Pro لتحليل الوثائق متصل</span>
+              </span>
             </div>
-          )}
 
-          <div>
-            <Label htmlFor="pasted" className="text-xs text-muted-foreground">
-              أو الصق نصًا مباشرة
-            </Label>
-            <Textarea
-              id="pasted"
-              rows={5}
-              value={pasted}
-              onChange={(e) => setPasted(e.target.value)}
-              placeholder="الصق نص التقرير أو البيانات…"
-              className="mt-2 resize-none bg-background/60"
-            />
+            {/* Document Counter */}
+            <div className="ms-auto flex items-center gap-2 text-xs text-muted-foreground font-mono">
+              <span>المستندات المحملة: {docs.length}</span>
+              <span>·</span>
+              <span>{totalChars.toLocaleString("ar-EG")} حرف</span>
+            </div>
           </div>
-
-          <p className="text-xs text-muted-foreground">
-            إجمالي المحتوى: {totalChars.toLocaleString("en")} حرف
-            {docs.some((d) => d.kind === "image") ? " + صور" : ""}
-          </p>
         </div>
 
-        {/* لوحة العمل */}
-        <Tabs defaultValue="analyze">
-          <TabsList className="mb-5 w-full">
-            <TabsTrigger value="analyze" className="flex-1">
-              <Sparkles className="size-4" /> تحليل جاهز
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="flex-1">
-              <Send className="size-4" /> اسأل مستنداتك
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="analyze" className="space-y-5">
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.id}
-                  disabled={!hasContent || busy}
-                  onClick={() => void runPreset(p)}
-                  className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-start text-xs transition-colors disabled:opacity-50 ${
-                    activePreset === p.id
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-card/60 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                  }`}
-                >
-                  {busy && activePreset === p.id ? (
-                    <DelvaiThinkingLoader size="xs" />
-                  ) : (
-                    <p.icon className="size-4 shrink-0" />
-                  )}
-                  {p.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="min-h-[320px] rounded-2xl border border-border bg-card/70 p-6 backdrop-blur">
-              {out ? (
-                <>
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        void navigator.clipboard.writeText(out);
-                        toast.success("تم النسخ");
-                      }}
-                    >
-                      <Copy className="size-3.5" /> نسخ
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const blob = new Blob([out], { type: "text/plain;charset=utf-8" });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement("a");
-                        a.href = url;
-                        a.download = "analysis.txt";
-                        a.click();
-                        URL.revokeObjectURL(url);
-                      }}
-                    >
-                      <Download className="size-3.5" /> تنزيل
-                    </Button>
-                    {looksLikeCsv && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => toCsvDownload(out.replace(/```[a-z]*|```/g, "").trim(), "table.csv")}
-                      >
-                        <Table2 className="size-3.5" /> تنزيل CSV
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      className="bg-cine text-primary-foreground"
-                      disabled={speaking}
-                      onClick={() => void listen()}
-                    >
-                      {speaking ? (
-                        <DelvaiThinkingLoader size="xs" />
-                      ) : (
-                        <Volume2 className="size-3.5" />
-                      )}
-                      استماع
-                    </Button>
-                  </div>
-                  {audioUrl && <audio src={audioUrl} controls className="mb-4 w-full" />}
-                  <p className="whitespace-pre-wrap text-sm leading-7">{tidy(out)}</p>
-                </>
-              ) : (
-                <p className="py-24 text-center text-sm text-muted-foreground">
-                  {hasContent
-                    ? "اختر نوع التحليل من الأعلى"
-                    : "ارفع مستندًا أو الصق نصًا للبدء"}
-                </p>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="chat" className="space-y-4">
-            <div className="min-h-[380px] space-y-3 rounded-2xl border border-border bg-card/70 p-5 backdrop-blur">
-              {messages.length === 0 && (
-                <p className="py-24 text-center text-sm text-muted-foreground">
-                  اسأل أي سؤال عن مستنداتك، وسأجيب بالاستناد إليها مع ذكر المصدر.
-                </p>
-              )}
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-7 ${
-                    m.role === "user"
-                      ? "ms-auto bg-primary/15 text-foreground"
-                      : "me-auto border border-border bg-background/60"
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{m.content}</p>
-                </div>
-              ))}
-              {busy && (
-                <div className="py-2">
-                  <DelvaiThinkingLoader size="sm" text="دلفاي يفكّر ويبحث في المستندات…" inline />
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    void sendQuestion();
-                  }
+        {/* ================= MAIN STUDIO CANVAS ================= */}
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          {/* ================= LEFT / DOCUMENT VAULT & ACTIONS ================= */}
+          <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
+            {/* Upload Box */}
+            <div>
+              <span className="mb-2 block text-xs font-bold text-foreground flex items-center gap-1.5">
+                <Upload className="size-3.5 text-primary" />
+                رفع المستندات (PDF, Word, Excel, CSV, صور OCR):
+              </span>
+              <div
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  void addFiles(e.dataTransfer.files);
                 }}
-                placeholder={hasContent ? "اكتب سؤالك عن المستندات…" : "ارفع مستندًا أولًا"}
-                disabled={!hasContent}
-                className="bg-background/60"
-              />
-              <Button
-                onClick={() => void sendQuestion()}
-                disabled={!question.trim() || busy || !hasContent}
-                className="bg-cine text-primary-foreground"
+                onClick={() => fileRef.current?.click()}
+                className="cursor-pointer rounded-2xl border border-dashed border-border/80 bg-background/60 p-6 text-center text-xs text-muted-foreground hover:border-primary/50 transition-colors"
               >
-                <Send className="size-4" />
-              </Button>
+                {loadingFiles ? (
+                  <DelvaiThinkingLoader size="sm" text="جارٍ استخراج نصوص المستندات…" inline />
+                ) : (
+                  <>
+                    <Upload className="mx-auto mb-2 size-7 text-primary/70" />
+                    <p className="font-bold text-foreground text-xs sm:text-sm">
+                      اسحب الملفات هنا أو اضغط للاختيار من جهازك
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      يدعم حتى 8 ملفات بحجم يصل إلى 25 ميجابايت لكل ملف
+                    </p>
+                  </>
+                )}
+              </div>
+
+              <input
+                ref={fileRef}
+                type="file"
+                multiple
+                accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.txt,image/*"
+                hidden
+                onChange={(e) => void addFiles(e.target.files)}
+              />
             </div>
-          </TabsContent>
-        </Tabs>
+
+            {/* Uploaded Document Badges */}
+            {docs.length > 0 && (
+              <div className="space-y-1.5">
+                <span className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  المستندات في الجلسة:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {docs.map((d, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-foreground"
+                    >
+                      <FileText className="size-3.5 text-primary" />
+                      <span className="max-w-[140px] truncate font-medium">{d.name}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono">({KIND_LABEL[d.kind]})</span>
+                      <button
+                        type="button"
+                        onClick={() => removeDoc(i)}
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Text Paste Fallback */}
+            <div>
+              <span className="mb-1.5 block text-xs font-bold text-muted-foreground">
+                أو الصق نص المستند مباشرة:
+              </span>
+              <div className="rounded-2xl border border-border/80 bg-background/80 p-2.5 shadow-inner">
+                <Textarea
+                  rows={3}
+                  value={pasted}
+                  onChange={(e) => setPasted(e.target.value)}
+                  placeholder="الصق أي تقرير، دراسة جدوى، أو عقد هنا للتحليل الفوري…"
+                  className="w-full resize-none border-none bg-transparent p-0 text-xs leading-5 placeholder:text-muted-foreground/60 outline-none focus-visible:ring-0"
+                />
+              </div>
+            </div>
+
+            {/* Instant AI Action Presets */}
+            <div className="border-t border-border/40 pt-3">
+              <span className="mb-2 block text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                التحليلات الذكية الفورية:
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {PRESETS.map((p) => {
+                  const Icon = p.icon;
+                  const isCurrent = activePreset === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      disabled={!hasContent || busy}
+                      onClick={() => void runPreset(p)}
+                      className={`flex items-center gap-2 rounded-2xl border p-2.5 text-start text-xs font-semibold transition-all ${
+                        isCurrent
+                          ? "border-primary bg-primary/15 text-primary shadow-sm font-bold"
+                          : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground disabled:opacity-50"
+                      }`}
+                    >
+                      <Icon className="size-4 shrink-0 text-primary" />
+                      <span className="truncate">{p.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* ================= RIGHT / RESULTS & CHAT CANVAS ================= */}
+          <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
+            {/* Output & Q&A Box */}
+            <div className="relative min-h-[380px] max-h-[58vh] overflow-y-auto rounded-2xl border border-border/80 bg-background/80 p-5 text-xs sm:text-sm leading-7 shadow-inner">
+              {busy ? (
+                <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
+                  <DelvaiThinkingLoader size="lg" text="دلفاي يحلل المستندات ويستخرج البيانات بدقة…" />
+                  <p className="mt-3 text-xs text-muted-foreground animate-pulse">
+                    مطابقة الأرقام والبنود والتفاصيل القانونية والمالية…
+                  </p>
+                </div>
+              ) : out ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                    <span className="font-bold text-primary">نتيجة التحليل الذكي:</span>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(out);
+                          toast.success("تم نسخ التحليل");
+                        }}
+                        className="h-7 text-xs gap-1"
+                      >
+                        <Copy className="size-3" /> نسخ
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleSpeak(out)}
+                        className="h-7 text-xs gap-1"
+                      >
+                        {speaking ? <VolumeX className="size-3" /> : <Volume2 className="size-3" />}
+                        <span>{speaking ? "إيقاف" : "استماع"}</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="whitespace-pre-wrap font-sans text-foreground/95">{out}</div>
+                </div>
+              ) : messages.length > 0 ? (
+                <div className="space-y-4">
+                  {messages.map((m, i) => (
+                    <div
+                      key={i}
+                      className={`rounded-2xl p-3.5 leading-6 ${
+                        m.role === "user"
+                          ? "bg-primary/20 border border-primary/30 text-foreground ms-6"
+                          : "bg-card border border-border text-foreground me-6 shadow-sm"
+                      }`}
+                    >
+                      <span className="block text-[10px] font-bold text-muted-foreground mb-1">
+                        {m.role === "user" ? "سؤالك:" : "إجابة دلفاي:"}
+                      </span>
+                      <p className="whitespace-pre-wrap">{m.content}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
+                  <div className="relative mx-auto mb-3 flex size-16 items-center justify-center">
+                    <div className="pointer-events-none absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                    <DelvaiLogo className="size-10 drop-shadow-[0_0_15px_oklch(0.82_0.14_82/0.8)]" />
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold text-foreground">
+                    استوديو <span className="text-shine">تحليل المستندات الفائق</span>
+                  </h3>
+                  <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
+                    ارفع ملفك أو اختر أحد التحليلات الفورية ليقوم دلفاي بقراءته وتلخيصه واستخراج جداوله بدقة متناهية.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Interactive Q&A Dock */}
+            <div className="border-t border-border/40 pt-3">
+              <div className="flex items-center gap-2 rounded-2xl border border-border/80 bg-background/90 p-2 shadow-inner focus-within:border-primary/80 focus-within:shadow-[0_0_15px_oklch(0.82_0.14_82/0.2)] transition-all">
+                <Input
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void askDoc();
+                    }
+                  }}
+                  disabled={!hasContent || busy}
+                  placeholder={
+                    hasContent
+                      ? "اسأل أي سؤال محدد حول المستند المرفوع…"
+                      : "ارفع مستنداً أولاً لطرح الأسئلة حوله…"
+                  }
+                  className="h-9 flex-1 border-none bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus-visible:ring-0"
+                />
+                <Button
+                  onClick={() => void askDoc()}
+                  disabled={!question.trim() || !hasContent || busy}
+                  size="sm"
+                  className="h-9 rounded-xl bg-cine text-primary-foreground shadow-glow"
+                >
+                  <Send className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </ToolShell>
   );
-}
-
-/** ينظّف علامات ماركداون من النص لعرض عربي مرتب. */
-function tidy(text: string) {
-  return text
-    .replace(/```[a-z]*\n?|```/g, "")
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/^#{1,6}\s*/gm, "")
-    .replace(/^\s*[*-]\s+/gm, "• ")
-    .trim();
 }
