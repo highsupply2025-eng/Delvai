@@ -2,21 +2,26 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import {
+  ArrowDown,
   Brain,
   Check,
   Compass,
   Copy,
   Cpu,
+  Download,
   FileCode2,
   ImagePlus,
   Lightbulb,
-  MessageSquarePlus,
+  Mic,
+  MicOff,
   RefreshCw,
   Rocket,
   Send,
   Sparkles,
   Square,
   Trash2,
+  Volume2,
+  VolumeX,
   Wand2,
   X,
   Zap,
@@ -79,7 +84,7 @@ const PERSONAS = [
     label: "مهندس برمجيات",
     icon: FileCode2,
     system:
-      "أنت مهندس برمجيات خبير. أجب بكود صحيح وموجز مع شرح قصير وأفضل الممارسات والأمان.",
+      "أنت مهندس برمجيات خبير. أجب بكود برمجي صحيح وموجز مع شرح قصير وأفضل الممارسات والأمان.",
   },
   {
     id: "tutor",
@@ -127,7 +132,164 @@ const QUICK_STARTERS = [
 ];
 
 const BASE_RULES =
-  "أنت 'دلفاي برايم' (Delvai Prime)، المساعد الذكي الخارق لمنصة Delvai، مبني بأحدث محركات الذكاء الاصطناعي اللحظية. تمتلك ذكاءً فائقاً وقدرة على التفكير المنطقي العميق وحل أصعب المسائل بجميع لغات العالم. نسّق إجاباتك بتنسيق Markdown احترافي، مباشر، ومبهر.";
+  "أنت 'دلفاي برايم' (Delvai Prime)، المساعد الذكي الخارق لمنصة Delvai. قدم إجابات واضحة، منسقة بشكل جذاب باستخدام Markdown (عناوين، نقاط، خط عريض، قوالب كود واضحة)، بدون حشو زائد وبأعلى مستويات الذكاء والاحترافية.";
+
+/* ================= CYBER CODE BLOCK COMPONENT ================= */
+function CodeSnippet({ code, lang }: { code: string; lang?: string }) {
+  const [copied, setCopied] = useState(false);
+  const copyCode = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    toast.success("تم نسخ الكود");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="my-3 overflow-hidden rounded-2xl border border-border/80 bg-black/60 shadow-lg" dir="ltr">
+      <div className="flex items-center justify-between border-b border-border/50 bg-card/60 px-4 py-2 text-xs text-muted-foreground">
+        <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-primary">
+          {lang || "CODE"}
+        </span>
+        <button
+          type="button"
+          onClick={copyCode}
+          className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-card hover:text-foreground transition-colors"
+        >
+          {copied ? <Check className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
+          <span>{copied ? "تم النسخ" : "نسخ الكود"}</span>
+        </button>
+      </div>
+      <pre className="overflow-x-auto p-4 font-mono text-xs text-emerald-300 leading-relaxed">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
+/* ================= RICH MARKDOWN RENDERER ================= */
+function RichMarkdown({ text, isStreaming }: { text: string; isStreaming?: boolean }) {
+  if (!text) return null;
+
+  // Split by code blocks first
+  const parts = text.split(/(```[\s\S]*?```)/g);
+
+  return (
+    <div className="space-y-2 text-sm leading-7">
+      {parts.map((part, idx) => {
+        if (part.startsWith("```") && part.endsWith("```")) {
+          const firstLineEnd = part.indexOf("\n");
+          const lang = part.slice(3, firstLineEnd > 0 ? firstLineEnd : undefined).trim();
+          const code = firstLineEnd > 0 ? part.slice(firstLineEnd + 1, -3) : part.slice(3, -3);
+          return <CodeSnippet key={idx} code={code.trim()} lang={lang} />;
+        }
+
+        // Parse paragraphs and bullet lines
+        const lines = part.split("\n");
+        return (
+          <div key={idx} className="space-y-1.5">
+            {lines.map((line, lineIdx) => {
+              const trimmed = line.trim();
+              if (!trimmed) return <div key={lineIdx} className="h-1" />;
+
+              // Horizontal Rule
+              if (/^---$|^___$|^\*\*\*$/.test(trimmed)) {
+                return <hr key={lineIdx} className="my-3 border-border/50" />;
+              }
+
+              // Headers
+              if (trimmed.startsWith("### ")) {
+                return (
+                  <h4 key={lineIdx} className="pt-2 text-base font-bold text-primary">
+                    {renderInline(trimmed.slice(4))}
+                  </h4>
+                );
+              }
+              if (trimmed.startsWith("## ")) {
+                return (
+                  <h3 key={lineIdx} className="pt-3 text-lg font-extrabold text-primary">
+                    {renderInline(trimmed.slice(3))}
+                  </h3>
+                );
+              }
+              if (trimmed.startsWith("# ")) {
+                return (
+                  <h2 key={lineIdx} className="pt-4 text-xl font-black text-primary">
+                    {renderInline(trimmed.slice(2))}
+                  </h2>
+                );
+              }
+
+              // Bullet List Item
+              if (/^[\*\-•]\s+/.test(trimmed)) {
+                const bulletContent = trimmed.replace(/^[\*\-•]\s+/, "");
+                return (
+                  <div key={lineIdx} className="flex items-start gap-2 ps-2">
+                    <span className="mt-2 flex size-1.5 shrink-0 rounded-full bg-primary shadow-glow" />
+                    <p className="flex-1">{renderInline(bulletContent)}</p>
+                  </div>
+                );
+              }
+
+              // Numbered List Item
+              const numMatch = /^(\d+)[\.\)]\s+(.*)/.exec(trimmed);
+              if (numMatch) {
+                return (
+                  <div key={lineIdx} className="flex items-start gap-2.5 ps-2">
+                    <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                      {numMatch[1]}
+                    </span>
+                    <p className="flex-1">{renderInline(numMatch[2])}</p>
+                  </div>
+                );
+              }
+
+              // Normal paragraph line
+              return (
+                <p key={lineIdx} className="text-foreground/95">
+                  {renderInline(line)}
+                </p>
+              );
+            })}
+          </div>
+        );
+      })}
+      {isStreaming && (
+        <span className="inline-block size-2 animate-ping rounded-full bg-primary align-middle ms-1" />
+      )}
+    </div>
+  );
+}
+
+function renderInline(str: string) {
+  // Bold **text**
+  const boldParts = str.split(/(\*\*.*?\*\*)/g);
+  return boldParts.map((bChunk, bIdx) => {
+    if (bChunk.startsWith("**") && bChunk.endsWith("**")) {
+      const inner = bChunk.slice(2, -2);
+      return (
+        <strong key={bIdx} className="font-bold text-primary drop-shadow-[0_0_8px_oklch(0.82_0.14_82/0.25)]">
+          {inner}
+        </strong>
+      );
+    }
+
+    // Inline `code`
+    const codeParts = bChunk.split(/(`.*?`)/g);
+    return codeParts.map((cChunk, cIdx) => {
+      if (cChunk.startsWith("`") && cChunk.endsWith("`")) {
+        return (
+          <code
+            key={cIdx}
+            className="mx-1 rounded-md border border-primary/30 bg-primary/10 px-1.5 py-0.5 font-mono text-xs text-primary"
+          >
+            {cChunk.slice(1, -1)}
+          </code>
+        );
+      }
+      return cChunk;
+    });
+  });
+}
 
 function ChatTool() {
   const { q } = Route.useSearch();
@@ -140,14 +302,132 @@ function ChatTool() {
   const [error, setError] = useState<string | null>(null);
   const [persona, setPersona] = useState<(typeof PERSONAS)[number]["id"]>("general");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [deepThinking, setDeepThinking] = useState(false);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+
   const fileRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const speechRef = useRef<any>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
   }, [messages, streaming]);
+
+  // Track scroll position to show/hide "scroll to bottom" button
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const isUp = scrollHeight - scrollTop - clientHeight > 120;
+    setShowScrollBottom(isUp);
+  };
+
+  const scrollToBottom = () => {
+    endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+  };
+
+  // Speech Recognition (Voice Input)
+  const toggleVoiceInput = () => {
+    if (isListening) {
+      speechRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      toast.error("الإدخال الصوتي غير مدعوم في هذا المتصفح");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "ar-SA";
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        toast.info("تحدث الآن، المساعد يستمع إليك…");
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join("");
+        setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+        toast.error("تعذر التقاط الصوت، يرجى المحاولة مرة أخرى.");
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      speechRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  // Text to Speech (Voice Readout)
+  const toggleSpeak = (text: string, idx: number) => {
+    if (speakingIndex === idx) {
+      window.speechSynthesis?.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+
+    if (!window.speechSynthesis) {
+      toast.error("القراءة الصوتية غير مدعومة في جهازك");
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[\*#`_~]/g, "");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = "ar";
+    utterance.rate = 1.0;
+
+    utterance.onend = () => setSpeakingIndex(null);
+    utterance.onerror = () => setSpeakingIndex(null);
+
+    setSpeakingIndex(idx);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Magic Prompt Enhancer
+  const enhancePrompt = () => {
+    if (!input.trim()) {
+      toast.info("اكتب فكرة قصيرة أولاً لنقوم بتحسينها");
+      return;
+    }
+    const enhanced = `أريد تحليلاً شاملاً ومتعمقاً خطوة بخطوة حول: "${input.trim()}". يرجى تقديم أمثلة تطبيقية، خطة عمل تنفيذية، ومراعاة أفضل الممارسات المعتمدة عالمياً.`;
+    setInput(enhanced);
+    toast.success("تم تحسين صياغة الأمر وتفصيله بالذكاء الاصطناعي 🪄");
+  };
+
+  // Export Conversation
+  const exportConversation = (content: string) => {
+    const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `delvai-prime-response-${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("تم تنزيل المحتوى كملف Markdown");
+  };
 
   const addFiles = async (files: FileList | File[] | null) => {
     if (!files || files.length === 0) return;
@@ -180,7 +460,11 @@ function ChatTool() {
     setError(null);
     setMessages([...history, { role: "assistant", content: "" }]);
 
-    const systemPrompt = `${PERSONAS.find((p) => p.id === persona)!.system}\n${BASE_RULES}`;
+    const deepDirective = deepThinking
+      ? "\n[توجيه التفكير العميق: قم بالتفكير والتحليل المنطقي المتسلسل بخطوات دقيقة وقدم استنتاجات مدعمة بالأسباب قبل الرد النهائي]."
+      : "";
+
+    const systemPrompt = `${PERSONAS.find((p) => p.id === persona)!.system}\n${BASE_RULES}${deepDirective}`;
     let acc = "";
     try {
       const res = await fetch("/api/chat", {
@@ -289,8 +573,8 @@ function ChatTool() {
       subtitle="عقل الذكاء الاصطناعي الفائق لمنصة Delvai — إجابات لحظية بالبث المباشر، تفكير عميق، وتحليل صور لحل أصعب المسائل."
     >
       <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-4">
-        {/* ================= PERSONA SELECTION & HEADER HUD ================= */}
-        <div className="relative overflow-hidden rounded-2xl glass p-3 sm:p-4 shadow-float border-primary/25 ring-glow">
+        {/* ================= PERSONA SELECTION & CONTROLS ================= */}
+        <div className="relative overflow-hidden rounded-2xl glass p-3 shadow-float border-primary/25 ring-glow">
           <div className="relative flex flex-wrap items-center justify-between gap-3">
             {/* Persona Chips */}
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -325,6 +609,7 @@ function ChatTool() {
                 className="ms-auto rounded-full text-xs text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors"
                 onClick={() => {
                   stop();
+                  window.speechSynthesis?.cancel();
                   setMessages([]);
                   setError(null);
                   toast.info("تم بدء محادثة جديدة");
@@ -341,7 +626,24 @@ function ChatTool() {
           {/* Subtle neural grid pattern in canvas */}
           <div className="pointer-events-none absolute inset-0 bg-grid opacity-25" />
 
-          <div className="relative flex min-h-[380px] max-h-[58vh] flex-col space-y-5 overflow-y-auto pe-2 sm:pe-3">
+          {/* Floating Scroll to Bottom Button */}
+          {showScrollBottom && (
+            <button
+              type="button"
+              onClick={scrollToBottom}
+              className="absolute bottom-6 end-6 z-20 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow hover:scale-110 transition-transform animate-bounce"
+              aria-label="التمرير إلى أحدث رسالة"
+              title="الانتقال إلى أسفل المحادثة"
+            >
+              <ArrowDown className="size-4" />
+            </button>
+          )}
+
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="relative flex min-h-[380px] max-h-[58vh] flex-col space-y-5 overflow-y-auto pe-2 sm:pe-3"
+          >
             {messages.length === 0 && (
               <div className="my-auto py-6 sm:py-8 text-center">
                 {/* Futuristic Logo Aura */}
@@ -411,19 +713,19 @@ function ChatTool() {
                 {/* Avatar */}
                 <div className="shrink-0 pt-1">
                   {m.role === "assistant" ? (
-                    <div className="relative flex size-8 items-center justify-center rounded-full bg-cine text-primary-foreground shadow-glow">
-                      <DelvaiLogo className="size-5" />
+                    <div className="relative flex size-9 items-center justify-center rounded-2xl bg-cine text-primary-foreground shadow-glow">
+                      <DelvaiLogo className="size-5 drop-shadow" />
                     </div>
                   ) : (
-                    <div className="flex size-8 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-xs font-bold text-primary">
+                    <div className="flex size-9 items-center justify-center rounded-2xl border border-primary/40 bg-primary/15 text-xs font-bold text-primary shadow-sm">
                       أنت
                     </div>
                   )}
                 </div>
 
-                {/* Message Bubble */}
+                {/* Message Bubble Card */}
                 <div
-                  className={`group relative max-w-[85%] sm:max-w-[80%] rounded-3xl p-4 text-sm leading-7 shadow-sm ${
+                  className={`group relative max-w-[88%] sm:max-w-[82%] rounded-3xl p-4 sm:p-5 text-sm leading-7 shadow-sm transition-all ${
                     m.role === "user"
                       ? "rounded-tr-sm bg-primary/20 text-foreground border border-primary/40"
                       : "rounded-tl-sm bg-card/90 text-foreground border border-border/80 shadow-float"
@@ -437,29 +739,34 @@ function ChatTool() {
                           key={j}
                           src={src}
                           alt="صورة مرفقة"
-                          className="size-28 rounded-xl border border-border/80 object-cover shadow-sm"
+                          className="size-28 rounded-2xl border border-border/80 object-cover shadow-sm"
                         />
                       ))}
                     </div>
                   )}
 
-                  {/* Message Text or Thinking State */}
+                  {/* Message Rich Text or Thinking State */}
                   {m.content ? (
-                    <div className="whitespace-pre-wrap font-sans text-sm">{m.content}</div>
+                    <RichMarkdown
+                      text={m.content}
+                      isStreaming={streaming && i === messages.length - 1}
+                    />
                   ) : streaming && i === messages.length - 1 ? (
-                    <div className="py-1">
+                    <div className="py-2">
                       <DelvaiThinkingLoader size="sm" text="دلفاي برايم يفكّر ويبحث في البيانات…" inline />
                     </div>
                   ) : null}
 
-                  {/* Assistant Footer Actions */}
+                  {/* Assistant Toolbar Actions */}
                   {m.role === "assistant" && m.content && !(streaming && i === messages.length - 1) && (
-                    <div className="mt-3 flex items-center gap-1 border-t border-border/40 pt-2 text-xs text-muted-foreground opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div className="mt-3.5 flex flex-wrap items-center gap-2 border-t border-border/40 pt-2.5 text-xs text-muted-foreground opacity-85 group-hover:opacity-100 transition-opacity">
+                      {/* Copy */}
                       <button
                         type="button"
                         onClick={() => void copy(m.content, i)}
                         className="inline-flex items-center gap-1 rounded-lg px-2 py-1 hover:bg-card hover:text-foreground transition-colors"
                         aria-label="نسخ الرد"
+                        title="نسخ النص"
                       >
                         {copiedIndex === i ? (
                           <Check className="size-3.5 text-emerald-400" />
@@ -469,19 +776,53 @@ function ChatTool() {
                         <span className="text-[11px]">{copiedIndex === i ? "تم النسخ" : "نسخ"}</span>
                       </button>
 
+                      {/* Text-to-speech Reader */}
+                      <button
+                        type="button"
+                        onClick={() => toggleSpeak(m.content, i)}
+                        className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 transition-colors ${
+                          speakingIndex === i
+                            ? "bg-primary/20 text-primary animate-pulse font-bold"
+                            : "hover:bg-card hover:text-foreground"
+                        }`}
+                        aria-label="قراءة صوتية"
+                        title="استماع للإجابة بصوت دلفاي"
+                      >
+                        {speakingIndex === i ? (
+                          <VolumeX className="size-3.5" />
+                        ) : (
+                          <Volume2 className="size-3.5" />
+                        )}
+                        <span className="text-[11px]">{speakingIndex === i ? "إيقاف الصوت" : "استماع"}</span>
+                      </button>
+
+                      {/* Export file */}
+                      <button
+                        type="button"
+                        onClick={() => exportConversation(m.content)}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 hover:bg-card hover:text-foreground transition-colors"
+                        aria-label="تنزيل الرد"
+                        title="تنزيل كملف Markdown"
+                      >
+                        <Download className="size-3.5" />
+                        <span className="text-[11px]">تنزيل</span>
+                      </button>
+
+                      {/* Regenerate if last message */}
                       {i === messages.length - 1 && (
                         <button
                           type="button"
                           onClick={() => void regenerate()}
                           className="inline-flex items-center gap-1 rounded-lg px-2 py-1 hover:bg-card hover:text-foreground transition-colors"
                           aria-label="إعادة التفكير والتوليد"
+                          title="إعادة التوليد"
                         >
                           <RefreshCw className="size-3.5" />
                           <span className="text-[11px]">إعادة التوليد</span>
                         </button>
                       )}
 
-                      <span className="ms-auto text-[10px] text-muted-foreground/60 font-mono">
+                      <span className="ms-auto text-[10px] text-muted-foreground/70 font-mono">
                         دلفاي برايم · {activePersona.label}
                       </span>
                     </div>
@@ -526,8 +867,54 @@ function ChatTool() {
               </div>
             )}
 
+            {/* Quick AI Assist Bar */}
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-b border-border/30 pb-2 px-1 text-xs">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {/* Deep Thinking Mode Pill */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeepThinking(!deepThinking);
+                    toast.info(
+                      !deepThinking
+                        ? "تم تفعيل نمط التفكير المنطقي العميق 🧠"
+                        : "تم تعطيل التفكير العميق والعودة للنمط السريع ⚡",
+                    );
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold transition-all ${
+                    deepThinking
+                      ? "bg-primary/20 text-primary border border-primary shadow-[0_0_10px_oklch(0.82_0.14_82/0.3)]"
+                      : "bg-card text-muted-foreground border border-border/60 hover:text-foreground"
+                  }`}
+                >
+                  <Brain className={`size-3 ${deepThinking ? "animate-pulse" : ""}`} />
+                  <span>تفكير عميق</span>
+                </button>
+
+                {/* Magic Prompt Enhancer */}
+                <button
+                  type="button"
+                  onClick={enhancePrompt}
+                  disabled={!input.trim() || streaming}
+                  className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-card px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground hover:border-primary/50 hover:text-primary transition-all disabled:opacity-50"
+                  title="تحسين وتفصيل صياغة الأمر بالذكاء الاصطناعي"
+                >
+                  <Wand2 className="size-3 text-primary/80" />
+                  <span>تحسين الأمر</span>
+                </button>
+              </div>
+
+              {/* Voice Dictation Status */}
+              {isListening && (
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-destructive/15 border border-destructive/40 px-2.5 py-0.5 text-[11px] font-bold text-destructive animate-pulse">
+                  <span className="size-2 rounded-full bg-destructive animate-ping" />
+                  <span>جارٍ الاستماع لصوتك…</span>
+                </div>
+              )}
+            </div>
+
             {/* Input & Action Bar */}
-            <div className="flex items-end gap-2.5">
+            <div className="flex items-end gap-2">
               <input
                 ref={fileRef}
                 type="file"
@@ -536,6 +923,8 @@ function ChatTool() {
                 className="hidden"
                 onChange={(e) => void addFiles(e.target.files)}
               />
+
+              {/* Image Upload Button */}
               <Button
                 variant="outline"
                 size="icon"
@@ -546,6 +935,23 @@ function ChatTool() {
                 title="إرفاق صور للتحليل"
               >
                 <ImagePlus className="size-4.5" />
+              </Button>
+
+              {/* Voice Input Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleVoiceInput}
+                disabled={streaming}
+                className={`size-10 rounded-2xl border-border/80 bg-card/60 transition-all shrink-0 ${
+                  isListening
+                    ? "border-destructive bg-destructive/20 text-destructive shadow-[0_0_12px_oklch(0.6_0.21_27/0.5)] animate-pulse"
+                    : "text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                }`}
+                aria-label="التحدث بالصوت"
+                title={isListening ? "إيقاف التسجيل الصوتي" : "تحدث بصوتك بدل الكتابة"}
+              >
+                {isListening ? <MicOff className="size-4.5" /> : <Mic className="size-4.5" />}
               </Button>
 
               <Textarea

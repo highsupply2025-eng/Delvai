@@ -215,6 +215,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "مسح المحادثة": "Effacer la discussion",
     "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Entrée pour envoyer · Shift+Entrée pour nouvelle ligne",
     "جاهز للبث المباشر": "Prêt pour le direct",
+    "استماع": "Écouter",
+    "إيقاف الصوت": "Couper le son",
+    "تنزيل": "Télécharger",
+    "نسخ الكود": "Copier le code",
+    "تحسين الأمر": "Optimiser le prompt",
+    "تفكير عميق": "Pensée Profonde",
+    "جارٍ الاستماع لصوتك…": "Écoute en cours…",
   },
 
   // ================= TURKISH =================
@@ -433,6 +440,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "مسح المحادثة": "Sohbeti Temizle",
     "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Göndermek için Enter · Yeni satır için Shift+Enter",
     "جاهز للبث المباشر": "Canlı Yayına Hazır",
+    "استماع": "Dinle",
+    "إيقاف الصوت": "Sesi Durdur",
+    "تنزيل": "İndir",
+    "نسخ الكود": "Kodu Kopyala",
+    "تحسين الأمر": "İstemi Geliştir",
+    "تفكير عميق": "Derin Düşünme",
+    "جارٍ الاستماع لصوتك…": "Sesiniz dinleniyor…",
   },
 
   // ================= SPANISH =================
@@ -651,6 +665,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "مسح المحادثة": "Borrar conversación",
     "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Presiona Enter para enviar · Shift+Enter para nueva línea",
     "جاهز للبث المباشر": "Listo para transmitir en vivo",
+    "استماع": "Escuchar",
+    "إيقاف الصوت": "Detener audio",
+    "تنزيل": "Descargar",
+    "نسخ الكود": "Copiar código",
+    "تحسين الأمر": "Mejorar prompt",
+    "تفكير عميق": "Pensamiento Profundo",
+    "جارٍ الاستماع لصوتك…": "Escuchando tu voz…",
   },
 
   // ================= GERMAN =================
@@ -869,6 +890,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "مسح المحادثة": "Chat löschen",
     "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Enter zum Senden · Shift+Enter für neue Zeile",
     "جاهز للبث المباشر": "Bereit für Live-Stream",
+    "استماع": "Vorlesen",
+    "إيقاف الصوت": "Audio stoppen",
+    "تنزيل": "Herunterladen",
+    "نسخ الكود": "Code kopieren",
+    "تحسين الأمر": "Prompt optimieren",
+    "تفكير عميق": "Tiefgründiges Denken",
+    "جارٍ الاستماع لصوتك…": "Sprache wird aufgezeichnet…",
   },
 
   // ================= CHINESE =================
@@ -1087,6 +1115,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "مسح المحادثة": "清空对话",
     "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "按 Enter 发送 · Shift+Enter 换行",
     "جاهز للبث المباشر": "实时响应就绪",
+    "استماع": "朗读回答",
+    "إيقاف الصوت": "停止朗读",
+    "تنزيل": "下载保存",
+    "نسخ الكود": "复制代码",
+    "تحسين الأمر": "AI智能润色提示词",
+    "تفكير عميق": "深度思考",
+    "جارٍ الاستماع لصوتك…": "正在倾听您的语音…",
   },
 
   // ================= JAPANESE =================
@@ -1305,5 +1340,12 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "مسح المحادثة": "チャット履歴を消去",
     "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Enter で送信 · Shift+Enter で改行",
     "جاهز للبث المباشر": "リアルタイム配信準備完了",
+    "استماع": "音声を再生",
+    "إيقاف الصوت": "音声を停止",
+    "تنزيل": "ダウンロード",
+    "نسخ الكود": "コードをコピー",
+    "تحسين الأمر": "プロンプトを最適化",
+    "تفكير عميق": "深層思考モード",
+    "جارٍ الاستماع لصوتك…": "音声を聞き取り中…",
   },
 };

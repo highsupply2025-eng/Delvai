@@ -291,6 +291,36 @@
   transform: none;
 }
 
+/* Custom Futuristic Cyber Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.82 0.14 82 / 0.35);
+  border-radius: 9999px;
+  border: 1px solid oklch(0.82 0.14 82 / 0.15);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.82 0.14 82 / 0.75);
+  box-shadow: 0 0 12px oklch(0.82 0.14 82 / 0.6);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.82 0.14 82 / 0.35) rgba(0, 0, 0, 0.2);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-drift,
   .animate-floaty,

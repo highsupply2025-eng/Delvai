@@ -864,5 +864,12 @@ export const AR_EN: Record<string, string> = {
   "مسح المحادثة": "Clear Chat",
   "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Press Enter to send · Shift+Enter for new line",
   "جاهز للبث المباشر": "Ready for Live Stream",
+  "استماع": "Listen",
+  "إيقاف الصوت": "Stop Audio",
+  "تنزيل": "Download",
+  "نسخ الكود": "Copy Code",
+  "تحسين الأمر": "Enhance Prompt",
+  "تفكير عميق": "Deep Thinking",
+  "جارٍ الاستماع لصوتك…": "Listening to your voice…",
 };
 
