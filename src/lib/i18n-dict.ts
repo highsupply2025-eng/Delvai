@@ -694,4 +694,142 @@ export const AR_EN: Record<string, string> = {
   "يمكنك الإلغاء في أي وقت، ويستمر وصولك حتى نهاية الفترة المدفوعة.": "You can cancel anytime, and your access will continue until the end of the paid period.",
   "يوتيوب": "YouTube",
   "يومًا مجانًا": "days free",
+  "منصة عالمية متطورة توفر ستة استوديوهات ذكاء اصطناعي للمبدعين والشركات حول العالم: فيديو سينمائي بدقة 4K، توليد صور إعلانية، كتابة محتوى، صوت طبيعي، وتحليل عقود ومستندات.":
+    "Advanced global platform providing six AI studios for creators and companies worldwide: 4K cinematic video, ad image generation, content writing, natural voice, and document analysis.",
+  "اكتب فكرتك أو مشروعك بالعربية… مثال: أنشئ مشهداً سينمائياً لمدينة مستقبلية ليلية":
+    "Type your idea or project... Example: Create a cinematic scene of a futuristic city at night",
+  "اكتب فكرتك أو مشروعك بالعربية... مثال: أنشئ مشهداً سينمائياً لمدينة مستقبلية ليلية":
+    "Type your idea or project... Example: Create a cinematic scene of a futuristic city at night",
+  "اكتب طلبك": "Type your prompt",
+  "أفكار جاهزة:": "Quick Ideas:",
+  "أفكار جاهزة": "Quick Ideas",
+  "أنشئ مشهد فيديو سينمائي لغروب الشمس في الصحراء": "Create a cinematic video scene of sunset in the desert",
+  "صمّم شعاراً فاخراً لعلامة تجارية بخط عربي ذهبي": "Design a luxury brand logo with golden calligraphy",
+  "اكتب لي خطة حملة إعلانية كاملة لمتجر إلكتروني": "Write a full ad campaign plan for an e-commerce store",
+  "لخّص هذا الملف واستخرج أهم خمس توصيات": "Summarize this file and extract the top 5 key recommendations",
+  "تجربة استوديو الفيديو": "Try Video Studio",
+  "استوديوهات متكاملة": "Integrated Studios",
+  "في اشتراك واحد": "In One Plan",
+  "يوماً تجربة مجانية": "Days Free Trial",
+  "وصول غير محدود": "Unlimited Access",
+  "دقة وجودة سينمائية": "4K Cinematic Quality",
+  "جاهزة للنشر الفوري": "Ready for instant publishing",
+  "سرعة استجابة فائقة": "Ultra-Fast Response",
+  "بدون انتظار": "Zero wait time",
+  "فيديو سينمائي 4K": "4K Cinematic Video",
+  "تحليل فوري للمستندات": "Instant Document Analysis",
+  "بث حرفاً بحرف": "Word-by-Word Live Stream",
+  "تفريغ صوتي عالي الدقة": "High-Accuracy Audio Transcription",
+  "تعليق صوتي طبيعي": "Natural Voiceover",
+  "توليد صور إعلانية": "Commercial Image Generation",
+  "أطر تسويقية معتمدة": "Proven Marketing Frameworks",
+  "دفع مشفر وآمن": "100% Secure & Encrypted Payment",
+  "ترخيص تجاري كامل": "Full Commercial License",
+  "دعم كامل للغة العربية": "Full Multilingual & Arabic Support",
+  "المساعد الذكي الخارق للإجابات الفورية والتفكير العميق": "Ultimate AI assistant for instant answers and deep reasoning",
+  "تحدث مع دلفاي برايم عقل الذكاء الاصطناعي لمنصة Delvai، يبث الإجابات لحظياً كلمة بكلمة، ويحلل أصعب المسائل البرمجية والعلمية والاستشارية بأعلى درجات المنطق والدقة.":
+    "Chat with Delvai Prime, the AI brain of Delvai platform, streaming live answers and solving the toughest problems.",
+  "بدء المحادثة مع دلفاي برايم": "Chat with Delvai Prime",
+  "بث مباشر": "Live Stream",
+  "كيف أصيغ استراتيجية نمو مضاعفة لمشروعي باستخدام الذكاء الاصطناعي؟":
+    "How do I formulate an exponential growth strategy for my business using AI?",
+  "خطة دلفاي برايم للنمو المتسارع:": "Delvai Prime Rapid Growth Strategy:",
+  "تحويل النص إلى فيديو فائق الواقعية": "Transform Text into Ultra-Realistic Video",
+  "أنشئ مشاهد إعلانية، لقطات سينمائية، أو مقاطع لشبكات التواصل مع تحكم كامل بزوايا الكاميرا ومؤثرات صوتية متزامنة بجودة تصل إلى 4K.":
+    "Create ads and cinematic scenes in 4K with full camera control and synchronized audio effects.",
+  "حركة الكاميرا": "Camera Movement",
+  "زووم، تتبع، دوران، وتصوير جوي": "Zoom, tracking, panning, and aerial shot",
+  "صوت متزامن": "Synchronized Audio",
+  "توليد مؤثرات صوتية تلقائية": "Automatic sound effects generation",
+  "فتح استوديو الفيديو الآن": "Open Video Studio",
+  "نسبة العرض: 16:9": "Aspect Ratio: 16:9",
+  "جاهز للتصدير": "Ready to Export",
+  "تصاميم وشعارات وصور منتجات مذهلة": "Stunning designs, logos, and product photos",
+  "توليد وتعديل الصور بدقة فائقة مع إمكانية استخدام صور مرجعية، تغيير الخلفيات، وتحديد الأنماط الفنية المناسبة لعلامتك التجارية.":
+    "Generate and edit ultra-HD visuals with reference images, background removal, and custom brand styles.",
+  "تجربة استوديو الصور": "Try Image Studio",
+  "تم إنتاج الصورة بدقة فائقة 2048x2048": "Image generated in ultra-HD 2048x2048",
+  "ألوان مشبعة، تدرجات حقيقية، وتحكم في الإضاءة": "Rich colors, realistic gradients, and lighting control",
+  "استوديو الصوتيات الذكي": "Smart Audio Studio",
+  "تفريغ التسجيلات وتحويل النصوص إلى صوت طبيعي": "Transcribe recordings and convert text to natural speech",
+  "حوّل المقالات والنصوص الإعلانية إلى تسجيلات صوتية بخامات عربية بشرية طبيعية، أو فرّغ التسجيلات والاجتماعات بنقرة واحدة.":
+    "Turn articles and ad copy into human-like voiceovers, or transcribe meetings in one click.",
+  "فتح استوديو الصوت": "Open Audio Studio",
+  "خامات صوتية احترافية: نبرة وثائقية، إعلانية، وإخبارية": "Professional voices: documentary, commercial, and news tone",
+  "قراءة وتحليل ملفات PDF و Word و Excel": "Read & Analyze PDF, Word, and Excel files",
+  "ارفع أي ملف أو عقد واستخرج منه أهم النقاط والبنود والأرقام بسرعة فائقة، مع إمكانية طرح الأسئلة مباشرة على محتوى الملف.":
+    "Upload any contract or report and extract key clauses and figures instantly with direct Q&A.",
+  "تحليل المستندات الآن": "Analyze Documents Now",
+  "تم التحليل بنجاح": "Analysis Completed",
+  "المنظومة الكاملة": "The Complete Ecosystem",
+  "ستة استوديوهات تغنيك عن عشرات الاشتراكات": "Six studios replacing dozens of separate subscriptions",
+  "كل استوديو مصمم ليكون الأفضل في مجاله، بواجهات سهلة وسريعة لخدمة رواد الأعمال، المسوقين، وصناع المحتوى.":
+    "Each studio is crafted to excel, featuring fast, intuitive interfaces for creators and businesses.",
+  "فيديو سينمائي مع حركة كاميرا وصوت متزامن": "Cinematic video with camera motion and synced audio",
+  "صور فائقة الواقعية بدقة وإضاءة احترافية": "Ultra-realistic images with professional lighting",
+  "المساعد الذكي الخارق للإجابة والتحليل وحل أعقد المسائل بلحظات.": "Supercharged AI assistant for instant answers and complex tasks.",
+  "صور تسويقية وشعارات، أو تعديل صورة موجودة بالوصف.": "Marketing visuals, logos, or image editing via text prompt.",
+  "منشورات، أوصاف منتجات، إيميلات ونصوص إعلانية.": "Social posts, product descriptions, emails, and high-converting ads.",
+  "حوّل وصف المشهد إلى فيديو قصير بالحركة والصوت.": "Convert a scene description into a short video with motion and audio.",
+  "تحويل النص إلى صوت طبيعي وتفريغ التسجيلات.": "Natural text-to-speech and audio recording transcription.",
+  "استخراج الجداول والبيانات وتلخيص المستندات بدقة.": "Table extraction, data parsing, and precise document summaries.",
+  "صياغة إعلانات مقنعة وتدوينات ترفع المبيعات": "Craft persuasive ads and sales-boosting blog posts",
+  "تفريغ التسجيلات وتحويل النصوص إلى صوت عربي مبهر": "Audio transcription and stunning natural voice synthesis",
+  "استخراج الجداول وتلخيص العقود والبيانات المعقدة": "Extract tables and summarize complex contracts",
+  "دخول الاستوديو": "Enter Studio",
+  "كيف تبدأ العمل في ٣ خطوات بسيطة": "How to get started in 3 simple steps",
+  "تجربة فورية وسلسة تتيح لك الانتقال من الفكرة إلى الإنتاج النهائي في ثوانٍ معدودة.":
+    "A seamless experience taking you from raw idea to polished production in seconds.",
+  "اختر الاستوديو المناسب": "Choose the Right Studio",
+  "حدد نوع الإنتاج المطلوب: فيديو سينمائي، تصميم صور، كتابة إعلانية، أو صوتيات.":
+    "Select your target production: 4K video, image design, ad copy, or audio.",
+  "صف فكرتك بالعربية": "Describe Your Idea",
+  "صف فكرتك بدقة": "Describe your idea in detail",
+  "اكتب وصف المشهد أو الطلب بلهجتك الطبيعية أو ارفع ملفاتك المرجعية.":
+    "Type your prompt in natural language or upload your reference files.",
+  "استلم إنتاجاً سينمائياً جاهزاً": "Receive Your Production",
+  "حمّل عملك بأعلى دقة واستخدمه في حملاتك وأعمالك مع ترخيص تجاري كامل.":
+    "Download your creations in top resolution with 100% commercial license included.",
+  "وفر أكثر من 90% من التكاليف": "Save over 90% on tool costs",
+  "لماذا تشترك في عشرات الأدوات بينما يمكنك الحصول على Delvai؟":
+    "Why subscribe to dozens of separate tools when you can have Delvai?",
+  "الاشتراكات المنفصلة التقليدية": "Traditional Separate Subscriptions",
+  "منصة Delvai الموحدة": "Unified Delvai Platform",
+  "شهر مجاناً ثم 6$ فقط": "1 month free, then only $6/month",
+  "اشتراك منفصل لكل أداة (فيديو + شات + صور + صوت + مستندات)": "A separate paid plan for every tool (video, chat, image, audio, docs)",
+  "واجهات معقدة وغير موحدة ومحدودة اللغات": "Disjointed, complex interfaces with limited multilingual support",
+  "تشتت الحسابات والفواتير والبطاقات الائتمانية": "Scattered billing, invoices, and multiple credit cards",
+  "ستة استوديوهات ذكاء اصطناعي رائدة تحت حساب واحد": "Six leading AI studios integrated under a single unified account",
+  "واجهة عالمية سريعة ومصممة بأحدث تقنيات المستقبل": "Ultra-fast global interface designed with next-gen tech",
+  "٣٠ يوماً تجربة مجانية كاملة وإلغاء في أي وقت بنقرة واحدة": "30 days full free trial and 1-click cancellation anytime",
+  "الأسئلة الشائعة": "Frequently Asked Questions",
+  "إجابات مباشرة": "Direct Answers",
+  "كل ما تود معرفته حول الاشتراك، التراخيص التجارية، والأدوات.":
+    "Everything you need to know about pricing, commercial licenses, and tools.",
+  "ما الذي يميز منصة Delvai عن باقي أدوات الذكاء الاصطناعي؟":
+    "What sets Delvai apart from other AI tools?",
+  "تجمع Delvai أقوى نماذج الذكاء الاصطناعي العالمية في منصة موحدة فائقة السرعة تدعم كافة لغات العالم بطلاقة، مما يغنيك عن دفع اشتراكات متعددة تتجاوز 100$ شهرياً.":
+    "Delvai combines the world's most powerful AI models into a unified, high-speed platform, saving you over $100/month in multiple subscriptions.",
+  "كيف تعمل فترة التجربة المجانية لمدة ٣٠ يوماً؟":
+    "How does the 30-day free trial work?",
+  "تحصل فور تسجيلك على شهر كامل مجاناً مع وصول شامل لكافة الاستوديوهات والأدوات. يمكنك تجربة كل الميزات وإنتاج محتواك بحرية تامة، وبعد انتهاء الشهر يكون الاشتراك بـ 6$ فقط شهرياً مع إمكانية الإلغاء في أي وقت بنقرة واحدة.":
+    "Upon signing up, you get a full month free with unlimited access to all studios. Afterwards, it is just $6/month, cancelable anytime with 1 click.",
+  "هل المحتوى الناتج من فيديوهات وصور ونصوص ملكي تجارياً؟":
+    "Do I commercially own the generated videos, images, and text?",
+  "نعم 100%. جميع المواد المنتجة من خلال المنصة مملوكة لك بالكامل وتمنحك ترخيصاً تجارياً شاملاً لاستخدامها في إعلاناتك، أعمالك، ومشاريع عملائك دون أي قيود أو حقوق ملكية لطرف ثالث.":
+    "Yes, 100%. All output belongs entirely to you with a full commercial license for your ads, business, and client projects.",
+  "هل تدعم المنصة جميع اللغات العالمية؟":
+    "Does the platform support all world languages?",
+  "نعم، تدعم المنصة أكثر من 50 لغة عالمية (العربية، الإنجليزية، الفرنسية، الإسبانية، الألمانية، التركية، الصينية، اليابانية وغيرها) بدقة متناهية، مع توفير خامات صوتية طبيعية احترافية.":
+    "Yes, the platform supports 50+ languages with supreme accuracy and realistic voiceovers.",
+  "هل بياناتي ومستنداتي آمنة ومحمية؟":
+    "Are my data and documents safe and protected?",
+  "نعم، نحن نطبق أعلى معايير التشفير (SSL/TLS و AES-256). ملفاتك وسجلاتك ومستنداتك خاصة بك وحدك ولا يتم استخدامها لتدريب النماذج العامة أو مشاركتها مع أي جهة.":
+    "Yes, we enforce industry-leading SSL/TLS and AES-256 encryption. Your files remain private and are never used to train public models.",
+  "ابدأ صناعة المستقبل اليوم": "Start Creating the Future Today",
+  "انضم إلى آلاف المسوقين وصناع المحتوى العرب واستفد من 30 يوماً وصولاً كاملاً مجاناً.":
+    "Join thousands of creators and enjoy 30 days of full access completely free.",
+  "تحدث مع دلفاي برايم (Delvai Prime)": "Chat with Delvai Prime",
+  "جميع الحقوق محفوظة": "All rights reserved",
 };
+

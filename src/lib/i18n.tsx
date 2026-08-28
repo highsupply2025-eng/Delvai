@@ -41,44 +41,85 @@ const norm = (s: string) => s.replace(/\s+/g, " ").trim();
 const MAP = new Map<string, string>();
 for (const [ar, en] of Object.entries(AR_EN)) MAP.set(norm(ar), en);
 
+function lookup(k: string, targetLang: Lang): string | null {
+  const normK = norm(k);
+  if (!normK) return null;
+  if (targetLang !== "en" && targetLang !== "ar") {
+    const direct = MULTI_DICT[targetLang]?.[normK];
+    if (direct) return direct;
+  }
+  const enDirect = MAP.get(normK);
+  if (enDirect) return enDirect;
+
+  // strip trailing / leading punctuation & quotes & ellipsis
+  const stripped = normK
+    .replace(/^[\s•✦✨*—\-–"“«]+/u, "")
+    .replace(/[\s•✦✨*—\-–"”»….:!?,،؟]+$/u, "")
+    .trim();
+  if (stripped && stripped !== normK) {
+    if (targetLang !== "en" && targetLang !== "ar") {
+      const strippedHit = MULTI_DICT[targetLang]?.[stripped];
+      if (strippedHit) return strippedHit;
+    }
+    const enStrippedHit = MAP.get(stripped);
+    if (enStrippedHit) return enStrippedHit;
+  }
+  return null;
+}
+
 function translate(value: string, targetLang: Lang = "en"): string | null {
   const key = norm(value);
   if (!key) return null;
+  if (targetLang === "ar") return null;
 
-  // 1. Check target language dict if not english
-  if (targetLang !== "en" && targetLang !== "ar") {
-    const directHit = MULTI_DICT[targetLang]?.[key];
-    if (directHit) return directHit;
-    const stripped = key.replace(/[،.:!?]+$/u, "");
-    const altHit = MULTI_DICT[targetLang]?.[stripped];
-    if (altHit) return altHit + key.slice(stripped.length);
+  // 1. Direct or stripped lookup
+  const simple = lookup(key, targetLang);
+  if (simple) return simple;
+
+  // 2. Composed strings (with bullets, dashes, colons, ellipses)
+  const leadMatch = /^([\s•✦✨*—\-–"“«]+)/u.exec(value);
+  const trailMatch = /([\s•✦✨*—\-–"”»….:!?,،؟]+)$/u.exec(value);
+  const lead = leadMatch ? leadMatch[1] : "";
+  const trail = trailMatch ? trailMatch[1] : "";
+  const core = norm(value.slice(lead.length, value.length - (trail ? trail.length : 0)));
+
+  if (core) {
+    const coreHit = lookup(core, targetLang);
+    if (coreHit) {
+      return lead + coreHit + trail;
+    }
   }
 
-  // 2. Fall back to English dictionary
-  const hit = MAP.get(key);
-  if (hit) return hit;
-  // strings that end with punctuation variations
-  const stripped = key.replace(/[،.:!?]+$/u, "");
-  const alt = MAP.get(stripped);
-  if (alt) return alt + key.slice(stripped.length);
-
-  // composed strings such as "label — state: value"
+  // 3. Composed strings such as "label — state: value"
   if (/[—:|·]/.test(key)) {
     const parts = key.split(/\s*([—:|·])\s*/);
     let translated = false;
     const rebuilt = parts.map((part) => {
       if (/^[—:|·]$/.test(part)) return part === ":" ? ": " : ` ${part} `;
       const normPart = norm(part);
-      if (targetLang !== "en" && targetLang !== "ar" && MULTI_DICT[targetLang]?.[normPart]) {
-        translated = true;
-        return MULTI_DICT[targetLang][normPart];
-      }
-      const piece = MAP.get(normPart);
+      const piece = lookup(normPart, targetLang);
       if (piece) translated = true;
       return piece ?? part;
     });
     if (translated) return rebuilt.join("").replace(/\s+/g, " ").trim();
   }
+
+  // 4. Multi-sentence paragraph split
+  if (/[.\n،؛]/.test(value) && value.length > 20) {
+    const lines = value.split(/(\n+)/);
+    let translatedLines = false;
+    const transformedLines = lines.map((line) => {
+      if (/^\n+$/.test(line)) return line;
+      const hit = lookup(line, targetLang);
+      if (hit) {
+        translatedLines = true;
+        return hit;
+      }
+      return line;
+    });
+    if (translatedLines) return transformedLines.join("");
+  }
+
   return null;
 }
 
