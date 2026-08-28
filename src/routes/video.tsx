@@ -41,22 +41,21 @@ import { ToolShell } from "@/components/ToolShell";
 import { useAuth } from "@/hooks/useAuth";
 import { createVideoJob, getVideoJob } from "@/lib/video.functions";
 import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoader";
-import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 
 export const Route = createFileRoute("/video")({
   head: () => ({
     meta: [
-      { title: "استوديو الفيديو السينمائي (Delvai Cinema) | توليد فيديو بالذكاء الاصطناعي Veo 3.1" },
+      { title: "استوديو الفيديو السينمائي (Delvai Cinema) | توليد فيديو فائق السرعة Veo 3.1" },
       {
         name: "description",
         content:
-          "استوديو دلفاي للفيديو السينمائي: توليد مشاهد سينمائية مذهلة بنموذج Google Veo 3.1 بدقة تصل إلى 4K، حركة كاميرا ذكية، مؤثرات صوتية محيطية، وتمديد المشاهد.",
+          "استوديو دلفاي للفيديو السينمائي: توليد مشاهد سينمائية مذهلة بنموذج Google Veo 3.1 بسرعة فائقة وبث حي للمراحل بدقة تصل إلى 4K مع حركة كاميرا ذكية ومؤثرات صوتية.",
       },
       { property: "og:title", content: "استوديو الفيديو السينمائي — Delvai Cinema" },
       {
         property: "og:description",
-        content: "حوّل الوصف أو الصورة إلى فيديو سينمائي بالحركة والصوت بجودة 4K ونموذج Veo 3.1 الخارق.",
+        content: "حوّل الوصف أو الصورة إلى فيديو سينمائي بالحركة والصوت فائق السرعة بجودة 4K ونموذج Veo 3.1.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -96,9 +95,9 @@ const LIGHTS = [
 ];
 
 const MODELS = [
-  { id: "google/veo-3.1" as const, label: "Veo 3.1 4K سينمائي", note: "أعلى جودة إخراج وتفاصيل سينمائية فائقة" },
-  { id: "google/veo-3.1-fast" as const, label: "Veo 3.1 متوازن", note: "توليد سريع بجودة سينمائية استثنائية" },
-  { id: "google/veo-3.1-lite" as const, label: "Veo 3.1 Lite اقتصادي", note: "سريع وخفيف للتجارب والمسودات الفورية" },
+  { id: "google/veo-3.1-lite" as const, label: "Veo 3.1 فائق السرعة ⚡", note: "أسرع رندرة وتوليد فوري للمشاهد" },
+  { id: "google/veo-3.1-fast" as const, label: "Veo 3.1 متوازن 🌟", note: "سرعة عالية وجودة سينمائية مذهلة" },
+  { id: "google/veo-3.1" as const, label: "Veo 3.1 Cinema 4K 🎬", note: "أعلى دقة إخراج وتفاصيل سينمائية قصوى" },
 ];
 
 const RATIOS = [
@@ -106,8 +105,17 @@ const RATIOS = [
   { id: "9:16" as const, label: "عمودي 9:16", desc: "ريلز وتيك توك", box: "aspect-[9/16]" },
 ];
 
-const RESOLUTIONS = ["720p", "1080p", "4k"] as const;
-const DURATIONS = [4, 6, 8] as const;
+const RESOLUTIONS = [
+  { id: "720p" as const, label: "720p (فائق السرعة ⚡)" },
+  { id: "1080p" as const, label: "1080p (عالي الدقة FHD)" },
+  { id: "4k" as const, label: "4K (فائق الوضوح UHD)" },
+];
+
+const DURATIONS = [
+  { sec: 4 as const, label: "4 ثوانٍ (الأسرع ⚡)" },
+  { sec: 6 as const, label: "6 ثوانٍ (متوازن 🌟)" },
+  { sec: 8 as const, label: "8 ثوانٍ (مشهد كامل 🎬)" },
+];
 
 type Clip = {
   id: string;
@@ -138,13 +146,6 @@ const INSPIRATION_CLIPS = [
     camera: "zoom",
     light: "studio",
   },
-  {
-    title: "طيران درون فوق جبال جليدية في الشفق القطبي",
-    desc: "حركة كاميرا درون سريعة وسلسة فوق قمم جبال مثلجة تضيئها أضواء الشفق القطبي الخضراء والبنفسجية الساحرة.",
-    style: "drone",
-    camera: "tracking",
-    light: "neon",
-  },
 ];
 
 const VIDEO_PHASES = [
@@ -152,7 +153,7 @@ const VIDEO_PHASES = [
   "🧠 تخطيط الحركة والفيزياء البصرية للقطة…",
   "🎨 رندرة الإطارات السينمائية وحساب الإضاءة…",
   "🎵 توليد المؤثرات الصوتية والموسيقى المحيطية…",
-  "✨ التجميع النهائي وضبط ألوان 4K والتصدير…",
+  "✨ التجميع النهائي وضبط الألوان والتصدير…",
 ];
 
 function readFile(file: File): Promise<{ bytesBase64Encoded: string; mimeType: string; preview: string }> {
@@ -171,7 +172,6 @@ function readFile(file: File): Promise<{ bytesBase64Encoded: string; mimeType: s
 function VideoTool() {
   const create = useServerFn(createVideoJob);
   const poll = useServerFn(getVideoJob);
-  const chat = useServerFn(chatComplete);
   const save = useServerFn(saveGeneration);
   const { user } = useAuth();
 
@@ -183,8 +183,8 @@ function VideoTool() {
   const [light, setLight] = useState(LIGHTS[0]!.id);
   const [model, setModel] = useState<(typeof MODELS)[number]["id"]>("google/veo-3.1-lite");
   const [ratio, setRatio] = useState<"16:9" | "9:16">("16:9");
-  const [resolution, setResolution] = useState<(typeof RESOLUTIONS)[number]>("720p");
-  const [duration, setDuration] = useState<(typeof DURATIONS)[number]>(8);
+  const [resolution, setResolution] = useState<(typeof RESOLUTIONS)[number]["id"]>("720p");
+  const [duration, setDuration] = useState<(typeof DURATIONS)[number]["sec"]>(4);
   const [audio, setAudio] = useState(true);
   const [seed, setSeed] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -219,26 +219,75 @@ function VideoTool() {
     }
     const interval = setInterval(() => {
       setPhaseIndex((prev) => (prev + 1) % VIDEO_PHASES.length);
-    }, 4500);
+    }, 3000);
     return () => clearInterval(interval);
   }, [busy]);
 
+  // Smooth simulated progress when waiting for updates
+  useEffect(() => {
+    if (!busy) return;
+    const interval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 92) return p;
+        return p + 1.5;
+      });
+    }, 800);
+    return () => clearInterval(interval);
+  }, [busy]);
+
+  // Fast Prompt Enhancer with Real-time Streaming
   const enhance = async () => {
     if (!prompt.trim() || enhancing) return;
     setEnhancing(true);
+    let enhancedAcc = "";
     try {
-      const res = await chat({
-        data: {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           system:
             "أنت مخرج سينمائي وخبير في هندسة أوامر الفيديو بالذكاء الاصطناعي (Google Veo 3.1). حوّل فكرة المستخدم إلى سيناريو تصويري سينمائي إنجليزي فائق الدقة (الموضوع، حركة الكاميرا والعدسة، الإضاءة، الحركة، الأجواء، جودة 4K السينمائية) في فقرة واحدة سلسة بدون أي مقدمات.",
+          model: "google/gemini-3.7-flash",
           messages: [{ role: "user", content: prompt.trim() }],
-          model: "google/gemini-2.5-flash",
-        },
+        }),
       });
-      if (res.ok && res.text) {
-        setPrompt(res.text.trim());
-        toast.success("تم تحسين الوصف السينمائي وتفصيله بالذكاء الاصطناعي 🪄");
+
+      if (!res.ok || !res.body) {
+        toast.error("تعذّر تحسين الوصف");
+        return;
       }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const payload = trimmed.slice(5).trim();
+          if (!payload || payload === "[DONE]") continue;
+          try {
+            const json = JSON.parse(payload) as {
+              choices?: { delta?: { content?: string } }[];
+            };
+            const delta = json.choices?.[0]?.delta?.content;
+            if (delta) {
+              enhancedAcc += delta;
+              setPrompt(enhancedAcc);
+            }
+          } catch {
+            /* ignore partial */
+          }
+        }
+      }
+
+      toast.success("تم تحسين الوصف السينمائي وتفصيله بالذكاء الاصطناعي 🪄");
     } finally {
       setEnhancing(false);
     }
@@ -324,12 +373,12 @@ function VideoTool() {
         setError(res.error || "تعذّر إكمال توليد الفيديو.");
         return;
       }
-      if (typeof res.progress === "number") setProgress(Math.max(10, Math.min(95, res.progress)));
-      else setProgress((p) => Math.min(92, p + 5));
+      if (typeof res.progress === "number") setProgress(Math.max(15, Math.min(95, res.progress)));
 
-      timer.current = setTimeout(() => void pollJob(id, fullPrompt), 3000);
+      // Responsive fast polling at 1.5s
+      timer.current = setTimeout(() => void pollJob(id, fullPrompt), 1500);
     } catch {
-      timer.current = setTimeout(() => void pollJob(id, fullPrompt), 3000);
+      timer.current = setTimeout(() => void pollJob(id, fullPrompt), 1500);
     }
   };
 
@@ -350,7 +399,7 @@ function VideoTool() {
 
     setBusy(true);
     setError(null);
-    setProgress(5);
+    setProgress(10);
 
     const styleObj = STYLES.find((s) => s.id === style);
     const camObj = CAMERAS.find((c) => c.id === camera);
@@ -361,7 +410,7 @@ function VideoTool() {
       styleObj ? `Visual Style: ${styleObj.hint}.` : "",
       camObj ? `Camera Motion: ${camObj.hint}.` : "",
       lightObj ? `Lighting & Environment: ${lightObj.hint}.` : "",
-      `Masterpiece, 4k resolution, smooth fluid physical motion, cinematic color grade.`,
+      `Masterpiece, high definition, smooth fluid physical motion, cinematic color grade.`,
     ]
       .filter(Boolean)
       .join(" ");
@@ -390,46 +439,59 @@ function VideoTool() {
       return;
     }
 
-    void pollJob(res.id, finalPrompt);
+    toast.info("بدأت معالجة المشهد في محرك Veo 3.1…");
+    timer.current = setTimeout(() => void pollJob(res.id, finalPrompt), 1500);
   };
 
   return (
     <ToolShell
-      title="استوديو الفيديو السينمائي — Delvai Cinema Studio"
-      subtitle="عقل الإخراج والتوليد السينمائي لمنصة Delvai — متصل بأحدث نماذج Google Veo 3.1 لتوليد مشاهد سينمائية خارقة بالصوت والحركة بدقة 4K."
+      title="استوديو الفيديو السينمائي — Delvai Cinema"
+      subtitle="محرك الإنتاج البصري لمنصة Delvai — توليد مشاهد سينمائية فائقة السرعة بنموذج Google Veo 3.1 بدقة 4K وحركة كاميرا ومؤثرات صوتية محيطية."
     >
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
         {/* ================= TOP CYBER HUD BAR ================= */}
         <div className="relative overflow-hidden rounded-3xl glass p-3 sm:p-4 shadow-float border-primary/25 ring-glow">
           <div className="relative flex flex-wrap items-center justify-between gap-3">
-            {/* Mode Switcher */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              {[
-                { id: "text" as const, label: "نص إلى فيديو", icon: Film },
-                { id: "image" as const, label: "صورة إلى حركة", icon: ImagePlus },
-                { id: "extend" as const, label: "تمديد المشهد", icon: Expand },
-              ].map((m) => {
-                const isSelected = mode === m.id;
-                const Icon = m.icon;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => {
-                      setMode(m.id);
-                      setError(null);
-                    }}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
-                      isSelected
-                        ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.35)] scale-105"
-                        : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                    }`}
-                  >
-                    <Icon className="size-3.5" />
-                    <span>{m.label}</span>
-                  </button>
-                );
-              })}
+            {/* Mode Switchers */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => setMode("text")}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
+                  mode === "text"
+                    ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.35)] scale-105"
+                    : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                }`}
+              >
+                <Video className="size-3.5" />
+                <span>نص إلى فيديو 🎬</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMode("image")}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
+                  mode === "image"
+                    ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.35)] scale-105"
+                    : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                }`}
+              >
+                <ImagePlus className="size-3.5" />
+                <span>صورة إلى حركة 🖼️</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMode("extend")}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
+                  mode === "extend"
+                    ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.35)] scale-105"
+                    : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                }`}
+              >
+                <Expand className="size-3.5" />
+                <span>تمديد المشهد ⏳</span>
+              </button>
             </div>
 
             {/* Model Engine Selector */}
@@ -449,7 +511,6 @@ function VideoTool() {
                         ? "bg-primary text-primary-foreground shadow-sm font-bold scale-105"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
-                    title={m.note}
                   >
                     <Zap className="size-3" />
                     <span>{m.label.split(" ")[0]} {m.label.split(" ")[1]}</span>
@@ -460,90 +521,48 @@ function VideoTool() {
           </div>
         </div>
 
-        {/* ================= MAIN STUDIO GRID ================= */}
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* ================= LEFT CONTROLS ================= */}
+        {/* ================= MAIN STUDIO CANVAS ================= */}
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* ================= LEFT / CONTROLS ================= */}
           <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
-            {/* Mode Specific Prompt Header */}
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                  <Sparkles className="size-3.5 text-primary" />
-                  {mode === "extend"
-                    ? "وصف المشهد الإضافي للتمديد"
-                    : mode === "image"
-                    ? "وصف الحركة والتفاعل للصورة"
-                    : "وصف السيناريو والمشهد السينمائي"}
-                </span>
-
-                <div className="flex items-center gap-1.5">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={enhance}
-                    disabled={enhancing || !prompt.trim()}
-                    className="h-7 rounded-xl text-xs text-primary hover:bg-primary/10 transition-colors font-semibold"
-                  >
-                    {enhancing ? <DelvaiThinkingLoader size="xs" inline /> : <Wand2 className="size-3.5 me-1" />}
-                    تحسين الإخراج
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleVoice}
-                    className={`size-7 rounded-xl transition-all ${
-                      isListening
-                        ? "bg-destructive/20 text-destructive animate-pulse"
-                        : "text-muted-foreground hover:text-primary hover:bg-primary/10"
-                    }`}
-                    title="وصف المشهد بالصوت"
-                  >
-                    {isListening ? <MicOff className="size-3.5" /> : <Mic className="size-3.5" />}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Textarea */}
-              <div className="mt-2 relative rounded-2xl border border-border/80 bg-background/80 p-3 shadow-inner focus-within:border-primary/80 focus-within:shadow-[0_0_20px_oklch(0.82_0.14_82/0.2)] transition-all">
-                <Textarea
-                  rows={3}
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="مثال: لقطة سينمائية بطيئة لرائد فضاء يكتشف بوابة مضيئة في كوكب فضائي مع حركة كاميرا دائرية وانعكاسات نيون مذهلة…"
-                  className="w-full resize-none border-none bg-transparent p-0 text-sm leading-6 placeholder:text-muted-foreground/60 outline-none focus-visible:ring-0"
-                />
-              </div>
-            </div>
-
-            {/* Image to Video Upload Slots */}
+            {/* Mode: Image Uploads */}
             {mode === "image" && (
-              <div className="grid grid-cols-2 gap-3 border-t border-border/40 pt-3">
+              <div className="grid grid-cols-2 gap-3">
                 {/* First Frame */}
                 <div>
-                  <span className="mb-1.5 block text-xs font-bold text-muted-foreground">صورة البداية (إلزامية):</span>
+                  <span className="mb-1.5 block text-xs font-bold text-foreground">
+                    صورة البداية (إلزامي):
+                  </span>
                   <div
                     onClick={() => firstRef.current?.click()}
-                    className="cursor-pointer overflow-hidden rounded-2xl border border-dashed border-border/80 bg-card/40 p-3 text-center hover:border-primary/50 transition-colors"
+                    className={`relative flex aspect-video cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed transition-all ${
+                      firstFrame
+                        ? "border-primary/80 bg-background"
+                        : "border-border/80 bg-background/60 hover:border-primary/50"
+                    }`}
                   >
                     {firstFrame ? (
-                      <div className="relative group">
-                        <img src={firstFrame.preview} alt="البداية" className="h-20 w-full rounded-xl object-cover" />
+                      <>
+                        <img
+                          src={firstFrame.preview}
+                          alt="First Frame"
+                          className="size-full object-cover"
+                        />
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setFirstFrame(null);
                           }}
-                          className="absolute top-1 end-1 rounded-full bg-destructive p-1 text-destructive-foreground shadow"
+                          className="absolute end-1.5 top-1.5 rounded-full bg-background/80 p-1 text-foreground hover:text-destructive"
                         >
-                          <X className="size-3" />
+                          <X className="size-3.5" />
                         </button>
-                      </div>
+                      </>
                     ) : (
-                      <div className="py-2 text-xs text-muted-foreground">
-                        <Upload className="mx-auto mb-1 size-5 text-primary/70" />
-                        <span>اختر صورة البداية</span>
+                      <div className="flex flex-col items-center gap-1 text-xs text-muted-foreground p-2 text-center">
+                        <Upload className="size-5 text-primary/70" />
+                        <span>ارفع صورة البداية</span>
                       </div>
                     )}
                   </div>
@@ -561,29 +580,39 @@ function VideoTool() {
 
                 {/* Last Frame */}
                 <div>
-                  <span className="mb-1.5 block text-xs font-bold text-muted-foreground">صورة النهاية (اختيارية):</span>
+                  <span className="mb-1.5 block text-xs font-bold text-muted-foreground">
+                    صورة النهاية (اختياري):
+                  </span>
                   <div
                     onClick={() => lastRef.current?.click()}
-                    className="cursor-pointer overflow-hidden rounded-2xl border border-dashed border-border/80 bg-card/40 p-3 text-center hover:border-primary/50 transition-colors"
+                    className={`relative flex aspect-video cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed transition-all ${
+                      lastFrame
+                        ? "border-primary/80 bg-background"
+                        : "border-border/80 bg-background/60 hover:border-primary/50"
+                    }`}
                   >
                     {lastFrame ? (
-                      <div className="relative group">
-                        <img src={lastFrame.preview} alt="النهاية" className="h-20 w-full rounded-xl object-cover" />
+                      <>
+                        <img
+                          src={lastFrame.preview}
+                          alt="Last Frame"
+                          className="size-full object-cover"
+                        />
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setLastFrame(null);
                           }}
-                          className="absolute top-1 end-1 rounded-full bg-destructive p-1 text-destructive-foreground shadow"
+                          className="absolute end-1.5 top-1.5 rounded-full bg-background/80 p-1 text-foreground hover:text-destructive"
                         >
-                          <X className="size-3" />
+                          <X className="size-3.5" />
                         </button>
-                      </div>
+                      </>
                     ) : (
-                      <div className="py-2 text-xs text-muted-foreground">
-                        <Upload className="mx-auto mb-1 size-5 text-primary/70" />
-                        <span>انتقال إلى نهاية المشهد</span>
+                      <div className="flex flex-col items-center gap-1 text-xs text-muted-foreground p-2 text-center">
+                        <Plus className="size-5 text-muted-foreground/60" />
+                        <span>نهاية الحركة</span>
                       </div>
                     )}
                   </div>
@@ -601,10 +630,55 @@ function VideoTool() {
               </div>
             )}
 
-            {/* Styles Selector */}
+            {/* Prompt Textarea */}
+            <div className="relative">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Film className="size-3.5 text-primary" />
+                  وصف المشهد السينمائي والحركة:
+                </span>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={toggleVoice}
+                    className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-xs transition-colors ${
+                      isListening
+                        ? "border-destructive bg-destructive/10 text-destructive animate-pulse"
+                        : "border-border/60 bg-background/50 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {isListening ? <MicOff className="size-3" /> : <Mic className="size-3" />}
+                    <span>{isListening ? "استماع…" : "إملاء"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void enhance()}
+                    disabled={enhancing || !prompt.trim()}
+                    className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary hover:bg-primary/20 transition-colors disabled:opacity-50"
+                  >
+                    <Wand2 className={`size-3 ${enhancing ? "animate-spin" : ""}`} />
+                    <span>{enhancing ? "تحسين سريع…" : "تحسين سينمائي"}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-inner focus-within:border-primary/80 focus-within:shadow-[0_0_20px_oklch(0.82_0.14_82/0.2)] transition-all">
+                <Textarea
+                  rows={3}
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="مثال: سيارة رياضية سوداء تسير في شوارع مدينة مضيئة بالنيون والمطر ينعكس على هيكلها المصقول مع حركة كاميرا درامية…"
+                  className="w-full resize-none border-none bg-transparent p-0 text-sm leading-6 placeholder:text-muted-foreground/60 outline-none focus-visible:ring-0"
+                />
+              </div>
+            </div>
+
+            {/* Visual Style Presets */}
             <div>
               <span className="mb-2 block text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                النمط البصري والسينمائي:
+                النمط البصري (Visual Style):
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {STYLES.map((s) => {
@@ -615,13 +689,13 @@ function VideoTool() {
                       key={s.id}
                       type="button"
                       onClick={() => setStyle(s.id)}
-                      className={`flex items-center gap-2 rounded-2xl border p-2 text-xs font-semibold transition-all ${
+                      className={`flex items-center gap-2 rounded-2xl border p-2.5 text-xs font-semibold text-start transition-all ${
                         isSelected
                           ? "border-primary bg-primary/15 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.25)] font-bold scale-[1.02]"
                           : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
                       }`}
                     >
-                      <Icon className="size-3.5 shrink-0" />
+                      <Icon className="size-3.5 shrink-0 text-primary" />
                       <span className="truncate">{s.label}</span>
                     </button>
                   );
@@ -629,13 +703,12 @@ function VideoTool() {
               </div>
             </div>
 
-            {/* Camera Motion & Lighting Selectors */}
+            {/* Camera Motion & Lighting Presets */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-border/40 pt-3">
               {/* Camera Motion */}
               <div>
-                <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
-                  <Camera className="size-3.5 text-primary" />
-                  حركة الكاميرا:
+                <span className="mb-1.5 block text-xs font-bold text-muted-foreground">
+                  حركة الكاميرا والعدسة:
                 </span>
                 <select
                   value={camera}
@@ -652,8 +725,7 @@ function VideoTool() {
 
               {/* Lighting */}
               <div>
-                <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
-                  <Sun className="size-3.5 text-primary" />
+                <span className="mb-1.5 block text-xs font-bold text-muted-foreground">
                   الإضاءة والأجواء:
                 </span>
                 <select
@@ -670,75 +742,125 @@ function VideoTool() {
               </div>
             </div>
 
-            {/* Aspect Ratio, Duration & Audio Switches */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-3">
-              {/* Ratio */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-muted-foreground">الإطار:</span>
-                {RATIOS.map((r) => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRatio(r.id)}
-                    className={`rounded-xl border px-3 py-1 text-xs font-bold transition-all ${
-                      ratio === r.id
-                        ? "border-primary bg-primary/15 text-primary shadow-sm"
-                        : "border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {r.label}
-                  </button>
-                ))}
-              </div>
-
+            {/* Quick Duration & Speed Controls */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 border-t border-border/40 pt-3">
               {/* Duration */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-muted-foreground">المدة:</span>
-                {DURATIONS.map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => setDuration(d)}
-                    className={`rounded-xl border px-2.5 py-1 text-xs font-bold transition-all ${
-                      duration === d
-                        ? "border-primary bg-primary/15 text-primary shadow-sm"
-                        : "border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {d} ثوانٍ
-                  </button>
-                ))}
+              <div>
+                <span className="mb-1 block text-xs font-bold text-muted-foreground">المدة الزمنية:</span>
+                <div className="flex gap-1">
+                  {DURATIONS.map((d) => (
+                    <button
+                      key={d.sec}
+                      type="button"
+                      onClick={() => setDuration(d.sec)}
+                      className={`flex-1 rounded-xl border py-1.5 text-xs font-bold transition-all ${
+                        duration === d.sec
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                          : "border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {d.sec}s
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Audio Generation Switch */}
-              <div className="flex items-center gap-2">
-                <Music className="size-3.5 text-primary" />
-                <span className="text-xs font-semibold text-muted-foreground">صوت وموسيقى:</span>
-                <Switch checked={audio} onCheckedChange={setAudio} />
+              {/* Resolution */}
+              <div>
+                <span className="mb-1 block text-xs font-bold text-muted-foreground">الجودة:</span>
+                <select
+                  value={resolution}
+                  onChange={(e) => setResolution(e.target.value as any)}
+                  className="w-full rounded-xl border border-border/80 bg-background/80 px-2.5 py-1.5 text-xs text-foreground outline-none"
+                >
+                  {RESOLUTIONS.map((r) => (
+                    <option key={r.id} value={r.id} className="bg-card text-foreground">
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Aspect Ratio */}
+              <div>
+                <span className="mb-1 block text-xs font-bold text-muted-foreground">الأبعاد:</span>
+                <div className="flex gap-1">
+                  {RATIOS.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => setRatio(r.id)}
+                      className={`flex-1 rounded-xl border py-1.5 text-xs font-bold transition-all ${
+                        ratio === r.id
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                          : "border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {r.id}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Launch Button */}
+            {/* Advanced Drawer Toggle */}
+            <div className="flex items-center justify-between border-t border-border/40 pt-3">
+              <div className="flex items-center gap-2">
+                <Switch id="audio-toggle" checked={audio} onCheckedChange={setAudio} />
+                <label htmlFor="audio-toggle" className="text-xs text-foreground font-medium cursor-pointer">
+                  توليد صوت وموسيقى تصويرية محيطية 🎵
+                </label>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Sliders className="size-3" />
+                <span>إعدادات إضافية</span>
+              </button>
+            </div>
+
+            {/* Advanced Drawer */}
+            {showAdvanced && (
+              <div className="grid grid-cols-2 gap-2.5 rounded-2xl border border-border/60 bg-background/50 p-3 text-xs">
+                <div>
+                  <label className="mb-1 block text-muted-foreground">الوصف السلبي (Negative Prompt):</label>
+                  <Input
+                    value={negative}
+                    onChange={(e) => setNegative(e.target.value)}
+                    placeholder="blurry, distorted, low quality"
+                    className="h-8 rounded-xl bg-background/70 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-muted-foreground">Seed (رقم البذرة للتكرار):</label>
+                  <Input
+                    value={seed}
+                    onChange={(e) => setSeed(e.target.value)}
+                    placeholder="عشوائي"
+                    className="h-8 rounded-xl bg-background/70 text-xs font-mono"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Launch Action */}
             <Button
               onClick={() => void run()}
-              disabled={busy || (mode === "text" && !prompt.trim()) || (mode === "image" && !firstFrame)}
+              disabled={busy}
               className="mt-2 h-12 w-full rounded-2xl bg-cine text-primary-foreground shadow-glow font-bold text-sm transition-transform hover:scale-[1.01]"
             >
               {busy ? (
                 <div className="flex items-center gap-2">
                   <DelvaiThinkingLoader size="xs" inline />
-                  <span>{VIDEO_PHASES[phaseIndex]} ({progress}%)</span>
+                  <span>دلفاي يرندر المشهد السينمائي بسرعة فائقة…</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Clapperboard className="size-4" />
-                  <span>
-                    {mode === "extend"
-                      ? "بدء تمديد المشهد"
-                      : mode === "image"
-                      ? "إطلاق تحريك الصورة سينمائياً"
-                      : "إطلاق التوليد السينمائي بدقة 4K"}
-                  </span>
+                  <Sparkles className="size-4" />
+                  <span>إطلاق الإنتاج السينمائي الفوري ⚡</span>
                 </div>
               )}
             </Button>
@@ -752,40 +874,41 @@ function VideoTool() {
 
           {/* ================= RIGHT / CINEMA VIEWPORT ================= */}
           <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
-            {/* Viewport Box */}
-            <div
-              className={`relative flex ${
-                (active?.ratio ?? ratio) === "16:9" ? "aspect-video" : "aspect-[9/16]"
-              } max-h-[60vh] w-full items-center justify-center overflow-hidden rounded-2xl border border-border/80 bg-background/80 shadow-2xl transition-all`}
-            >
-              {/* Grid Background */}
-              <div className="pointer-events-none absolute inset-0 bg-grid opacity-20" />
-
-              {busy ? (
-                <div className="relative z-10 w-full p-6 text-center max-w-sm">
-                  <DelvaiThinkingLoader size="lg" text="دلفاي يخرج المشهد بالذكاء الاصطناعي…" />
-                  <p className="mt-3 text-xs text-primary font-mono font-bold animate-pulse">
-                    {VIDEO_PHASES[phaseIndex]}
-                  </p>
-                  <div className="mt-4 w-full">
-                    <Progress value={progress} className="h-2 bg-card/60" />
-                    <span className="mt-1 block text-[11px] text-muted-foreground font-mono">
-                      اكتمال التوليد: {progress}%
-                    </span>
-                  </div>
+            {/* Live Progress HUD Bar */}
+            {busy && (
+              <div className="space-y-2 rounded-2xl border border-primary/30 bg-primary/10 p-4">
+                <div className="flex items-center justify-between text-xs font-bold text-primary">
+                  <span className="flex items-center gap-1.5">
+                    <Radio className="size-3.5 animate-pulse" />
+                    <span>{VIDEO_PHASES[phaseIndex]}</span>
+                  </span>
+                  <span className="font-mono">{Math.round(progress)}%</span>
                 </div>
-              ) : active ? (
-                <div className="relative size-full">
-                  <video
-                    src={active.url}
-                    controls
-                    autoPlay
-                    loop
-                    className="size-full object-contain"
-                  />
+                <Progress value={progress} className="h-2 rounded-full bg-primary/20" />
+              </div>
+            )}
+
+            {/* Cinema Video Viewport */}
+            <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl border border-border/80 bg-background/80 shadow-inner">
+              {active ? (
+                <video
+                  key={active.url}
+                  src={active.url}
+                  controls
+                  autoPlay
+                  loop
+                  playsInline
+                  className="size-full object-contain"
+                />
+              ) : busy ? (
+                <div className="flex flex-col items-center justify-center p-6 text-center">
+                  <DelvaiThinkingLoader size="lg" text="رندرة المشهد ومطابقة حركة الكاميرا والفيزياء…" />
+                  <p className="mt-3 text-xs text-muted-foreground animate-pulse">
+                    توليد فائق السرعة عبر محرك Google Veo 3.1
+                  </p>
                 </div>
               ) : (
-                <div className="relative z-10 p-6 text-center my-auto">
+                <div className="flex flex-col items-center justify-center p-6 text-center">
                   <div className="relative mx-auto mb-3 flex size-16 items-center justify-center">
                     <div className="pointer-events-none absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
                     <div
@@ -796,25 +919,21 @@ function VideoTool() {
                   </div>
 
                   <h3 className="text-sm sm:text-base font-bold text-foreground">
-                    استوديو دلفاي <span className="text-shine">للفيديو السينمائي</span>
+                    شاشة العرض <span className="text-shine">السينمائية فائقة السرعة</span>
                   </h3>
                   <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-                    اختر قالباً إلهامياً أدناه أو اكتب سيناريو المشهد ليبدأ دلفاي بالإخراج فوراً بدقة 4K.
+                    اكتب وصف المشهد أو اختر أحد القوالب الإلهامية بالأسفل وسيبدأ الإنتاج فوراً.
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Viewport Actions */}
+            {/* Active Video Actions */}
             {active && !busy && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <a
-                  href={active.url}
-                  download={`delvai-cinema-${Date.now()}.mp4`}
-                  className="w-full"
-                >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/40 pt-3">
+                <a href={active.url} download={`delvai-cinema-${active.id}.mp4`} className="flex-1 sm:flex-initial">
                   <Button variant="outline" size="sm" className="w-full rounded-xl text-xs gap-1.5">
-                    <Download className="size-3.5" /> تنزيل الفيديو 4K
+                    <Download className="size-3.5" /> تنزيل الفيديو MP4
                   </Button>
                 </a>
 
@@ -823,34 +942,47 @@ function VideoTool() {
                   size="sm"
                   onClick={() => {
                     setMode("extend");
-                    toast.info("تم تفعيل نمط التمديد الزمني للفيديو");
+                    toast.info("تم تفعيل نمط تمديد هذا المشهد");
                   }}
                   className="rounded-xl text-xs gap-1.5"
                 >
-                  <Expand className="size-3.5" /> تمديد مدة المشهد
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    void navigator.clipboard.writeText(active.url);
-                    toast.success("تم نسخ رابط الفيديو");
-                  }}
-                  className="rounded-xl text-xs gap-1.5 col-span-2 sm:col-span-1"
-                >
-                  <Sparkles className="size-3.5" /> نسخ الرابط
+                  <Expand className="size-3.5" /> تمديد مدة هذا المشهد
                 </Button>
               </div>
             )}
 
-            {/* Inspiration Presets (If No Active Video) */}
-            {!active && !busy && (
+            {/* Gallery of Generated Clips */}
+            {clips.length > 1 && (
+              <div className="space-y-2 border-t border-border/40 pt-3">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  المشاهد المنتجة في الجلسة:
+                </span>
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {clips.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setActive(c)}
+                      className={`relative aspect-video w-24 shrink-0 overflow-hidden rounded-xl border transition-all ${
+                        active?.id === c.id
+                          ? "border-primary ring-2 ring-primary/40 scale-105"
+                          : "border-border/70 opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <video src={c.url} className="size-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Inspiration Starter Presets (When Empty) */}
+            {clips.length === 0 && !busy && (
               <div className="space-y-2">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                  قوالب إلهامية سينمائية:
+                  قوالب سينمائية جاهزة:
                 </span>
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid gap-2 sm:grid-cols-3">
                   {INSPIRATION_CLIPS.map((c, idx) => (
                     <button
                       key={idx}
@@ -861,32 +993,9 @@ function VideoTool() {
                       <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
                         {c.title}
                       </span>
-                      <span className="mt-0.5 text-[10px] text-muted-foreground line-clamp-1">
+                      <span className="mt-0.5 text-[10px] text-muted-foreground line-clamp-2">
                         {c.desc}
                       </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Clips History */}
-            {clips.length > 1 && (
-              <div className="border-t border-border/40 pt-3">
-                <span className="mb-2 block text-[11px] font-bold text-muted-foreground">الفيديوهات المولدة في هذه الجلسة ({clips.length}):</span>
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {clips.map((c, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setActive(c)}
-                      className={`relative shrink-0 overflow-hidden rounded-xl border-2 transition-all ${
-                        active?.id === c.id
-                          ? "border-primary shadow-[0_0_10px_oklch(0.82_0.14_82/0.4)] scale-105"
-                          : "border-border/60 opacity-70 hover:opacity-100"
-                      }`}
-                    >
-                      <video src={c.url} className="size-16 object-cover pointer-events-none" />
                     </button>
                   ))}
                 </div>
