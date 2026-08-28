@@ -63,7 +63,7 @@ export function ToolShell({
 
 export function SiteHeader() {
   const { user, loading, signOut } = useAuth();
-  const { lang, toggle } = useLang();
+  const { lang, setLang, toggle } = useLang();
 
   return (
     <div className="sticky top-0 z-30">
@@ -116,26 +116,28 @@ export function SiteHeader() {
                 >
                   <Languages className="size-4 text-primary" />
                   <span className="font-semibold text-xs">
-                    {SUPPORTED_LANGUAGES.find((l) => l.code === lang)?.flag}{" "}
                     {SUPPORTED_LANGUAGES.find((l) => l.code === lang)?.nativeName ?? "العربية"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="glass border-border/80 min-w-[10.5rem] p-1 shadow-float">
+              <DropdownMenuContent align="end" className="glass border-border/80 min-w-[11.5rem] p-1.5 shadow-float z-50">
                 {SUPPORTED_LANGUAGES.map((l) => (
                   <DropdownMenuItem
                     key={l.code}
+                    onSelect={() => setLang(l.code)}
                     onClick={() => setLang(l.code)}
                     data-no-translate
-                    className={`flex items-center justify-between gap-3 text-xs cursor-pointer rounded-lg px-2.5 py-1.5 ${
-                      lang === l.code ? "bg-primary/15 text-primary font-bold" : "text-foreground hover:bg-card/70"
+                    className={`flex items-center justify-between gap-3 text-xs cursor-pointer rounded-lg px-2.5 py-1.5 my-0.5 transition-colors ${
+                      lang === l.code ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-primary/10"
                     }`}
                   >
                     <span className="flex items-center gap-2">
-                      <span className="text-base">{l.flag}</span>
-                      <span>{l.nativeName}</span>
+                      <span className="font-mono text-[10px] font-bold rounded bg-muted/60 px-1.5 py-0.5 text-foreground/80">
+                        {l.code.toUpperCase()}
+                      </span>
+                      <span className="font-medium">{l.nativeName}</span>
                     </span>
-                    <span className="text-[10px] text-muted-foreground uppercase">{l.code}</span>
+                    <span className="text-[10px] opacity-70">{l.name}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>

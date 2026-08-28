@@ -124,15 +124,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     });
     let node = walker.nextNode() as Text | null;
     while (node) {
+      if (!textNodes.current.has(node) && node.nodeValue) {
+        textNodes.current.set(node, node.nodeValue);
+      }
       const original = textNodes.current.get(node) ?? node.nodeValue ?? "";
-      const next = translate(original, currentLang);
-      if (next) {
-        const lead = /^\s*/.exec(original)?.[0] ?? "";
-        const trail = /\s*$/.exec(original)?.[0] ?? "";
-        const value = lead + next + trail;
-        if (node.nodeValue !== value) {
-          if (!textNodes.current.has(node)) textNodes.current.set(node, original);
-          node.nodeValue = value;
+      if (currentLang === "ar") {
+        if (node.nodeValue !== original) {
+          node.nodeValue = original;
+        }
+      } else {
+        const next = translate(original, currentLang);
+        if (next) {
+          const lead = /^\s*/.exec(original)?.[0] ?? "";
+          const trail = /\s*$/.exec(original)?.[0] ?? "";
+          const value = lead + next + trail;
+          if (node.nodeValue !== value) {
+            node.nodeValue = value;
+          }
         }
       }
       node = walker.nextNode() as Text | null;
@@ -148,13 +156,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       for (const attr of ATTRS) {
         const current = el.getAttribute(attr);
         if (!current) continue;
-        const saved = attrNodes.current.get(el)?.[attr] ?? current;
-        const next = translate(saved, currentLang);
-        if (next && current !== next) {
+        if (!attrNodes.current.get(el)?.[attr]) {
           const bucket = attrNodes.current.get(el) ?? {};
-          bucket[attr] = saved;
+          bucket[attr] = current;
           attrNodes.current.set(el, bucket);
-          el.setAttribute(attr, next);
+        }
+        const original = attrNodes.current.get(el)?.[attr] ?? current;
+        if (currentLang === "ar") {
+          if (current !== original) {
+            el.setAttribute(attr, original);
+          }
+        } else {
+          const next = translate(original, currentLang);
+          if (next && current !== next) {
+            el.setAttribute(attr, next);
+          }
         }
       }
     }
@@ -162,15 +178,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const restoreArabic = useCallback(() => {
     for (const [node, original] of textNodes.current) {
-      if (node.isConnected) node.nodeValue = original;
-    }
-    textNodes.current.clear();
-    for (const [el, attrs] of attrNodes.current) {
-      for (const [attr, original] of Object.entries(attrs)) {
-        if (el.isConnected) el.setAttribute(attr, original);
+      if (node.isConnected && node.nodeValue !== original) {
+        node.nodeValue = original;
       }
     }
-    attrNodes.current.clear();
+    for (const [el, attrs] of attrNodes.current) {
+      if (el.isConnected) {
+        for (const [attr, original] of Object.entries(attrs)) {
+          if (el.getAttribute(attr) !== original) {
+            el.setAttribute(attr, original);
+          }
+        }
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -180,19 +200,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     if (lang === "ar") {
       restoreArabic();
-      return;
+    } else {
+      restoreArabic();
+      applyLanguage(document.body, lang);
     }
 
-    // Always reset back to original Arabic first if switching between non-Arabic languages
-    restoreArabic();
+    let timer: number | null = null;
+    const observer = new MutationObserver(() => {
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        if (lang === "ar") {
+          restoreArabic();
+        } else {
+          applyLanguage(document.body, lang);
+        }
+      }, 50);
+    });
 
-    let frame = 0;
-    const run = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => applyLanguage(document.body, lang));
-    };
-    run();
-    const observer = new MutationObserver(run);
     observer.observe(document.body, {
       childList: true,
       subtree: true,
@@ -200,9 +224,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       attributes: true,
       attributeFilter: [...ATTRS],
     });
+
     return () => {
+      if (timer) window.clearTimeout(timer);
       observer.disconnect();
-      cancelAnimationFrame(frame);
     };
   }, [lang, applyLanguage, restoreArabic]);
 
