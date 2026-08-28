@@ -26,6 +26,7 @@ import {
   Upload,
   Volume2,
   VolumeX,
+  Wand2,
   X,
   Zap,
 } from "lucide-react";
@@ -42,7 +43,7 @@ import { extractFile, toCsvDownload, type ExtractedDoc } from "@/lib/extract";
 export const Route = createFileRoute("/docs")({
   head: () => ({
     meta: [
-      { title: "استوديو تحليل المستندات والبيانات (Delvai Docs) | بث لحظي فائق السرعة" },
+      { title: "استوديو تحليل المستندات والبيانات (Delvai Docs) | ذكاء اصطناعي فائق السرعة" },
       {
         name: "description",
         content:
@@ -59,6 +60,11 @@ export const Route = createFileRoute("/docs")({
   }),
   component: DocsStudio,
 });
+
+const ENGINES = [
+  { id: "google/gemini-3.7-flash", label: "Gemini 3.7 اللحظي", tag: "بث فوري ⚡" },
+  { id: "google/gemini-3.7-pro", label: "Gemini 3.7 تفكير عميق", tag: "تحليل استراتيجي 🧠" },
+];
 
 const PRESETS = [
   {
@@ -99,6 +105,77 @@ const PRESETS = [
   },
 ] as const;
 
+const SAMPLES = [
+  {
+    title: "عقد استشاري تجاري",
+    desc: "نموذج اتفاقية خدمات تقنية مع بنود سداد وغرامات تأخير والتزامات أطراف.",
+    text: `اتفاقية تقديم خدمات استشارية وتقنية
+الطرف الأول: شركة دلفاي للحلول الذكية (المزود)
+الطرف الثاني: شركة الأفق للتجارة (العميل)
+
+المادة الأولى: موضوع العقد
+يقوم المزود بتطوير ونشر منصة ذكاء اصطناعي مخصصة لإدارة العمليات التجارية للعميل.
+
+المادة الثانية: القيمة المالية وطريقة السداد
+إجمالي قيمة العقد 150,000 ريال سعودي، تُدفع على 3 دفعات متساوية:
+1. دفعة أولى 30% عند توقيع العقد.
+2. دفعة ثانية 40% عند تسليم النسخة التجريبية.
+3. دفعة أخيرة 30% بعد الإطلاق الرسمي والقبول النهائي.
+
+المادة الثالثة: المدة الزمنية وغرامات التأخير
+مدة تنفيذ المشروع 90 يوماً تقويمياً. في حال تأخر المزود عن التسليم، تُفرض غرامة تأخير قدرها 1,000 ريال عن كل يوم تأخير بحد أقصى 10% من إجمالي قيمة العقد.
+
+المادة الرابعة: السرية وحقوق الملكية
+تؤول كافة حقوق الملكية الفكرية والشفرة البرمجية المخصصة للطرف الثاني بعد استيفاء كامل المستحقات المالية.`,
+  },
+  {
+    title: "تقرير أداء مالي فصلي",
+    desc: "بيانات إيرادات وتكاليف وهوامش ربح مع مقارنة أداء ربع سنوي.",
+    text: `تقرير الأداء المالي للربع الثاني - 2026
+
+1. الإيرادات الإجمالية:
+- مبيعات الاشتراكات السحابية: 850,000 دولار (+24% مقارنة بالربع الأول)
+- الخدمات الاستشارية المباشرة: 320,000 دولار (+15%)
+- مبيعات الرخص المؤسسية: 430,000 دولار (+30%)
+إجمالي الإيرادات: 1,600,000 دولار
+
+2. التكاليف التشغيلية (OPEX):
+- الخوادم والبنية السحابية GPU: 210,000 دولار
+- الرواتب والمكافآت: 540,000 دولار
+- التسويق واكتساب العملاء: 180,000 دولار
+- مصاريف إدارية وعمومية: 90,000 دولار
+إجمالي التكاليف: 1,020,000 دولار
+
+3. صافي الأرباح وهوامش الربحية:
+- صافي الربح التشغيلي (EBITDA): 580,000 دولار
+- هامش الربح التشغيلي: 36.25%
+- معدل بقاء العملاء السنوي (Retention Rate): 94.5%`,
+  },
+  {
+    title: "دراسة جدوى إطلاق منتج",
+    desc: "تحليل السوق، الجمهور المستهدف، المزايا التنافسية، وخطة التسعير.",
+    text: `دراسة جدوى وخطة إطلاق: منصة Delvai Copy الذكية
+
+1. الفرصة السوقية:
+تزايد الطلب على أدوات صناعة المحتوى العربي بنسبة 140% سنوياً مع نقص في الأدوات المتخصصة في التسويق المحلي واللهجات الخليجية والمصرية.
+
+2. الجمهور المستهدف:
+- المتاجر الإلكترونية ورواد أعمال الدروب شيبينغ.
+- وكالات الإعلانات والتسويق الرقمي.
+- صناع المحتوى واليوتيوبرز والمدونون.
+
+3. الميزة التنافسية:
+- توليد إعلانات بنماذج AIDA و PAS بنقرة واحدة.
+- بث لحظي سريع بدون انتظار.
+- دمج التعليق الصوتي العصبي مع النصوص في حزمة واحدة.
+
+4. خطة التسعير المقترحة:
+- الخطة المجانية: 50 عملية شهرياً للتجربة.
+- خطة المحترفين: 29 دولار/شهرياً لعمليات غير محدودة.
+- خطة الشركات: 99 دولار/شهرياً مع واجهات API ودعم فني مخصص.`,
+  },
+];
+
 const KIND_LABEL: Record<ExtractedDoc["kind"], string> = {
   pdf: "PDF",
   word: "Word",
@@ -112,6 +189,7 @@ type ChatMsg = { role: "user" | "assistant"; content: string };
 function DocsStudio() {
   const save = useServerFn(saveGeneration);
 
+  const [model, setModel] = useState(ENGINES[0].id);
   const [docs, setDocs] = useState<ExtractedDoc[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [pasted, setPasted] = useState("");
@@ -151,6 +229,7 @@ function DocsStudio() {
           toast.error(`تعذّر استخراج محتوى ${file.name}`);
         }
       }
+      toast.success("تم تحميل واستخراج محتوى المستند بنجاح!");
     } finally {
       setLoadingFiles(false);
     }
@@ -160,13 +239,18 @@ function DocsStudio() {
     setDocs((p) => p.filter((_, i) => i !== idx));
   };
 
+  const loadSample = (sample: (typeof SAMPLES)[number]) => {
+    setPasted(sample.text);
+    toast.success(`تم اختيار نموذج: ${sample.title}`);
+  };
+
   const buildContext = () => {
     const parts: string[] = [];
     docs.forEach((d) => {
       if (d.text) parts.push(`--- بداية مستند: ${d.name} (${KIND_LABEL[d.kind]}) ---\n${d.text}\n--- نهاية المستند ---`);
     });
     if (pasted.trim()) {
-      parts.push(`--- نص مدخل يدويًا ---\n${pasted.trim()}\n--- نهاية النص ---`);
+      parts.push(`--- نص المستند / المدخلات ---\n${pasted.trim()}\n--- نهاية النص ---`);
     }
     return parts.join("\n\n");
   };
@@ -188,7 +272,7 @@ function DocsStudio() {
         signal: controller.signal,
         body: JSON.stringify({
           system,
-          model: "google/gemini-3.7-flash",
+          model,
           messages: [{ role: "user", content: userPrompt }],
         }),
       });
@@ -253,7 +337,8 @@ function DocsStudio() {
 
     setBusy(false);
     if (fullResult) {
-      toast.success(`تم إتمام تحليل: ${p.label}`);
+      toast.success(`تم إتمام تحليل: ${p.label} ⚡`);
+      void save({ data: { tool: "مستندات", prompt: p.label, result_text: fullResult } });
     }
   };
 
@@ -307,10 +392,28 @@ function DocsStudio() {
     window.speechSynthesis.speak(utterance);
   };
 
+  const copyToClipboard = (text: string) => {
+    void navigator.clipboard.writeText(text);
+    setCopied(true);
+    toast.success("تم نسخ التحليل");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const downloadAsMarkdown = (text: string) => {
+    const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `delvai-docs-${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("تم تنزيل التحليل بصيغة Markdown");
+  };
+
   return (
     <ToolShell
       title="استوديو تحليل المستندات والبيانات — Delvai Docs"
-      subtitle="عقل التحليل واستخراج البيانات لمنصة Delvai — تحليل ملفات PDF وWord وExcel ببث لحظي فوري، استخراج الجداول، مراجعة العقود، ومحادثة ذكية مع مستنداتك."
+      subtitle="عقل التحليل واستخراج البيانات لمنصة Delvai — فحص ملفات PDF وWord وExcel بالبث اللحظي الفوري، استخراج الجداول، مراجعة العقود، ومحادثة ذكية مع مستنداتك."
     >
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
         {/* ================= TOP CYBER HUD BAR ================= */}
@@ -320,21 +423,47 @@ function DocsStudio() {
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3.5 py-1 text-xs font-bold text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.25)]">
                 <Sparkles className="size-3.5 animate-pulse" />
-                <span>محرك Multimodal Gemini 3.7 اللحظي لتحليل الوثائق متصل</span>
+                <span>محرك Multimodal Gemini 3.7 لتحليل الوثائق متصل</span>
               </span>
             </div>
 
-            {/* Document Counter */}
-            <div className="ms-auto flex items-center gap-2 text-xs text-muted-foreground font-mono">
-              <span>المستندات المحملة: {docs.length}</span>
-              <span>·</span>
-              <span>{totalChars.toLocaleString("ar-EG")} حرف</span>
+            {/* Model Selector & Document Counter */}
+            <div className="ms-auto flex items-center gap-3">
+              <div className="flex items-center gap-1 rounded-2xl border border-primary/30 bg-card/60 p-1">
+                <span className="ps-2 pe-1 text-[10px] font-bold text-muted-foreground font-mono uppercase">
+                  المحرك:
+                </span>
+                {ENGINES.map((e) => {
+                  const isSelected = model === e.id;
+                  return (
+                    <button
+                      key={e.id}
+                      type="button"
+                      onClick={() => setModel(e.id)}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground shadow-sm font-bold scale-105"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Zap className="size-3" />
+                      <span>{e.label.split(" ")[0]} {e.label.split(" ")[1]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+                <span>{docs.length} مستند</span>
+                <span>·</span>
+                <span>{totalChars.toLocaleString("ar-EG")} حرف</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* ================= MAIN STUDIO CANVAS ================= */}
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           {/* ================= LEFT / DOCUMENT VAULT & ACTIONS ================= */}
           <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
             {/* Upload Box */}
@@ -353,7 +482,7 @@ function DocsStudio() {
                 className="cursor-pointer rounded-2xl border border-dashed border-border/80 bg-background/60 p-6 text-center text-xs text-muted-foreground hover:border-primary/50 transition-colors"
               >
                 {loadingFiles ? (
-                  <DelvaiThinkingLoader size="sm" text="جارٍ استخراج نصوص المستندات…" inline />
+                  <DelvaiThinkingLoader size="sm" text="جارٍ استخراج نصوص وبيانات المستندات…" inline />
                 ) : (
                   <>
                     <Upload className="mx-auto mb-2 size-7 text-primary/70" />
@@ -361,7 +490,7 @@ function DocsStudio() {
                       اسحب الملفات هنا أو اضغط للاختيار من جهازك
                     </p>
                     <p className="mt-1 text-[11px] text-muted-foreground">
-                      يدعم حتى 8 ملفات بحجم يصل إلى 25 ميجابايت لكل ملف
+                      يدعم حتى 8 ملفات (PDF, Word, Excel, CSV, صور) بحجم يصل إلى 25MB لكل ملف
                     </p>
                   </>
                 )}
@@ -381,7 +510,7 @@ function DocsStudio() {
             {docs.length > 0 && (
               <div className="space-y-1.5">
                 <span className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                  المستندات في الجلسة:
+                  المستندات المحملة في الجلسة:
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {docs.map((d, i) => (
@@ -421,6 +550,32 @@ function DocsStudio() {
               </div>
             </div>
 
+            {/* Sample Templates Demo (When No Document) */}
+            {docs.length === 0 && !pasted && (
+              <div className="space-y-1.5 border-t border-border/40 pt-3">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  أو جرّب أحد النماذج الجاهزة فوراً:
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {SAMPLES.map((s, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => loadSample(s)}
+                      className="flex flex-col items-start rounded-2xl border border-border/70 bg-card/40 p-2.5 text-start hover:border-primary/50 hover:bg-card/80 transition-all"
+                    >
+                      <span className="text-xs font-bold text-foreground hover:text-primary transition-colors">
+                        {s.title}
+                      </span>
+                      <span className="mt-0.5 text-[10px] text-muted-foreground line-clamp-1">
+                        {s.desc}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Instant AI Action Presets */}
             <div className="border-t border-border/40 pt-3">
               <span className="mb-2 block text-xs font-bold text-muted-foreground uppercase tracking-wider">
@@ -438,7 +593,7 @@ function DocsStudio() {
                       onClick={() => void runPreset(p)}
                       className={`flex items-center gap-2 rounded-2xl border p-2.5 text-start text-xs font-semibold transition-all ${
                         isCurrent
-                          ? "border-primary bg-primary/15 text-primary shadow-sm font-bold"
+                          ? "border-primary bg-primary/15 text-primary shadow-sm font-bold scale-[1.02]"
                           : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground disabled:opacity-50"
                       }`}
                     >
@@ -457,7 +612,7 @@ function DocsStudio() {
             <div className="relative min-h-[380px] max-h-[58vh] overflow-y-auto rounded-2xl border border-border/80 bg-background/80 p-5 text-xs sm:text-sm leading-7 shadow-inner">
               {busy && !out && messages.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
-                  <DelvaiThinkingLoader size="lg" text="دلفاي يبدأ البث اللحظي السريع…" />
+                  <DelvaiThinkingLoader size="lg" text="دلفاي يحلل المستند بالبث اللحظي السريع…" />
                 </div>
               ) : out ? (
                 <div className="space-y-3">
@@ -467,19 +622,38 @@ function DocsStudio() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          void navigator.clipboard.writeText(out);
-                          toast.success("تم نسخ التحليل");
-                        }}
+                        onClick={() => copyToClipboard(out)}
                         className="h-7 text-xs gap-1"
                       >
-                        <Copy className="size-3" /> نسخ
+                        {copied ? <Check className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
+                        <span>{copied ? "تم النسخ" : "نسخ"}</span>
                       </Button>
+
+                      {activePreset === "tables" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toCsvDownload(out, `delvai-table-${Date.now()}.csv`)}
+                          className="h-7 text-xs gap-1 text-primary"
+                        >
+                          <Download className="size-3" /> تنزيل CSV
+                        </Button>
+                      )}
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => downloadAsMarkdown(out)}
+                        className="h-7 text-xs gap-1"
+                      >
+                        <Download className="size-3" /> .md
+                      </Button>
+
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleSpeak(out)}
-                        className="h-7 text-xs gap-1"
+                        className={`h-7 text-xs gap-1 ${speaking ? "text-primary animate-pulse font-bold" : ""}`}
                       >
                         {speaking ? <VolumeX className="size-3" /> : <Volume2 className="size-3" />}
                         <span>{speaking ? "إيقاف" : "استماع"}</span>
@@ -523,10 +697,10 @@ function DocsStudio() {
                     <DelvaiLogo className="size-10 drop-shadow-[0_0_15px_oklch(0.82_0.14_82/0.8)]" />
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-foreground">
-                    استوديو <span className="text-shine">تحليل المستندات الفائق</span>
+                    استوديو <span className="text-shine">تحليل المستندات والبيانات</span>
                   </h3>
                   <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-                    ارفع ملفك أو اختر أحد التحليلات الفورية ليقوم دلفاي بقراءته وتلخيصه ببث لحظي فائق السرعة.
+                    ارفع ملفك أو اختر أحد التحليلات الفورية أو النماذج الجاهزة وسيبدأ دلفاي بقراءته وتلخيصه ببث لحظي فائق السرعة.
                   </p>
                 </div>
               )}
