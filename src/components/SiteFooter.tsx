@@ -133,7 +133,7 @@ export function SiteFooter() {
                   className="flex items-center gap-1.5 transition-colors hover:text-primary"
                 >
                   <Bot className="size-3.5 text-primary/80" />
-                  المساعد الذكي الفوري
+                  دلفاي برايم (Delvai Prime)
                 </Link>
               </li>
               <li>

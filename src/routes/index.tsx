@@ -69,7 +69,7 @@ const TOOL_META: Record<
 > = {
   "/video": { icon: Clapperboard, tag: "فيديو سينمائي 4K", highlight: "فيديو سينمائي مع حركة كاميرا وصوت متزامن" },
   "/image": { icon: ImageIcon, tag: "استوديو الصور", highlight: "صور فائقة الواقعية بدقة وإضاءة احترافية" },
-  "/chat": { icon: Bot, tag: "المساعد الفوري", highlight: "مساعد ذكي يحلل ويفكر خطوة بخطوة بلحظات" },
+  "/chat": { icon: Bot, tag: "Delvai Prime", highlight: "المساعد الذكي الخارق للإجابات الفورية والتفكير العميق" },
   "/write": { icon: PenLine, tag: "أطر تسويقية AIDA", highlight: "صياغة إعلانات مقنعة وتدوينات ترفع المبيعات" },
   "/voice": { icon: Mic, tag: "١٠ أصوات طبيعية", highlight: "تفريغ التسجيلات وتحويل النصوص إلى صوت عربي مبهر" },
   "/docs": { icon: FileSpreadsheet, tag: "PDF · Word · Excel", highlight: "استخراج الجداول وتلخيص العقود والبيانات المعقدة" },
@@ -289,9 +289,9 @@ function Home() {
 
             <div className="mt-8 flex flex-wrap justify-center gap-2">
               {[
+                { id: "chat", label: "دلفاي برايم (Delvai Prime)", icon: Bot },
                 { id: "video", label: "استوديو الفيديو", icon: Clapperboard },
                 { id: "image", label: "توليد الصور", icon: ImageIcon },
-                { id: "chat", label: "المساعد الفوري", icon: Bot },
                 { id: "voice", label: "الصوتيات", icon: Mic },
                 { id: "docs", label: "المستندات", icon: FileSpreadsheet },
               ].map((tab) => {
@@ -317,6 +317,75 @@ function Home() {
           </div>
 
           <div className="reveal mt-12 rounded-3xl glass p-4 sm:p-8 shadow-float ring-glow border-primary/30" data-reveal>
+            {activeTab === "chat" && (
+              <div className="grid gap-8 lg:grid-cols-2 items-center">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1 text-xs text-primary font-bold">
+                    <Sparkles className="size-3.5" />
+                    دلفاي برايم — Delvai Prime
+                  </div>
+                  <h3 className="text-2xl font-black sm:text-3xl">
+                    المساعد الذكي الخارق للإجابات الفورية والتفكير العميق
+                  </h3>
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    تحدث مع <strong>دلفاي برايم</strong> عقل الذكاء الاصطناعي لمنصة Delvai، يبث الإجابات لحظياً كلمة بكلمة، ويحلل أصعب المسائل البرمجية والعلمية والاستشارية بأعلى درجات المنطق والدقة.
+                  </p>
+                  <Link to="/chat" className="inline-block pt-2">
+                    <Button className="bg-cine text-primary-foreground shadow-glow">
+                      بدء المحادثة مع دلفاي برايم <ArrowLeft className="size-4" />
+                    </Button>
+                  </Link>
+                </div>
+                <div className="rounded-2xl border border-border/80 bg-card/60 p-5 space-y-3 font-sans text-xs">
+                  <div className="flex items-center gap-2 border-b border-border/60 pb-2.5">
+                    <Bot className="size-4 text-primary" />
+                    <span className="font-bold text-foreground">Delvai Prime Core</span>
+                    <span className="ms-auto inline-flex items-center gap-1 text-[10px] text-primary bg-primary/10 rounded-full px-2 py-0.5 font-mono">
+                      <span className="size-1.5 rounded-full bg-primary animate-ping" />
+                      بث مباشر
+                    </span>
+                  </div>
+                  <div className="ms-auto w-fit max-w-[85%] rounded-xl bg-secondary/80 px-3.5 py-2">
+                    كيف أصيغ استراتيجية نمو مضاعفة لمشروعي باستخدام الذكاء الاصطناعي؟
+                  </div>
+                  <div className="w-fit max-w-[90%] rounded-xl bg-card/90 border border-border/70 px-3.5 py-2.5 leading-6 text-foreground">
+                    ✨ <strong>خطة دلفاي برايم للنمو المتسارع:</strong>
+                    <br />1. أتمتة صناعة المحتوى الإعلاني والفيديو عبر استوديوهات Delvai.
+                    <br />2. تحليل عقود الموردين وبيانات المبيعات لحظياً واستخراج فرص التوفير.
+                    <br />3. بناء تجربة عملاء فورية متعددة اللغات…
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "image" && (
+              <div className="grid gap-8 lg:grid-cols-2 items-center">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1 text-xs text-primary font-bold">
+                    <ImageIcon className="size-3.5" />
+                    استوديو الصور الفائق
+                  </div>
+                  <h3 className="text-2xl font-black">تصاميم وشعارات وصور منتجات مذهلة</h3>
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    توليد وتعديل الصور بدقة فائقة مع إمكانية استخدام صور مرجعية، تغيير الخلفيات، وتحديد الأنماط الفنية المناسبة لعلامتك التجارية.
+                  </p>
+                  <Link to="/image" className="inline-block pt-2">
+                    <Button className="bg-cine text-primary-foreground shadow-glow">
+                      تجربة استوديو الصور <ArrowLeft className="size-4" />
+                    </Button>
+                  </Link>
+                </div>
+                <div className="rounded-2xl border border-border/80 bg-card/60 p-5 space-y-3">
+                  <div className="text-xs text-muted-foreground font-mono">الأمر: "صورة إعلانية فاخرة لعطر عربي على قاعدة رخامية سوداء، إضاءة درامية ناعمة"</div>
+                  <div className="rounded-xl border border-border/80 bg-background/80 p-6 text-center text-xs text-muted-foreground space-y-2">
+                    <Sparkles className="size-8 text-primary mx-auto" />
+                    <div className="text-foreground font-bold">تم إنتاج الصورة بدقة فائقة 2048x2048</div>
+                    <div className="text-[11px] text-muted-foreground">ألوان مشبعة، تدرجات حقيقية، وتحكم في الإضاءة</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {activeTab === "video" && (
               <div className="grid gap-8 lg:grid-cols-2 items-center">
                 <div className="space-y-4">
@@ -350,7 +419,7 @@ function Home() {
                       REC · 4K 60FPS
                     </span>
                     <span className="rounded-md bg-black/60 px-2.5 py-1 text-[11px] text-muted-foreground">
-                      Veo 3.1 Fast
+                      Veo 3.1
                     </span>
                   </div>
                   <div className="my-auto text-center space-y-2 z-10">
@@ -358,7 +427,7 @@ function Home() {
                       <Play className="size-6 fill-primary" />
                     </div>
                     <p className="text-xs text-foreground/90 font-medium max-w-xs mx-auto">
-                      "لقطة سينمائية بطيئة لخيول عربية تركض وقت الغروب، إضاءة ذهبية وغبار متطاير"
+                      "لقطة سينمائية بطيئة لخيول أصيلة تركض وقت الغروب، إضاءة ذهبية وغبار متطاير"
                     </p>
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-muted-foreground z-10">
@@ -366,65 +435,6 @@ function Home() {
                     <span>جاهز للتصدير</span>
                   </div>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                </div>
-              </div>
-            )}
-
-            {activeTab === "image" && (
-              <div className="grid gap-8 lg:grid-cols-2 items-center">
-                <div className="space-y-4">
-                  <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1 text-xs text-primary font-bold">
-                    <ImageIcon className="size-3.5" />
-                    استوديو الصور الفائق
-                  </div>
-                  <h3 className="text-2xl font-black">تصاميم وشعارات وصور منتجات مذهلة</h3>
-                  <p className="text-sm leading-7 text-muted-foreground">
-                    توليد وتعديل الصور بدقة فائقة مع إمكانية استخدام صور مرجعية، تغيير الخلفيات، وتحديد الأنماط الفنية المناسبة لعلامتك التجارية.
-                  </p>
-                  <Link to="/image" className="inline-block pt-2">
-                    <Button className="bg-cine text-primary-foreground shadow-glow">
-                      تجربة استوديو الصور <ArrowLeft className="size-4" />
-                    </Button>
-                  </Link>
-                </div>
-                <div className="rounded-2xl border border-border/80 bg-card/60 p-5 space-y-3">
-                  <div className="text-xs text-muted-foreground font-mono">الأمر: "صورة إعلانية فاخرة لعطر عربي على قاعدة رخامية سوداء، إضاءة درامية ناعمة"</div>
-                  <div className="rounded-xl border border-border/80 bg-background/80 p-6 text-center text-xs text-muted-foreground space-y-2">
-                    <Sparkles className="size-8 text-primary mx-auto" />
-                    <div className="text-foreground font-bold">تم إنتاج الصورة بدقة فائقة 2048x2048</div>
-                    <div className="text-[11px] text-muted-foreground">ألوان مشبعة، تدرجات حقيقية، وتحكم في الإضاءة</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "chat" && (
-              <div className="grid gap-8 lg:grid-cols-2 items-center">
-                <div className="space-y-4">
-                  <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1 text-xs text-primary font-bold">
-                    <Bot className="size-3.5" />
-                    Gemini 3.7 Thinking
-                  </div>
-                  <h3 className="text-2xl font-black">مساعد ذكي يعالج أعقد المسائل بلحظات</h3>
-                  <p className="text-sm leading-7 text-muted-foreground">
-                    دردشة ذكية تبث الإجابات حرفاً بحرف، قادرة على كتابة الأكواد، تحليل البيانات، وتقديم استشارات تسويقية وتقنية موثوقة.
-                  </p>
-                  <Link to="/chat" className="inline-block pt-2">
-                    <Button className="bg-cine text-primary-foreground shadow-glow">
-                      بدء المحادثة الآن <ArrowLeft className="size-4" />
-                    </Button>
-                  </Link>
-                </div>
-                <div className="rounded-2xl border border-border/80 bg-card/60 p-5 space-y-3 font-sans text-xs">
-                  <div className="ms-auto w-fit max-w-[85%] rounded-xl bg-secondary/80 px-3.5 py-2">
-                    كيف أصيغ عرضاً تسويقياً لا يُرفض لمتجري؟
-                  </div>
-                  <div className="w-fit max-w-[90%] rounded-xl bg-card/90 border border-border/70 px-3.5 py-2.5 leading-6 text-foreground">
-                    ✨ <strong>إليك استراتيجية العرض المغري:</strong>
-                    <br />1. حدد النتيجة الحلمية للعميل.
-                    <br />2. قدّم ضماناً قوياً (استرجاع مجاني خلال 14 يوماً).
-                    <br />3. قلل المجهود والوقت المطلوب من العميل…
-                  </div>
                 </div>
               </div>
             )}
@@ -714,7 +724,7 @@ function Home() {
               </Link>
               <Link to="/chat">
                 <Button size="lg" variant="outline" className="border-primary/40">
-                  تحدث مع المساعد الذكي
+                  تحدث مع دلفاي برايم (Delvai Prime)
                 </Button>
               </Link>
             </div>

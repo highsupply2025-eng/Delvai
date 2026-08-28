@@ -27,16 +27,16 @@ export const Route = createFileRoute("/chat")({
     typeof search["q"] === "string" ? { q: search["q"] } : {},
   head: () => ({
     meta: [
-      { title: "المساعد الذكي | دردشة ذكاء اصطناعي سريعة بالعربية" },
+      { title: "دلفاي برايم (Delvai Prime) | مساعد الذكاء الاصطناعي الفائق" },
       {
         name: "description",
         content:
-          "مساعد ذكاء اصطناعي احترافي بالعربية: إجابات فورية بالبث المباشر، أنماط تفكير متعددة، شخصيات متخصصة، وتحليل الصور.",
+          "دلفاي برايم: المساعد الذكي الخارق لمنصة Delvai. إجابات فورية بالبث المباشر، أنماط تفكير عميق لحل المسائل المعقدة، وتحليل صور ومستندات.",
       },
-      { property: "og:title", content: "المساعد الذكي — دردشة سريعة بالعربية" },
+      { property: "og:title", content: "دلفاي برايم (Delvai Prime) — عقل الذكاء الاصطناعي الفائق" },
       {
         property: "og:description",
-        content: "إجابات فورية بالبث المباشر مع شخصيات متخصصة وتحليل صور.",
+        content: "إجابات فورية بالبث المباشر مع تفكير عميق لحل أعقد المسائل بلحظات.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -269,8 +269,8 @@ function ChatTool() {
 
   return (
     <ToolShell
-      title="المساعد الذكي"
-      subtitle="إجابات فورية بالبث المباشر — اختر سرعة التفكير والشخصية المناسبة، وأرفق صورًا للتحليل."
+      title="دلفاي برايم — Delvai Prime"
+      subtitle="عقل الذكاء الاصطناعي لمنصة Delvai — إجابات فورية بالبث المباشر، تفكير عميق، تحليل صور ومستندات، وحل أصعب المسائل بلحظات."
     >
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card/60 p-3 backdrop-blur">

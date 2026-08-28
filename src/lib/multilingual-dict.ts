@@ -1,6 +1,7 @@
-﻿export const MULTI_DICT: Record<string, Record<string, string>> = {
+export const MULTI_DICT: Record<string, Record<string, string>> = {
   fr: {
-    "المساعد الذكي": "Assistant IA",
+    "دلفاي برايم": "Delvai Prime",
+    "المساعد الذكي": "Delvai Prime (IA)",
     "توليد وتحرير الصور": "Studio d'Images IA",
     "كتابة المحتوى والإعلانات": "Rédacteur de Contenu",
     "الفيديو السينمائي": "Vidéo Cinématique",
@@ -32,7 +33,8 @@
     "ابدأ صناعة المستقبل اليوم": "Créez l'avenir dès aujourd'hui",
   },
   es: {
-    "المساعد الذكي": "Asistente IA",
+    "دلفاي برايم": "Delvai Prime",
+    "المساعد الذكي": "Delvai Prime (IA)",
     "توليد وتحرير الصور": "Estudio de Imágenes IA",
     "كتابة المحتوى والإعلانات": "Redactor de Contenido",
     "الفيديو السينمائي": "Video Cinemático",
@@ -64,7 +66,8 @@
     "ابدأ صناعة المستقبل اليوم": "Comience a crear el futuro hoy",
   },
   de: {
-    "المساعد الذكي": "KI-Assistent",
+    "دلفاي برايم": "Delvai Prime",
+    "المساعد الذكي": "Delvai Prime (KI)",
     "توليد وتحرير الصور": "KI-Bildstudio",
     "كتابة المحتوى والإعلانات": "KI-Texterstellung",
     "الفيديو السينمائي": "Kino-Video",
@@ -96,7 +99,8 @@
     "ابدأ صناعة المستقبل اليوم": "Gestalten Sie die Zukunft noch heute",
   },
   tr: {
-    "المساعد الذكي": "Yapay Zeka Asistanı",
+    "دلفاي برايم": "Delvai Prime",
+    "المساعد الذكي": "Delvai Prime (YZ)",
     "توليد وتحرير الصور": "Görüntü Stüdyosu",
     "كتابة المحتوى والإعلانات": "İçerik & Reklam Yazarı",
     "الفيديو السينمائي": "Sinematik Video",
@@ -128,7 +132,8 @@
     "ابدأ صناعة المستقبل اليوم": "Geleceği Bugünden Yaratın",
   },
   zh: {
-    "المساعد الذكي": "智能AI助手",
+    "دلفاي برايم": "Delvai Prime (智能大脑)",
+    "المساعد الذكي": "Delvai Prime (AI助手)",
     "توليد وتحرير الصور": "AI图像创作工坊",
     "كتابة المحتوى والإعلانات": "智能文案与营销",
     "الفيديو السينمائي": "电影级视频生成",
@@ -160,7 +165,8 @@
     "ابدأ صناعة المستقبل اليوم": "即刻开启未来创作之旅",
   },
   ja: {
-    "المساعد الذكي": "AIアシスタント",
+    "دلفاي برايم": "Delvai Prime (AIブレイン)",
+    "المساعد الذكي": "Delvai Prime (AI)",
     "توليد وتحرير الصور": "AI画像スタジオ",
     "كتابة المحتوى والإعلانات": "AIコンテンツ・広告作成",
     "الفيديو السينمائي": "シネマティック動画生成",
