@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Check,
   Copy,
@@ -16,6 +16,7 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
+  Square,
   Volume2,
   VolumeX,
   Wand2,
@@ -26,9 +27,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { ToolShell } from "@/components/ToolShell";
-import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoader";
@@ -36,16 +35,16 @@ import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoa
 export const Route = createFileRoute("/write")({
   head: () => ({
     meta: [
-      { title: "استوديو كتابة المحتوى وصناعة الإعلانات (Delvai Copy) | ذكاء اصطناعي فائق" },
+      { title: "استوديو كتابة المحتوى وصناعة الإعلانات (Delvai Copy) | سرعة فائقة وبث فوري" },
       {
         name: "description",
         content:
-          "استوديو كتابة متكامل: صياغة إعلانات تسويقية فيروسية، مقالات SEO، أوصاف منتجات، خطابات بريد إلكتروني، تدقيق لغوي وتحليل معدل التحويل بأحدث محركات Gemini 3.7.",
+          "استوديو كتابة متكامل فائق السرعة: صياغة إعلانات تسويقية فيروسية، مقالات SEO، أوصاف منتجات، خطابات بريد إلكتروني، تدقيق لغوي وتحليل معدل التحويل بأحدث محركات Gemini 3.7 اللحظية.",
       },
       { property: "og:title", content: "استوديو كتابة المحتوى وصناعة الإعلانات — Delvai Copy" },
       {
         property: "og:description",
-        content: "محتوى تسويقي فائق التأثير بالعربية بأحدث أطر الإعلانات العالمية AIDA و PAS و 4P.",
+        content: "محتوى تسويقي فائق التأثير والسرعة بالعربية بأحدث أطر الإعلانات العالمية AIDA و PAS و 4P.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -65,9 +64,9 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 const ENGINES = [
-  { id: "google/gemini-3.7-flash", label: "Gemini 3.7 اللحظي", tag: "بث فوري" },
-  { id: "google/gemini-3.7-pro", label: "Gemini 3.7 تفكير عميق", tag: "تفكير استراتيجي" },
-  { id: "google/gemini-2.5-pro", label: "Gemini Pro المتخصص", tag: "دقة لغوية قصوى" },
+  { id: "google/gemini-3.7-flash", label: "Gemini 3.7 فائق السرعة", tag: "بث فوري لحظي" },
+  { id: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash", tag: "توليد سريع جداً" },
+  { id: "google/gemini-3.7-pro", label: "Gemini 3.7 تفكير عميق", tag: "تحليل استراتيجي" },
 ];
 
 const KINDS = [
@@ -130,7 +129,6 @@ const INSPIRATION_COPY = [
 const SEP = "-----";
 
 function WriteTool() {
-  const ask = useServerFn(chatComplete);
   const save = useServerFn(saveGeneration);
   const { user } = useAuth();
 
@@ -158,13 +156,19 @@ function WriteTool() {
   const [targetLang, setTargetLang] = useState(LANGS[0]!);
   const [seoKeyword, setSeoKeyword] = useState("");
 
+  const [streamingText, setStreamingText] = useState("");
   const [results, setResults] = useState<string[]>([]);
   const [activeVariant, setActiveVariant] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const stop = () => {
+    abortRef.current?.abort();
+    setBusy(false);
+  };
 
   const toggleSpeak = (text: string) => {
     if (speaking) {
@@ -223,9 +227,12 @@ function WriteTool() {
       return;
     }
 
+    const controller = new AbortController();
+    abortRef.current = controller;
     setBusy(true);
     setError(null);
     setResults([]);
+    setStreamingText("");
 
     let system = "";
     let userPrompt = "";
@@ -265,39 +272,98 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
       userPrompt = `حلّل قوة هذا النص التسويقي:\n\n${source}`;
     }
 
+    let acc = "";
     try {
-      const res = await ask({
-        data: {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
           system,
-          messages: [{ role: "user", content: userPrompt }],
           model,
-        },
+          messages: [{ role: "user", content: userPrompt }],
+        }),
       });
 
-      if (!res.ok || !res.text) {
-        setError(res.error || "تعذّر إتمام توليد المحتوى، حاول مجدداً.");
+      if (!res.ok || !res.body) {
+        const msg = (await res.text().catch(() => "")) || "تعذّر إتمام توليد المحتوى، حاول مجدداً.";
+        setError(msg);
+        setBusy(false);
         return;
       }
 
-      const raw = res.text.trim();
-      const parts = tab === "generate" ? raw.split(SEP).map((p) => p.trim()).filter(Boolean) : [raw];
-      setResults(parts);
-      setActiveVariant(0);
-      toast.success("تم تجهيز المحتوى التسويقي بنجاح!");
-      if (user) {
-        void save({ data: { tool: "كتابة", prompt: topic || source, result_text: raw } });
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const payload = trimmed.slice(5).trim();
+          if (!payload || payload === "[DONE]") continue;
+          try {
+            const json = JSON.parse(payload) as {
+              choices?: { delta?: { content?: string } }[];
+            };
+            const delta = json.choices?.[0]?.delta?.content;
+            if (delta) {
+              acc += delta;
+              setStreamingText(acc);
+            }
+          } catch {
+            /* ignore partial json */
+          }
+        }
       }
-    } catch {
-      setError("تعذّر الاتصال بخادم الذكاء الاصطناعي.");
+
+      if (!acc.trim()) {
+        setError("لم يتم استلام محتوى من النموذج، يرجى المحاولة مرة أخرى.");
+        setBusy(false);
+        return;
+      }
+
+      const parts =
+        tab === "generate"
+          ? acc.split(SEP).map((p) => p.trim()).filter(Boolean)
+          : [acc.trim()];
+
+      setResults(parts.length > 0 ? parts : [acc.trim()]);
+      setActiveVariant(0);
+      toast.success("تم إتمام صياغة المحتوى فائق السرعة! ⚡");
+      if (user) {
+        void save({ data: { tool: "كتابة", prompt: topic || source, result_text: acc } });
+      }
+    } catch (e) {
+      if ((e as Error)?.name === "AbortError") {
+        if (acc.trim()) {
+          const parts = tab === "generate" ? acc.split(SEP).map((p) => p.trim()).filter(Boolean) : [acc.trim()];
+          setResults(parts);
+        }
+        return;
+      }
+      setError("حدث خطأ في الاتصال، يرجى المحاولة مجدداً.");
     } finally {
       setBusy(false);
+      abortRef.current = null;
     }
   };
+
+  const displayedContent = busy
+    ? streamingText
+    : results.length > 0
+    ? results[activeVariant]
+    : "";
 
   return (
     <ToolShell
       title="استوديو كتابة المحتوى وصناعة الإعلانات — Delvai Copy"
-      subtitle="عقل الكتابة والتسويق لمنصة Delvai — صياغة إعلانات فيروسية، خطط محتوى، مقالات SEO، وتحليل معدل التحويل بأحدث محركات Gemini 3.7."
+      subtitle="عقل الكتابة والتسويق لمنصة Delvai — صياغة إعلانات فيروسية فائقة السرعة، خطط محتوى، مقالات SEO، وتحليل معدل التحويل ببث لحظي فوري."
     >
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
         {/* ================= TOP CYBER HUD BAR ================= */}
@@ -577,23 +643,27 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
             )}
 
             {/* Launch Action */}
-            <Button
-              onClick={() => void run()}
-              disabled={busy || (tab === "generate" ? !topic.trim() : !source.trim())}
-              className="mt-2 h-12 w-full rounded-2xl bg-cine text-primary-foreground shadow-glow font-bold text-sm transition-transform hover:scale-[1.01]"
-            >
+            <div className="flex items-center gap-2">
               {busy ? (
-                <div className="flex items-center gap-2">
-                  <DelvaiThinkingLoader size="xs" inline />
-                  <span>دلفاي يحلل ويصيغ المحتوى التسويقي…</span>
-                </div>
+                <Button
+                  onClick={stop}
+                  className="mt-2 h-12 w-full rounded-2xl bg-destructive/15 border border-destructive/40 text-destructive hover:bg-destructive/25 font-bold text-sm"
+                >
+                  <Square className="size-4 me-2" /> إيقاف التوليد
+                </Button>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Sparkles className="size-4" />
-                  <span>إطلاق الصياغة بالذكاء الاصطناعي</span>
-                </div>
+                <Button
+                  onClick={() => void run()}
+                  disabled={busy || (tab === "generate" ? !topic.trim() : !source.trim())}
+                  className="mt-2 h-12 w-full rounded-2xl bg-cine text-primary-foreground shadow-glow font-bold text-sm transition-transform hover:scale-[1.01]"
+                >
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="size-4" />
+                    <span>إطلاق الصياغة بالبث اللحظي الفوري ⚡</span>
+                  </div>
+                </Button>
               )}
-            </Button>
+            </div>
 
             {error && (
               <p className="rounded-2xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
@@ -605,9 +675,9 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
           {/* ================= RIGHT / OUTPUT VIEWPORT ================= */}
           <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
             {/* Variants Switcher (If multiple versions) */}
-            {results.length > 1 && (
+            {results.length > 1 && !busy && (
               <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                <span className="text-xs font-bold text-muted-foreground">النسخ المولدة:</span>
+                <span className="text-xs font-bold text-muted-foreground">النسخ المقترحة ({results.length}):</span>
                 <div className="flex gap-1.5">
                   {results.map((_, i) => (
                     <button
@@ -627,18 +697,18 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
               </div>
             )}
 
-            {/* Output Display Box */}
+            {/* Output Display Box with Live Streaming */}
             <div className="relative min-h-[380px] max-h-[60vh] overflow-y-auto rounded-2xl border border-border/80 bg-background/80 p-5 shadow-inner leading-7 text-sm">
-              {busy ? (
+              {busy && !streamingText ? (
                 <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
-                  <DelvaiThinkingLoader size="lg" text="دلفاي يصيغ أفكارك بأعلى مستويات الإقناع…" />
-                  <p className="mt-3 text-xs text-muted-foreground animate-pulse">
-                    تطبيق الأطر التسويقية وضبط النبرة ومعدل التحويل…
-                  </p>
+                  <DelvaiThinkingLoader size="lg" text="دلفاي يبدأ البث اللحظي السريع…" />
                 </div>
-              ) : results.length > 0 ? (
+              ) : displayedContent ? (
                 <div className="whitespace-pre-wrap font-sans text-foreground/95 space-y-2">
-                  {results[activeVariant]}
+                  {displayedContent}
+                  {busy && (
+                    <span className="inline-block size-2 animate-ping rounded-full bg-primary align-middle ms-1" />
+                  )}
                 </div>
               ) : (
                 <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
@@ -655,19 +725,19 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
                     استوديو دلفاي <span className="text-shine">لكتابة المحتوى والإعلانات</span>
                   </h3>
                   <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-                    اختر قالباً تسويقياً أدناه أو اكتب فكرتك وسيقوم دلفاي بصياغتها بأسلوب عالمي.
+                    اختر قالباً تسويقياً أدناه أو اكتب فكرتك وسيبدأ دلفاي بالبث اللحظي لكلماته فوراً.
                   </p>
                 </div>
               )}
             </div>
 
             {/* Output Actions Toolbar */}
-            {results.length > 0 && !busy && (
+            {displayedContent && !busy && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => void copyText(results[activeVariant]!)}
+                  onClick={() => void copyText(displayedContent)}
                   className="rounded-xl text-xs gap-1.5"
                 >
                   {copied ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
@@ -677,7 +747,7 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => toggleSpeak(results[activeVariant]!)}
+                  onClick={() => toggleSpeak(displayedContent)}
                   className={`rounded-xl text-xs gap-1.5 ${
                     speaking ? "bg-primary/20 text-primary animate-pulse font-bold" : ""
                   }`}
@@ -689,7 +759,7 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => downloadText(results[activeVariant]!)}
+                  onClick={() => downloadText(displayedContent)}
                   className="rounded-xl text-xs gap-1.5"
                 >
                   <Download className="size-3.5" /> تنزيل .md
@@ -707,7 +777,7 @@ ${emoji ? "استخدم رموزاً تعبيرية مناسبة وجذابة." 
             )}
 
             {/* Inspiration Presets (When Empty) */}
-            {results.length === 0 && !busy && (
+            {!displayedContent && !busy && (
               <div className="space-y-2">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                   قوالب إلهامية جاهزة:

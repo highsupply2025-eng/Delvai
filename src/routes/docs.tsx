@@ -20,6 +20,7 @@ import {
   Search,
   Send,
   Sparkles,
+  Square,
   Table2,
   Trash2,
   Upload,
@@ -35,18 +36,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ToolShell } from "@/components/ToolShell";
 import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoader";
-import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { extractFile, toCsvDownload, type ExtractedDoc } from "@/lib/extract";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
     meta: [
-      { title: "استوديو تحليل المستندات والبيانات (Delvai Docs) | ذكاء اصطناعي فائق" },
+      { title: "استوديو تحليل المستندات والبيانات (Delvai Docs) | بث لحظي فائق السرعة" },
       {
         name: "description",
         content:
-          "تحليل وفحص ملفات PDF وWord وExcel والصور بالذكاء الاصطناعي: تلخيص تنفيذي، استخراج جداول CSV، مراجعة العقود، محادثة وسؤال وجواب مع مستنداتك.",
+          "تحليل وفحص ملفات PDF وWord وExcel والصور بالذكاء الاصطناعي ببث فوري: تلخيص تنفيذي، استخراج جداول CSV، مراجعة العقود، محادثة وسؤال وجواب مع مستنداتك بسرعة البرق.",
       },
       { property: "og:title", content: "استوديو تحليل المستندات والبيانات — Delvai Docs" },
       {
@@ -110,7 +110,6 @@ const KIND_LABEL: Record<ExtractedDoc["kind"], string> = {
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
 function DocsStudio() {
-  const ask = useServerFn(chatComplete);
   const save = useServerFn(saveGeneration);
 
   const [docs, setDocs] = useState<ExtractedDoc[]>([]);
@@ -124,6 +123,7 @@ function DocsStudio() {
   const [speaking, setSpeaking] = useState(false);
   const [copied, setCopied] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const totalChars = useMemo(
     () => docs.reduce((n, d) => n + d.chars, 0) + pasted.length,
@@ -171,6 +171,72 @@ function DocsStudio() {
     return parts.join("\n\n");
   };
 
+  const stop = () => {
+    abortRef.current?.abort();
+    setBusy(false);
+  };
+
+  const streamFromAi = async (system: string, userPrompt: string, onChunk: (text: string) => void) => {
+    const controller = new AbortController();
+    abortRef.current = controller;
+    let acc = "";
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          system,
+          model: "google/gemini-3.7-flash",
+          messages: [{ role: "user", content: userPrompt }],
+        }),
+      });
+
+      if (!res.ok || !res.body) {
+        toast.error("تعذّر الاتصال بخادم الذكاء الاصطناعي.");
+        return "";
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const payload = trimmed.slice(5).trim();
+          if (!payload || payload === "[DONE]") continue;
+          try {
+            const json = JSON.parse(payload) as {
+              choices?: { delta?: { content?: string } }[];
+            };
+            const delta = json.choices?.[0]?.delta?.content;
+            if (delta) {
+              acc += delta;
+              onChunk(acc);
+            }
+          } catch {
+            /* ignore partial */
+          }
+        }
+      }
+      return acc.trim();
+    } catch (e) {
+      if ((e as Error)?.name === "AbortError") return acc.trim();
+      toast.error("حدث خطأ في الاتصال، حاول مجدداً.");
+      return "";
+    } finally {
+      abortRef.current = null;
+    }
+  };
+
   const runPreset = async (p: (typeof PRESETS)[number]) => {
     if (!hasContent || busy) return;
     setActivePreset(p.id);
@@ -181,26 +247,13 @@ function DocsStudio() {
     const system =
       "أنت خبير فائق في تحليل الوثائق والبيانات المالية والقانونية والتقارير في منصة Delvai. قدّم تحليلاً دقيقاً، واضحاً، منسقاً بعناوين ونقاط، واعتمد فقط على البيانات الموجودة في المستندات المرفقة.";
 
-    try {
-      const res = await ask({
-        data: {
-          system,
-          messages: [{ role: "user", content: `${p.prompt}\n\nالمستندات:\n${context}` }],
-          model: "google/gemini-3.7-flash",
-        },
-      });
+    const fullResult = await streamFromAi(system, `${p.prompt}\n\nالمستندات:\n${context}`, (chunk) => {
+      setOut(chunk);
+    });
 
-      if (!res.ok || !res.text) {
-        toast.error(res.error || "تعذّر إتمام التحليل، حاول مجدداً.");
-        return;
-      }
-
-      setOut(res.text.trim());
+    setBusy(false);
+    if (fullResult) {
       toast.success(`تم إتمام تحليل: ${p.label}`);
-    } catch {
-      toast.error("تعذّر الاتصال بخادم الذكاء الاصطناعي.");
-    } finally {
-      setBusy(false);
     }
   };
 
@@ -208,7 +261,7 @@ function DocsStudio() {
     if (!question.trim() || !hasContent || busy) return;
     const q = question.trim();
     setQuestion("");
-    const newMsgs: ChatMsg[] = [...messages, { role: "user", content: q }];
+    const newMsgs: ChatMsg[] = [...messages, { role: "user", content: q }, { role: "assistant", content: "" }];
     setMessages(newMsgs);
     setBusy(true);
 
@@ -216,26 +269,21 @@ function DocsStudio() {
     const system =
       "أنت مساعد تحليلي ذكي لمستندات المستخدم في منصة Delvai. أجب بدقة وموضوعية اعتماداً على محتوى المستندات المرفقة مع ذكر أرقام الصفحات أو الأقسام إن وُجدت.";
 
-    try {
-      const history = newMsgs.map((m) => ({ role: m.role, content: m.content }));
-      const res = await ask({
-        data: {
-          system: `${system}\n\nمحتوى المستندات:\n${context}`,
-          messages: history,
-          model: "google/gemini-3.7-flash",
-        },
+    const historyPrompt = `المستندات:\n${context}\n\nالسؤال:\n${q}`;
+
+    const fullResult = await streamFromAi(system, historyPrompt, (chunk) => {
+      setMessages((prev) => {
+        const updated = [...prev];
+        if (updated.length > 0) {
+          updated[updated.length - 1] = { role: "assistant", content: chunk };
+        }
+        return updated;
       });
+    });
 
-      if (!res.ok || !res.text) {
-        toast.error("تعذّر استلام الإجابة");
-        return;
-      }
-
-      setMessages([...newMsgs, { role: "assistant", content: res.text.trim() }]);
-    } catch {
-      toast.error("حدث خطأ أثناء المحادثة مع المستند.");
-    } finally {
-      setBusy(false);
+    setBusy(false);
+    if (!fullResult) {
+      setMessages((prev) => prev.slice(0, -1));
     }
   };
 
@@ -262,7 +310,7 @@ function DocsStudio() {
   return (
     <ToolShell
       title="استوديو تحليل المستندات والبيانات — Delvai Docs"
-      subtitle="عقل التحليل واستخراج البيانات لمنصة Delvai — تحليل ملفات PDF وWord وExcel، استخراج الجداول، مراجعة العقود، ومحادثة ذكية مع مستنداتك."
+      subtitle="عقل التحليل واستخراج البيانات لمنصة Delvai — تحليل ملفات PDF وWord وExcel ببث لحظي فوري، استخراج الجداول، مراجعة العقود، ومحادثة ذكية مع مستنداتك."
     >
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
         {/* ================= TOP CYBER HUD BAR ================= */}
@@ -272,7 +320,7 @@ function DocsStudio() {
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3.5 py-1 text-xs font-bold text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.25)]">
                 <Sparkles className="size-3.5 animate-pulse" />
-                <span>محرك Multimodal Gemini 3.7 Pro لتحليل الوثائق متصل</span>
+                <span>محرك Multimodal Gemini 3.7 اللحظي لتحليل الوثائق متصل</span>
               </span>
             </div>
 
@@ -407,12 +455,9 @@ function DocsStudio() {
           <div className="flex flex-col gap-4 rounded-3xl glass p-5 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
             {/* Output & Q&A Box */}
             <div className="relative min-h-[380px] max-h-[58vh] overflow-y-auto rounded-2xl border border-border/80 bg-background/80 p-5 text-xs sm:text-sm leading-7 shadow-inner">
-              {busy ? (
+              {busy && !out && messages.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center p-6 text-center my-auto">
-                  <DelvaiThinkingLoader size="lg" text="دلفاي يحلل المستندات ويستخرج البيانات بدقة…" />
-                  <p className="mt-3 text-xs text-muted-foreground animate-pulse">
-                    مطابقة الأرقام والبنود والتفاصيل القانونية والمالية…
-                  </p>
+                  <DelvaiThinkingLoader size="lg" text="دلفاي يبدأ البث اللحظي السريع…" />
                 </div>
               ) : out ? (
                 <div className="space-y-3">
@@ -441,7 +486,12 @@ function DocsStudio() {
                       </Button>
                     </div>
                   </div>
-                  <div className="whitespace-pre-wrap font-sans text-foreground/95">{out}</div>
+                  <div className="whitespace-pre-wrap font-sans text-foreground/95">
+                    {out}
+                    {busy && (
+                      <span className="inline-block size-2 animate-ping rounded-full bg-primary align-middle ms-1" />
+                    )}
+                  </div>
                 </div>
               ) : messages.length > 0 ? (
                 <div className="space-y-4">
@@ -457,7 +507,12 @@ function DocsStudio() {
                       <span className="block text-[10px] font-bold text-muted-foreground mb-1">
                         {m.role === "user" ? "سؤالك:" : "إجابة دلفاي:"}
                       </span>
-                      <p className="whitespace-pre-wrap">{m.content}</p>
+                      <p className="whitespace-pre-wrap">
+                        {m.content}
+                        {busy && i === messages.length - 1 && (
+                          <span className="inline-block size-2 animate-ping rounded-full bg-primary align-middle ms-1" />
+                        )}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -471,7 +526,7 @@ function DocsStudio() {
                     استوديو <span className="text-shine">تحليل المستندات الفائق</span>
                   </h3>
                   <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-                    ارفع ملفك أو اختر أحد التحليلات الفورية ليقوم دلفاي بقراءته وتلخيصه واستخراج جداوله بدقة متناهية.
+                    ارفع ملفك أو اختر أحد التحليلات الفورية ليقوم دلفاي بقراءته وتلخيصه ببث لحظي فائق السرعة.
                   </p>
                 </div>
               )}
@@ -497,14 +552,24 @@ function DocsStudio() {
                   }
                   className="h-9 flex-1 border-none bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus-visible:ring-0"
                 />
-                <Button
-                  onClick={() => void askDoc()}
-                  disabled={!question.trim() || !hasContent || busy}
-                  size="sm"
-                  className="h-9 rounded-xl bg-cine text-primary-foreground shadow-glow"
-                >
-                  <Send className="size-3.5" />
-                </Button>
+                {busy ? (
+                  <Button
+                    onClick={stop}
+                    size="sm"
+                    className="h-9 rounded-xl bg-destructive/20 border border-destructive/40 text-destructive hover:bg-destructive/30"
+                  >
+                    <Square className="size-3.5" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => void askDoc()}
+                    disabled={!question.trim() || !hasContent || busy}
+                    size="sm"
+                    className="h-9 rounded-xl bg-cine text-primary-foreground shadow-glow"
+                  >
+                    <Send className="size-3.5" />
+                  </Button>
+                )}
               </div>
             </div>
           </div>
