@@ -318,43 +318,7 @@ function ChatTool() {
           {/* Ambient header aurora */}
           <div className="pointer-events-none absolute -top-12 inset-x-0 h-28 bg-aurora opacity-40 blur-2xl" />
 
-          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            {/* Engine Modes */}
-            <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-border/80 bg-background/50 p-1.5 backdrop-blur-md">
-              <span className="pe-2 ps-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                المحرك:
-              </span>
-              {MODES.map((m) => {
-                const Icon = m.icon;
-                const active = mode === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => setMode(m.id)}
-                    title={m.hint}
-                    className={`group relative flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200 ${
-                      active
-                        ? "bg-cine text-primary-foreground shadow-glow scale-[1.02]"
-                        : "text-muted-foreground hover:bg-card hover:text-foreground"
-                    }`}
-                  >
-                    <Icon className={`size-3.5 ${active ? "animate-pulse" : "text-primary/70"}`} />
-                    <span>{m.label}</span>
-                    <span
-                      className={`text-[10px] rounded px-1.5 py-0.2 font-mono ${
-                        active
-                          ? "bg-black/20 text-primary-foreground"
-                          : "bg-muted text-muted-foreground group-hover:text-foreground"
-                      }`}
-                    >
-                      {m.tag}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
+          <div className="relative flex flex-wrap items-center justify-between gap-3">
             {/* Persona Chips & Controls */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="pe-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
@@ -379,23 +343,23 @@ function ChatTool() {
                   </button>
                 );
               })}
-
-              {messages.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ms-auto rounded-full text-xs text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors"
-                  onClick={() => {
-                    stop();
-                    setMessages([]);
-                    setError(null);
-                    toast.info("تم بدء محادثة جديدة");
-                  }}
-                >
-                  <Trash2 className="size-3.5 me-1" /> مسح
-                </Button>
-              )}
             </div>
+
+            {messages.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ms-auto rounded-full text-xs text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors"
+                onClick={() => {
+                  stop();
+                  setMessages([]);
+                  setError(null);
+                  toast.info("تم بدء محادثة جديدة");
+                }}
+              >
+                <Trash2 className="size-3.5 me-1" /> مسح
+              </Button>
+            )}
           </div>
         </div>
 
@@ -537,7 +501,7 @@ function ChatTool() {
                       )}
 
                       <span className="ms-auto text-[10px] text-muted-foreground/60 font-mono">
-                        {activeMode.label} · {activePersona.label}
+                        دلفاي برايم · {activePersona.label}
                       </span>
                     </div>
                   )}
