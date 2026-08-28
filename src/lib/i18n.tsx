@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { AR_EN } from "./i18n-dict";
+import { MULTI_DICT } from "./multilingual-dict";
 
 export type Lang = "ar" | "en" | "fr" | "es" | "de" | "tr" | "zh" | "ja";
 
@@ -31,8 +32,6 @@ export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳", dir: "ltr" },
   { code: "ja", name: "Japanese", nativeName: "日本語", flag: "🇯🇵", dir: "ltr" },
 ];
-
-import { MULTI_DICT } from "./multilingual-dict";
 
 const STORAGE_KEY = "app.lang";
 const ATTRS = ["placeholder", "title", "aria-label", "alt"] as const;

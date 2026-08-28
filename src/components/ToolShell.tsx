@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { LogIn, LogOut, History, CreditCard, Languages } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
