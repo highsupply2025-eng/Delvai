@@ -17,6 +17,7 @@ import {
   Sparkles,
   Square,
   Trash2,
+  Wand2,
   X,
   Zap,
 } from "lucide-react";
@@ -56,33 +57,6 @@ type Msg = { role: "user" | "assistant"; content: string; images?: string[] };
 
 const MAX_IMAGES = 4;
 const MAX_SIZE = 5 * 1024 * 1024;
-
-const MODES = [
-  {
-    id: "balanced",
-    label: "Gemini 3.7 اللحظي",
-    tag: "بث فوري",
-    icon: Zap,
-    model: "google/gemini-3.7-flash",
-    hint: "بث فوري فائق السرعة مع أحدث المعارف اللحظية",
-  },
-  {
-    id: "deep",
-    label: "Gemini 3.7 تفكير عميق",
-    tag: "تفكير منطقي",
-    icon: Brain,
-    model: "google/gemini-3.7-pro",
-    hint: "تحليل عميق خطوة بخطوة لحل أعقد المسائل والأسئلة الاستراتيجية",
-  },
-  {
-    id: "pro",
-    label: "Gemini Pro المتخصص",
-    tag: "دقة استثنائية",
-    icon: Sparkles,
-    model: "google/gemini-2.5-pro",
-    hint: "دقة قصوى في كتابة الأكواد والبحوث العلمية المعقدة",
-  },
-] as const;
 
 const PERSONAS = [
   { id: "general", label: "مساعد عام", icon: Cpu, system: "أنت مساعد ذكي محترف وودود، دقيق ومباشر وموسوعي المعرفة." },
@@ -127,29 +101,33 @@ const QUICK_STARTERS = [
     desc: "صياغة استراتيجية تسويق رقمي تضاعف المبيعات لمتجر أو تطبيق.",
     prompt: "ضع لي خطة عمل تسويقية شاملة لزيادة المبيعات بنسبة 300% خلال 90 يوماً مع تحديد القنوات الإعلانية.",
     icon: Rocket,
+    badge: "تسويق ونمو",
   },
   {
     title: "تفكير عميق وتحليل مسألة معقدة",
     desc: "تحليل منطقي خطوة بخطوة مع استنتاج الحلول والبدائل.",
     prompt: "اشرح لي بالتفصيل والمنطق كيف تعمل الحواسيب الكمية وكيف ستغير مستقبل التشفير والذكاء الاصطناعي؟",
     icon: Brain,
+    badge: "تحليل منطقي",
   },
   {
     title: "مراجعة وهندسة كود برمجي",
     desc: "تحليل كود، كشف الثغرات، وتحسين الأداء والأمان.",
     prompt: "اكتب لي كود تطبيق ويب حديث ومتجاوب باستخدام TypeScript و React مع معالجة الأخطاء والتحميل.",
     icon: FileCode2,
+    badge: "برمجة وهندسة",
   },
   {
     title: "صياغة محتوى إبداعي استثنائي",
     desc: "كتابة نصوص ترويجية وسيناريوهات مؤثرة بأسلوب عالمي.",
     prompt: "اكتب لي سيناريو إعلان فيديو تشويقي مدته 30 ثانية لمنتج فاخر يجذب الانتباه من الثانية الأولى.",
     icon: Sparkles,
+    badge: "إبداع وتأليف",
   },
 ];
 
 const BASE_RULES =
-  "أنت 'دلفاي برايم' (Delvai Prime)، المساعد الذكي الخارق لمنصة Delvai، مبني بأحدث محركات Gemini 3.7 اللحظية. تمتلك ذكاءً فائقاً وقدرة على التفكير المنطقي العميق وحل أصعب المسائل بجميع لغات العالم. نسّق إجاباتك بتنسيق Markdown احترافي، مباشر، ومبهر.";
+  "أنت 'دلفاي برايم' (Delvai Prime)، المساعد الذكي الخارق لمنصة Delvai، مبني بأحدث محركات الذكاء الاصطناعي اللحظية. تمتلك ذكاءً فائقاً وقدرة على التفكير المنطقي العميق وحل أصعب المسائل بجميع لغات العالم. نسّق إجاباتك بتنسيق Markdown احترافي، مباشر، ومبهر.";
 
 function ChatTool() {
   const { q } = Route.useSearch();
@@ -160,7 +138,6 @@ function ChatTool() {
   const [images, setImages] = useState<string[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<(typeof MODES)[number]["id"]>("balanced");
   const [persona, setPersona] = useState<(typeof PERSONAS)[number]["id"]>("general");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -212,7 +189,7 @@ function ChatTool() {
         signal: controller.signal,
         body: JSON.stringify({
           system: systemPrompt,
-          model: MODES.find((m) => m.id === mode)!.model,
+          model: "google/gemini-3.7-flash",
           messages: history,
         }),
       });
@@ -304,7 +281,6 @@ function ChatTool() {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const activeMode = MODES.find((m) => m.id === mode)!;
   const activePersona = PERSONAS.find((p) => p.id === persona)!;
 
   return (
@@ -312,15 +288,12 @@ function ChatTool() {
       title="دلفاي برايم — Delvai Prime"
       subtitle="عقل الذكاء الاصطناعي الفائق لمنصة Delvai — إجابات لحظية بالبث المباشر، تفكير عميق، وتحليل صور لحل أصعب المسائل."
     >
-      <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-5">
-        {/* ================= CYBERNETIC CONTROL HUD ================= */}
-        <div className="relative overflow-hidden rounded-3xl glass p-4 shadow-float border-primary/25 ring-glow">
-          {/* Ambient header aurora */}
-          <div className="pointer-events-none absolute -top-12 inset-x-0 h-28 bg-aurora opacity-40 blur-2xl" />
-
+      <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-4">
+        {/* ================= PERSONA SELECTION & HEADER HUD ================= */}
+        <div className="relative overflow-hidden rounded-2xl glass p-3 sm:p-4 shadow-float border-primary/25 ring-glow">
           <div className="relative flex flex-wrap items-center justify-between gap-3">
-            {/* Persona Chips & Controls */}
-            <div className="flex flex-wrap items-center gap-1.5">
+            {/* Persona Chips */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span className="pe-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                 التخصص:
               </span>
@@ -334,11 +307,11 @@ function ChatTool() {
                     onClick={() => setPersona(p.id)}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all duration-200 ${
                       active
-                        ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.3)] font-bold scale-105"
+                        ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.35)] font-bold scale-105"
                         : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
                     }`}
                   >
-                    <Icon className="size-3" />
+                    <Icon className="size-3.5" />
                     <span>{p.label}</span>
                   </button>
                 );
@@ -357,7 +330,7 @@ function ChatTool() {
                   toast.info("تم بدء محادثة جديدة");
                 }}
               >
-                <Trash2 className="size-3.5 me-1" /> مسح
+                <Trash2 className="size-3.5 me-1" /> مسح المحادثة
               </Button>
             )}
           </div>
@@ -366,32 +339,35 @@ function ChatTool() {
         {/* ================= CHAT CONVERSATION CANVAS ================= */}
         <div className="relative overflow-hidden rounded-3xl glass p-4 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
           {/* Subtle neural grid pattern in canvas */}
-          <div className="pointer-events-none absolute inset-0 bg-grid opacity-30" />
+          <div className="pointer-events-none absolute inset-0 bg-grid opacity-25" />
 
-          <div className="relative flex min-h-[420px] max-h-[60vh] flex-col space-y-5 overflow-y-auto pe-2 sm:pe-3">
+          <div className="relative flex min-h-[380px] max-h-[58vh] flex-col space-y-5 overflow-y-auto pe-2 sm:pe-3">
             {messages.length === 0 && (
-              <div className="my-auto py-8 text-center">
+              <div className="my-auto py-6 sm:py-8 text-center">
                 {/* Futuristic Logo Aura */}
                 <div className="relative mx-auto mb-4 flex size-20 items-center justify-center">
                   <div className="pointer-events-none absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
-                  <div className="pointer-events-none absolute size-20 rounded-full border border-dashed border-primary/40 animate-spin" style={{ animationDuration: "6s" }} />
-                  <DelvaiLogo className="size-12 drop-shadow-[0_0_20px_oklch(0.82_0.14_82/0.8)]" />
+                  <div
+                    className="pointer-events-none absolute size-20 rounded-full border border-dashed border-primary/40 animate-spin"
+                    style={{ animationDuration: "6s" }}
+                  />
+                  <DelvaiLogo className="size-12 drop-shadow-[0_0_20px_oklch(0.82_0.14_82/0.85)]" />
                 </div>
 
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary">
-                  <Sparkles className="size-3.5" />
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-4 py-1 text-xs font-bold text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.2)]">
+                  <Sparkles className="size-3.5 animate-pulse" />
                   <span>دلفاي برايم متصل · جاهز للإجابة والبث المباشر</span>
                 </div>
 
-                <h3 className="mt-3 text-2xl font-black sm:text-3xl text-foreground">
+                <h2 className="mt-4 text-2xl font-black sm:text-3xl lg:text-4xl text-foreground tracking-tight">
                   كيف يمكنني <span className="text-shine">مساعدتك اليوم</span>؟
-                </h3>
-                <p className="mx-auto mt-2 max-w-lg text-xs sm:text-sm text-muted-foreground">
+                </h2>
+                <p className="mx-auto mt-2 max-w-lg text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   اختر أحد المحاور الاستراتيجية أو اكتب أي سؤال أو فكرة لتوليد تحليل فوري عميق.
                 </p>
 
                 {/* Quick starter cards */}
-                <div className="mt-8 grid gap-3 sm:grid-cols-2 text-start">
+                <div className="mt-7 grid gap-3 sm:grid-cols-2 text-start">
                   {QUICK_STARTERS.map((item, idx) => {
                     const Icon = item.icon;
                     return (
@@ -401,15 +377,20 @@ function ChatTool() {
                         onClick={() => void send(item.prompt)}
                         className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/60 hover:bg-card/90 hover:shadow-glow"
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
-                            <Icon className="size-4" />
+                        <div className="flex items-start gap-3.5">
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110 shadow-sm">
+                            <Icon className="size-5" />
                           </span>
-                          <div>
-                            <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
-                              {item.title}
-                            </h4>
-                            <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-1">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                                {item.title}
+                              </h3>
+                              <span className="text-[10px] rounded-md bg-muted px-1.5 py-0.5 text-muted-foreground font-mono shrink-0">
+                                {item.badge}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
                               {item.desc}
                             </p>
                           </div>
@@ -520,11 +501,11 @@ function ChatTool() {
             </div>
           )}
 
-          {/* ================= FLOATING COMMAND INPUT DECK ================= */}
-          <div className="mt-4 rounded-2xl border border-border/80 bg-background/80 p-2.5 shadow-float backdrop-blur-xl transition-all focus-within:border-primary/60 focus-within:ring-glow">
+          {/* ================= HIGH-TECH COMMAND INPUT DOCK ================= */}
+          <div className="mt-4 rounded-3xl border border-border/90 bg-background/85 p-3 shadow-float backdrop-blur-2xl transition-all focus-within:border-primary/80 focus-within:shadow-[0_0_30px_oklch(0.82_0.14_82/0.25)]">
             {/* Uploaded Images Preview */}
             {images.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-2 border-b border-border/40 pb-2 px-2">
+              <div className="mb-2.5 flex flex-wrap gap-2 border-b border-border/40 pb-2 px-2">
                 {images.map((src, i) => (
                   <div key={i} className="relative group">
                     <img
@@ -545,7 +526,8 @@ function ChatTool() {
               </div>
             )}
 
-            <div className="flex items-end gap-2">
+            {/* Input & Action Bar */}
+            <div className="flex items-end gap-2.5">
               <input
                 ref={fileRef}
                 type="file"
@@ -555,15 +537,15 @@ function ChatTool() {
                 onChange={(e) => void addFiles(e.target.files)}
               />
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={() => fileRef.current?.click()}
                 disabled={streaming || images.length >= MAX_IMAGES}
-                className="rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                aria-label="إرفاق صورة"
+                className="size-10 rounded-2xl border-border/80 bg-card/60 text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary transition-all shrink-0"
+                aria-label="إرفاق صورة للتحليل"
                 title="إرفاق صور للتحليل"
               >
-                <ImagePlus className="size-5" />
+                <ImagePlus className="size-4.5" />
               </Button>
 
               <Textarea
@@ -588,7 +570,7 @@ function ChatTool() {
                   }
                 }}
                 placeholder="اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)"
-                className="min-h-12 max-h-40 flex-1 resize-none bg-transparent px-3 py-3 text-sm outline-none border-none focus-visible:ring-0 placeholder:text-muted-foreground/60 leading-6"
+                className="min-h-12 max-h-40 flex-1 resize-none bg-transparent px-3 py-3 text-sm sm:text-base outline-none border-none focus-visible:ring-0 placeholder:text-muted-foreground/60 leading-6"
               />
 
               {streaming ? (
@@ -596,19 +578,28 @@ function ChatTool() {
                   variant="outline"
                   onClick={stop}
                   aria-label="إيقاف التفكير"
-                  className="rounded-xl border-destructive/40 text-destructive hover:bg-destructive/10 shrink-0"
+                  className="h-10 rounded-2xl border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 shrink-0 font-bold px-4"
                 >
-                  <Square className="size-4 me-1" /> إيقاف
+                  <Square className="size-4 me-1.5" /> إيقاف
                 </Button>
               ) : (
                 <Button
                   onClick={() => void send()}
                   disabled={!input.trim() && images.length === 0}
-                  className="rounded-xl bg-cine text-primary-foreground shadow-glow shrink-0 transition-transform hover:scale-105"
+                  className="size-10 rounded-2xl bg-cine text-primary-foreground shadow-glow shrink-0 transition-transform hover:scale-105"
+                  aria-label="إرسال"
                 >
-                  <Send className="size-4" />
+                  <Send className="size-4.5" />
                 </Button>
               )}
+            </div>
+
+            {/* Input Dock Bottom Status */}
+            <div className="mt-2 flex items-center justify-between px-2 pt-1 border-t border-border/30 text-[11px] text-muted-foreground/70">
+              <span className="hidden sm:inline">اضغط Enter للإرسال · Shift+Enter لسطر جديد</span>
+              <span className="ms-auto font-mono">
+                {activePersona.label} · جاهز للبث المباشر
+              </span>
             </div>
           </div>
         </div>

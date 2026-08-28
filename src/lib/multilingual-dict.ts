@@ -208,6 +208,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "إعادة التوليد": "Régénérer",
     "إيقاف": "Arrêter",
     "اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)": "Demandez tout à Delvai Prime… (Entrée pour envoyer, Shift+Entrée nouvelle ligne)",
+    "تسويق ونمو": "Marketing & Croissance",
+    "تحليل منطقي": "Analyse Logique",
+    "برمجة وهندسة": "Code & Ingénierie",
+    "إبداع وتأليف": "Création & Rédaction",
+    "مسح المحادثة": "Effacer la discussion",
+    "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Entrée pour envoyer · Shift+Entrée pour nouvelle ligne",
+    "جاهز للبث المباشر": "Prêt pour le direct",
   },
 
   // ================= TURKISH =================
@@ -419,6 +426,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "إعادة التوليد": "Yeniden Üret",
     "إيقاف": "Durdur",
     "اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)": "Delvai Prime'a sorun… (Gönder: Enter, Alt satır: Shift+Enter)",
+    "تسويق ونمو": "Pazarlama ve Büyüme",
+    "تحليل منطقي": "Mantıksal Analiz",
+    "برمجة وهندسة": "Kod ve Mühendislik",
+    "إبداع وتأليف": "Yaratıcı Yazarlık",
+    "مسح المحادثة": "Sohbeti Temizle",
+    "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Göndermek için Enter · Yeni satır için Shift+Enter",
+    "جاهز للبث المباشر": "Canlı Yayına Hazır",
   },
 
   // ================= SPANISH =================
@@ -630,6 +644,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "إعادة التوليد": "Regenerar",
     "إيقاف": "Detener",
     "اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)": "Pregunta a Delvai Prime lo que quieras… (Enter para enviar, Shift+Enter para nueva línea)",
+    "تسويق ونمو": "Marketing y Crecimiento",
+    "تحليل منطقي": "Análisis Lógico",
+    "برمجة وهندسة": "Código e Ingeniería",
+    "إبداع وتأليف": "Creación y Redacción",
+    "مسح المحادثة": "Borrar conversación",
+    "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Presiona Enter para enviar · Shift+Enter para nueva línea",
+    "جاهز للبث المباشر": "Listo para transmitir en vivo",
   },
 
   // ================= GERMAN =================
@@ -841,6 +862,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "إعادة التوليد": "Neu generieren",
     "إيقاف": "Stoppen",
     "اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)": "Fragen Sie Delvai Prime alles… (Enter zum Senden, Shift+Enter für neue Zeile)",
+    "تسويق ونمو": "Marketing & Wachstum",
+    "تحليل منطقي": "Logische Analyse",
+    "برمجة وهندسة": "Code & Entwicklung",
+    "إبداع وتأليف": "Kreatives Schreiben",
+    "مسح المحادثة": "Chat löschen",
+    "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Enter zum Senden · Shift+Enter für neue Zeile",
+    "جاهز للبث المباشر": "Bereit für Live-Stream",
   },
 
   // ================= CHINESE =================
@@ -1052,6 +1080,13 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "إعادة التوليد": "重新生成",
     "إيقاف": "停止",
     "اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)": "向 Delvai Prime 提问任何内容… (Enter 发送，Shift+Enter 换行)",
+    "تسويق ونمو": "营销与增长",
+    "تحليل منطقي": "逻辑分析",
+    "برمجة وهندسة": "编程与架构",
+    "إبداع وتأليف": "创意与撰写",
+    "مسح المحادثة": "清空对话",
+    "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "按 Enter 发送 · Shift+Enter 换行",
+    "جاهز للبث المباشر": "实时响应就绪",
   },
 
   // ================= JAPANESE =================
@@ -1263,5 +1298,12 @@ export const MULTI_DICT: Record<string, Record<string, string>> = {
     "إعادة التوليد": "再生成",
     "إيقاف": "停止",
     "اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)": "Delvai Prime に何でも質問してください… (送信: Enter, 改行: Shift+Enter)",
+    "تسويق ونمو": "マーケティング＆成長",
+    "تحليل منطقي": "論理的分析",
+    "برمجة وهندسة": "プログラミング＆設計",
+    "إبداع وتأليف": "クリエイティブ執筆",
+    "مسح المحادثة": "チャット履歴を消去",
+    "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Enter で送信 · Shift+Enter で改行",
+    "جاهز للبث المباشر": "リアルタイム配信準備完了",
   },
 };

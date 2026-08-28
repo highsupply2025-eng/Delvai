@@ -857,5 +857,12 @@ export const AR_EN: Record<string, string> = {
   "اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)": "Ask Delvai Prime anything… (Enter to send, Shift+Enter for newline)",
   "دلفاي برايم يفكّر ويبحث في البيانات…": "Delvai Prime is thinking and searching data…",
   "دلفاي برايم يفكّر ويبحث…": "Delvai Prime is thinking and searching…",
+  "تسويق ونمو": "Marketing & Growth",
+  "تحليل منطقي": "Logical Analysis",
+  "برمجة وهندسة": "Dev & Engineering",
+  "إبداع وتأليف": "Creative & Writing",
+  "مسح المحادثة": "Clear Chat",
+  "اضغط Enter للإرسال · Shift+Enter لسطر جديد": "Press Enter to send · Shift+Enter for new line",
+  "جاهز للبث المباشر": "Ready for Live Stream",
 };
 
