@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Copy, Languages, Loader2, PenLine, RefreshCcw, Search, ShieldCheck, Sparkles } from "lucide-react";
+import { Copy, Languages, PenLine, RefreshCcw, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { ToolShell } from "@/components/ToolShell";
 import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
 
 export const Route = createFileRoute("/write")({
   head: () => ({
@@ -455,8 +456,8 @@ function WriteTool() {
             disabled={busy || !canRun}
             className="mt-7 w-full bg-cine text-primary-foreground"
           >
-            {busy ? <Loader2 className="size-4 animate-spin" /> : <PenLine className="size-4" />}
-            {busy ? "جارٍ التنفيذ..." : "تنفيذ"}
+            {busy ? <DelvaiThinkingLoader size="xs" /> : <PenLine className="size-4" />}
+            {busy ? "دلفاي يفكّر ويكتب…" : "تنفيذ"}
           </Button>
 
           {error && (

@@ -5,7 +5,6 @@ import {
   Download,
   Eraser,
   ImageIcon,
-  Loader2,
   Sparkles,
   Upload,
   Wand2,
@@ -20,6 +19,7 @@ import { ToolShell } from "@/components/ToolShell";
 import { saveGeneration } from "@/lib/history.functions";
 import { chatComplete } from "@/lib/ai.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
 
 export const Route = createFileRoute("/image")({
   head: () => ({
@@ -220,7 +220,7 @@ function ImageTool() {
           <div className="flex items-center justify-between">
             <Label htmlFor="p">{tab === "edit" ? "تفاصيل التعديل (اختياري)" : "وصف الصورة"}</Label>
             <Button variant="ghost" size="sm" onClick={() => void enhance()} disabled={enhancing || !prompt.trim()}>
-              {enhancing ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+              {enhancing ? <DelvaiThinkingLoader size="xs" /> : <Sparkles className="size-4" />}
               تحسين الوصف
             </Button>
           </div>
@@ -397,7 +397,7 @@ function ImageTool() {
             disabled={busy || (tab === "generate" ? !prompt.trim() : refs.length === 0)}
             className="mt-7 w-full bg-cine text-primary-foreground shadow-glow"
           >
-            {busy ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
+            {busy ? <DelvaiThinkingLoader size="xs" /> : <Wand2 className="size-4" />}
             {tab === "edit" ? "تطبيق التعديل" : "توليد الصورة"}
           </Button>
 
@@ -413,9 +413,9 @@ function ImageTool() {
             className={`flex ${tab === "generate" ? ratioBox : "aspect-square"} items-center justify-center overflow-hidden rounded-xl bg-background/70`}
           >
             {busy && !active ? (
-              <div className="text-center text-muted-foreground">
-                <Loader2 className="mx-auto size-8 animate-spin text-primary" />
-                <p className="mt-3 text-sm">جارٍ الرسم…</p>
+              <div className="text-center text-muted-foreground p-6">
+                <DelvaiThinkingLoader size="lg" />
+                <p className="mt-4 text-sm font-medium animate-pulse text-foreground/90">دلفاي يفكّر ويرسم بالذكاء الاصطناعي…</p>
               </div>
             ) : active ? (
               <img src={active.url} alt={active.prompt} className="h-full w-full object-contain" />

@@ -17,10 +17,7 @@ import {
 import { SUPPORTED_LANGUAGES, useLang } from "@/lib/i18n";
 import { AccessGate } from "@/components/AccessGate";
 import { SiteFooter } from "@/components/SiteFooter";
-
-function DelvaiLogo({ className }: { className?: string }) {
-  return <img src={delvaiMark} alt="Delvai" className={className} loading="eager" />;
-}
+import { DelvaiLogo } from "@/components/DelvaiThinkingLoader";
 
 export const TOOLS = [
   { to: "/chat", label: "دلفاي برايم", desc: "المساعد الذكي الخارق للإجابة والتحليل وحل أعقد المسائل بلحظات." },

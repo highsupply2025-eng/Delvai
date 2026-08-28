@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Clock, Lock, Loader2 } from "lucide-react";
+import { Clock, Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAccess } from "@/hooks/useAccess";
+import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
 
 /** يحجب الأدوات بعد انتهاء الشهر المجاني (المرتبط بعنوان الإنترنت) ما لم يكن هناك اشتراك فعّال. */
 export function AccessGate({ children }: { children: ReactNode }) {
@@ -11,8 +12,8 @@ export function AccessGate({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center gap-2 py-20 text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> جارٍ التحقق من صلاحية الوصول…
+      <div className="flex items-center justify-center gap-3 py-24 text-muted-foreground">
+        <DelvaiThinkingLoader size="md" text="دلفاي يجهّز ويتحقق من صلاحية الوصول…" />
       </div>
     );
   }

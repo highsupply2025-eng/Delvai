@@ -10,7 +10,6 @@ import {
   Image as ImageIcon,
   Languages,
   ListChecks,
-  Loader2,
   Mic,
   Send,
   Sparkles,
@@ -28,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToolShell } from "@/components/ToolShell";
+import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
 import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { extractFile, toCsvDownload, type ExtractedDoc } from "@/lib/extract";
@@ -300,7 +300,7 @@ function DocsStudio() {
             className="cursor-pointer rounded-xl border border-dashed border-border bg-background/50 px-4 py-8 text-center transition-colors hover:border-primary/50"
           >
             {loadingFiles ? (
-              <Loader2 className="mx-auto size-5 animate-spin text-primary" />
+              <DelvaiThinkingLoader size="xs" className="mx-auto" />
             ) : (
               <Upload className="mx-auto size-5 text-primary" />
             )}
@@ -403,7 +403,7 @@ function DocsStudio() {
                   }`}
                 >
                   {busy && activePreset === p.id ? (
-                    <Loader2 className="size-4 shrink-0 animate-spin" />
+                    <DelvaiThinkingLoader size="xs" />
                   ) : (
                     <p.icon className="size-4 shrink-0" />
                   )}
@@ -457,7 +457,7 @@ function DocsStudio() {
                       onClick={() => void listen()}
                     >
                       {speaking ? (
-                        <Loader2 className="size-3.5 animate-spin" />
+                        <DelvaiThinkingLoader size="xs" />
                       ) : (
                         <Volume2 className="size-3.5" />
                       )}
@@ -497,9 +497,9 @@ function DocsStudio() {
                 </div>
               ))}
               {busy && (
-                <p className="flex items-center gap-2 text-sm text-primary">
-                  <Loader2 className="size-4 animate-spin" /> جارٍ البحث في المستندات…
-                </p>
+                <div className="py-2">
+                  <DelvaiThinkingLoader size="sm" text="دلفاي يفكّر ويبحث في المستندات…" inline />
+                </div>
               )}
             </div>
             <div className="flex gap-2">

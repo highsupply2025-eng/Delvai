@@ -6,7 +6,6 @@ import {
   Download,
   Film,
   ImagePlus,
-  Loader2,
   Plus,
   Sparkles,
   Trash2,
@@ -23,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { ToolShell } from "@/components/ToolShell";
 import { useAuth } from "@/hooks/useAuth";
 import { createVideoJob, getVideoJob } from "@/lib/video.functions";
+import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
 import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 
@@ -347,7 +347,7 @@ function VideoTool() {
               {mode === "extend" ? "وصف استمرار المشهد" : "وصف المشهد"}
             </Label>
             <Button variant="ghost" size="sm" onClick={onEnhance} disabled={enhancing || !prompt.trim()}>
-              {enhancing ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
+              {enhancing ? <DelvaiThinkingLoader size="xs" /> : <Sparkles className="size-3.5" />}
               تحسين الوصف
             </Button>
           </div>
@@ -499,9 +499,7 @@ function VideoTool() {
             className="mt-7 w-full bg-cine text-primary-foreground shadow-glow hover:opacity-90"
           >
             {busy ? (
-              <>
-                <Loader2 className="size-4 animate-spin" /> جارٍ التوليد…
-              </>
+              <DelvaiThinkingLoader size="sm" text="جارٍ التفكير والتوليد السينمائي…" inline />
             ) : (
               <>
                 <Film className="size-4" /> {mode === "extend" ? "تمديد المشهد" : "توليد الفيديو"}

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   Copy,
   ImagePlus,
-  Loader2,
   RefreshCw,
   Send,
   Square,
@@ -21,6 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ToolShell } from "@/components/ToolShell";
 import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
 
 export const Route = createFileRoute("/chat")({
   validateSearch: (search: Record<string, unknown>): { q?: string } =>
@@ -371,7 +371,7 @@ function ChatTool() {
                   )}
                   {m.content ||
                     (streaming && i === messages.length - 1 ? (
-                      <Loader2 className="size-4 animate-spin text-primary" />
+                      <DelvaiThinkingLoader size="sm" text="دلفاي برايم يفكّر ويبحث…" />
                     ) : null)}
                   {m.role === "assistant" && m.content && !(streaming && i === messages.length - 1) && (
                     <div className="mt-2 flex gap-1 opacity-0 transition group-hover:opacity-100">

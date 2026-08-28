@@ -5,7 +5,6 @@ import {
   Download,
   FileAudio,
   Languages,
-  Loader2,
   Mic,
   Pause,
   Play,
@@ -28,6 +27,8 @@ import { ToolShell } from "@/components/ToolShell";
 import { chatComplete } from "@/lib/ai.functions";
 import { saveGeneration } from "@/lib/history.functions";
 import { chunkText, encodeWav } from "@/lib/wav";
+import { useAuth } from "@/hooks/useAuth";
+import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
 
 export const Route = createFileRoute("/voice")({
   head: () => ({
@@ -384,9 +385,9 @@ function VoiceStudio() {
             </div>
 
             {transcribing && (
-              <p className="flex items-center gap-2 text-sm text-primary">
-                <Loader2 className="size-4 animate-spin" /> جارٍ التفريغ…
-              </p>
+              <div className="py-1">
+                <DelvaiThinkingLoader size="sm" text="دلفاي يفكّر ويفرّغ التسجيل الصوتي…" inline />
+              </div>
             )}
             <p className="text-xs text-muted-foreground">
               يدعم mp3 وwav وm4a وwebm حتى ٢٤ ميجابايت. للتسجيلات الطويلة قسّمها إلى مقاطع.
@@ -404,7 +405,7 @@ function VoiceStudio() {
                   onClick={() => void runPost(a)}
                 >
                   {working === a.id ? (
-                    <Loader2 className="size-3.5 animate-spin" />
+                    <DelvaiThinkingLoader size="xs" />
                   ) : a.id.startsWith("translate") ? (
                     <Languages className="size-3.5" />
                   ) : (
@@ -482,7 +483,7 @@ function VoiceStudio() {
                 disabled={!text.trim() || working !== null}
                 onClick={() => void enhanceScript()}
               >
-                {working ? <Loader2 className="size-3.5 animate-spin" /> : <Wand2 className="size-3.5" />}
+                {working ? <DelvaiThinkingLoader size="xs" /> : <Wand2 className="size-3.5" />}
                 تحسين السكربت
               </Button>
             </div>
@@ -493,7 +494,7 @@ function VoiceStudio() {
                 disabled={!text.trim() || speaking}
                 className="flex-1 bg-cine text-primary-foreground"
               >
-                {speaking ? <Loader2 className="size-4 animate-spin" /> : <Volume2 className="size-4" />}
+                {speaking ? <DelvaiThinkingLoader size="xs" /> : <Volume2 className="size-4" />}
                 {speaking ? "جارٍ التوليد…" : "توليد الصوت"}
               </Button>
               {audioUrl && (
