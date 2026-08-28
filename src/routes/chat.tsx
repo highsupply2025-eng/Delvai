@@ -2,16 +2,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import {
+  Brain,
+  Check,
+  Compass,
   Copy,
+  Cpu,
+  FileCode2,
   ImagePlus,
+  Lightbulb,
+  MessageSquarePlus,
   RefreshCw,
+  Rocket,
   Send,
+  Sparkles,
   Square,
   Trash2,
   X,
   Zap,
-  Brain,
-  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,7 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ToolShell } from "@/components/ToolShell";
 import { saveGeneration } from "@/lib/history.functions";
 import { useAuth } from "@/hooks/useAuth";
-import { DelvaiThinkingLoader } from "@/components/DelvaiThinkingLoader";
+import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoader";
 
 export const Route = createFileRoute("/chat")({
   validateSearch: (search: Record<string, unknown>): { q?: string } =>
@@ -54,6 +61,7 @@ const MODES = [
   {
     id: "balanced",
     label: "Gemini 3.7 اللحظي",
+    tag: "بث فوري",
     icon: Zap,
     model: "google/gemini-3.7-flash",
     hint: "بث فوري فائق السرعة مع أحدث المعارف اللحظية",
@@ -61,60 +69,87 @@ const MODES = [
   {
     id: "deep",
     label: "Gemini 3.7 تفكير عميق",
+    tag: "تفكير منطقي",
     icon: Brain,
     model: "google/gemini-3.7-pro",
-    hint: "تفكير منطقي وتحليل عميق لحل أصعب المسائل والأسئلة المعقدة",
+    hint: "تحليل عميق خطوة بخطوة لحل أعقد المسائل والأسئلة الاستراتيجية",
   },
   {
     id: "pro",
-    label: "Gemini Pro المتقدم",
+    label: "Gemini Pro المتخصص",
+    tag: "دقة استثنائية",
     icon: Sparkles,
     model: "google/gemini-2.5-pro",
-    hint: "دقة استثنائية في البرمجة والأبحاث والتحليل",
+    hint: "دقة قصوى في كتابة الأكواد والبحوث العلمية المعقدة",
   },
 ] as const;
 
 const PERSONAS = [
-  { id: "general", label: "مساعد عام", system: "أنت مساعد ذكي محترف وودود، دقيق ومباشر وموسوعي المعرفة." },
+  { id: "general", label: "مساعد عام", icon: Cpu, system: "أنت مساعد ذكي محترف وودود، دقيق ومباشر وموسوعي المعرفة." },
   {
     id: "business",
     label: "مستشار أعمال",
+    icon: Rocket,
     system:
       "أنت مستشار أعمال خبير. حلّل بأرقام وخطوات عملية، واذكر المخاطر والفرص وخطة تنفيذ مختصرة.",
   },
   {
     id: "marketing",
     label: "خبير تسويق",
+    icon: Sparkles,
     system:
       "أنت خبير تسويق رقمي. قدّم أفكارًا إعلانية قابلة للتنفيذ مع زوايا رسائل وجمهور مستهدف.",
   },
   {
     id: "dev",
     label: "مهندس برمجيات",
+    icon: FileCode2,
     system:
       "أنت مهندس برمجيات خبير. أجب بكود صحيح وموجز مع شرح قصير وأفضل الممارسات والأمان.",
   },
   {
     id: "tutor",
     label: "معلّم مبسّط",
+    icon: Lightbulb,
     system: "أنت معلّم صبور. اشرح بخطوات مبسّطة وأمثلة من الحياة اليومية، ثم اختبر الفهم بسؤال.",
   },
   {
     id: "writer",
     label: "كاتب محترف",
+    icon: Compass,
     system: "أنت كاتب محترف. اكتب بأسلوب سلس بلا حشو، مع عناية بالإيقاع واختيار الكلمة.",
   },
 ] as const;
 
-const SUGGESTIONS = [
-  "اشرح لي فكرة معقّدة وحللها خطوة بخطوة",
-  "ما هي أحدث التطورات العلمية والتقنية اليوم؟",
-  "اكتب خطة عمل متكاملة لمشروع عالمي",
-  "حلل هذا الكود واقترح تحسينات لأدائه وأمانه",
+const QUICK_STARTERS = [
+  {
+    title: "خطة نمو تسويقية مضاعفة",
+    desc: "صياغة استراتيجية تسويق رقمي تضاعف المبيعات لمتجر أو تطبيق.",
+    prompt: "ضع لي خطة عمل تسويقية شاملة لزيادة المبيعات بنسبة 300% خلال 90 يوماً مع تحديد القنوات الإعلانية.",
+    icon: Rocket,
+  },
+  {
+    title: "تفكير عميق وتحليل مسألة معقدة",
+    desc: "تحليل منطقي خطوة بخطوة مع استنتاج الحلول والبدائل.",
+    prompt: "اشرح لي بالتفصيل والمنطق كيف تعمل الحواسيب الكمية وكيف ستغير مستقبل التشفير والذكاء الاصطناعي؟",
+    icon: Brain,
+  },
+  {
+    title: "مراجعة وهندسة كود برمجي",
+    desc: "تحليل كود، كشف الثغرات، وتحسين الأداء والأمان.",
+    prompt: "اكتب لي كود تطبيق ويب حديث ومتجاوب باستخدام TypeScript و React مع معالجة الأخطاء والتحميل.",
+    icon: FileCode2,
+  },
+  {
+    title: "صياغة محتوى إبداعي استثنائي",
+    desc: "كتابة نصوص ترويجية وسيناريوهات مؤثرة بأسلوب عالمي.",
+    prompt: "اكتب لي سيناريو إعلان فيديو تشويقي مدته 30 ثانية لمنتج فاخر يجذب الانتباه من الثانية الأولى.",
+    icon: Sparkles,
+  },
 ];
 
 const BASE_RULES =
-  "أنت مساعد الذكاء الاصطناعي العالمي فائق الذكاء، مدعوم بأحدث محركات Gemini 3.7 اللحظية. لديك قدرة فائقة على تقديم إجابات فورية عميقة وموسوعية لأي سؤال مهما كانت صعوبته. أجب باللغة التي يطلبها المستخدم بدقة وتنسيق منظم واحترافي.";
+  "أنت 'دلفاي برايم' (Delvai Prime)، المساعد الذكي الخارق لمنصة Delvai، مبني بأحدث محركات Gemini 3.7 اللحظية. تمتلك ذكاءً فائقاً وقدرة على التفكير المنطقي العميق وحل أصعب المسائل بجميع لغات العالم. نسّق إجاباتك بتنسيق Markdown احترافي، مباشر، ومبهر.";
 
 function ChatTool() {
   const { q } = Route.useSearch();
@@ -127,9 +162,11 @@ function ChatTool() {
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<(typeof MODES)[number]["id"]>("balanced");
   const [persona, setPersona] = useState<(typeof PERSONAS)[number]["id"]>("general");
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
@@ -260,139 +297,248 @@ function ChatTool() {
 
   const stop = () => abortRef.current?.abort();
 
-  const copy = async (text: string) => {
+  const copy = async (text: string, idx: number) => {
     await navigator.clipboard.writeText(text);
-    toast.success("تم النسخ");
+    setCopiedIndex(idx);
+    toast.success("تم نسخ الإجابة");
+    setTimeout(() => setCopiedIndex(null), 2000);
   };
 
   const activeMode = MODES.find((m) => m.id === mode)!;
+  const activePersona = PERSONAS.find((p) => p.id === persona)!;
 
   return (
     <ToolShell
       title="دلفاي برايم — Delvai Prime"
-      subtitle="عقل الذكاء الاصطناعي لمنصة Delvai — إجابات فورية بالبث المباشر، تفكير عميق، تحليل صور ومستندات، وحل أصعب المسائل بلحظات."
+      subtitle="عقل الذكاء الاصطناعي الفائق لمنصة Delvai — إجابات لحظية بالبث المباشر، تفكير عميق، وتحليل صور لحل أصعب المسائل."
     >
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card/60 p-3 backdrop-blur">
-          <div className="flex gap-1 rounded-xl bg-background/60 p-1">
-            {MODES.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => setMode(m.id)}
-                title={m.hint}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition ${
-                  mode === m.id
-                    ? "bg-primary/20 text-primary shadow-glow"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <m.icon className="size-3.5" />
-                {m.label}
-              </button>
-            ))}
-          </div>
+      <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-5">
+        {/* ================= CYBERNETIC CONTROL HUD ================= */}
+        <div className="relative overflow-hidden rounded-3xl glass p-4 shadow-float border-primary/25 ring-glow">
+          {/* Ambient header aurora */}
+          <div className="pointer-events-none absolute -top-12 inset-x-0 h-28 bg-aurora opacity-40 blur-2xl" />
 
-          <div className="flex flex-wrap gap-1">
-            {PERSONAS.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setPersona(p.id)}
-                className={`rounded-full border px-3 py-1 text-xs transition ${
-                  persona === p.id
-                    ? "border-primary/60 bg-primary/15 text-primary"
-                    : "border-border text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            {/* Engine Modes */}
+            <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-border/80 bg-background/50 p-1.5 backdrop-blur-md">
+              <span className="pe-2 ps-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                المحرك:
+              </span>
+              {MODES.map((m) => {
+                const Icon = m.icon;
+                const active = mode === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setMode(m.id)}
+                    title={m.hint}
+                    className={`group relative flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200 ${
+                      active
+                        ? "bg-cine text-primary-foreground shadow-glow scale-[1.02]"
+                        : "text-muted-foreground hover:bg-card hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className={`size-3.5 ${active ? "animate-pulse" : "text-primary/70"}`} />
+                    <span>{m.label}</span>
+                    <span
+                      className={`text-[10px] rounded px-1.5 py-0.2 font-mono ${
+                        active
+                          ? "bg-black/20 text-primary-foreground"
+                          : "bg-muted text-muted-foreground group-hover:text-foreground"
+                      }`}
+                    >
+                      {m.tag}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
-          {messages.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="ms-auto text-xs text-muted-foreground"
-              onClick={() => {
-                stop();
-                setMessages([]);
-                setError(null);
-              }}
-            >
-              <Trash2 className="me-1 size-3.5" /> محادثة جديدة
-            </Button>
-          )}
+            {/* Persona Chips & Controls */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="pe-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                التخصص:
+              </span>
+              {PERSONAS.map((p) => {
+                const active = persona === p.id;
+                const Icon = p.icon;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setPersona(p.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all duration-200 ${
+                      active
+                        ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.3)] font-bold scale-105"
+                        : "border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="size-3" />
+                    <span>{p.label}</span>
+                  </button>
+                );
+              })}
+
+              {messages.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ms-auto rounded-full text-xs text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors"
+                  onClick={() => {
+                    stop();
+                    setMessages([]);
+                    setError(null);
+                    toast.info("تم بدء محادثة جديدة");
+                  }}
+                >
+                  <Trash2 className="size-3.5 me-1" /> مسح
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card/70 p-5 backdrop-blur">
-          <div className="max-h-[52vh] min-h-[280px] space-y-4 overflow-y-auto pe-1">
+        {/* ================= CHAT CONVERSATION CANVAS ================= */}
+        <div className="relative overflow-hidden rounded-3xl glass p-4 sm:p-6 shadow-float border-primary/20 backdrop-blur-xl">
+          {/* Subtle neural grid pattern in canvas */}
+          <div className="pointer-events-none absolute inset-0 bg-grid opacity-30" />
+
+          <div className="relative flex min-h-[420px] max-h-[60vh] flex-col space-y-5 overflow-y-auto pe-2 sm:pe-3">
             {messages.length === 0 && (
-              <div className="pt-10 text-center">
-                <p className="text-sm text-muted-foreground">
-                  ابدأ المحادثة — الوضع الحالي: {activeMode.label}
+              <div className="my-auto py-8 text-center">
+                {/* Futuristic Logo Aura */}
+                <div className="relative mx-auto mb-4 flex size-20 items-center justify-center">
+                  <div className="pointer-events-none absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                  <div className="pointer-events-none absolute size-20 rounded-full border border-dashed border-primary/40 animate-spin" style={{ animationDuration: "6s" }} />
+                  <DelvaiLogo className="size-12 drop-shadow-[0_0_20px_oklch(0.82_0.14_82/0.8)]" />
+                </div>
+
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary">
+                  <Sparkles className="size-3.5" />
+                  <span>دلفاي برايم متصل · جاهز للإجابة والبث المباشر</span>
+                </div>
+
+                <h3 className="mt-3 text-2xl font-black sm:text-3xl text-foreground">
+                  كيف يمكنني <span className="text-shine">مساعدتك اليوم</span>؟
+                </h3>
+                <p className="mx-auto mt-2 max-w-lg text-xs sm:text-sm text-muted-foreground">
+                  اختر أحد المحاور الاستراتيجية أو اكتب أي سؤال أو فكرة لتوليد تحليل فوري عميق.
                 </p>
-                <div className="mt-4 flex flex-wrap justify-center gap-2">
-                  {SUGGESTIONS.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => void send(s)}
-                      className="rounded-full border border-border bg-background/60 px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/50 hover:text-foreground"
-                    >
-                      {s}
-                    </button>
-                  ))}
+
+                {/* Quick starter cards */}
+                <div className="mt-8 grid gap-3 sm:grid-cols-2 text-start">
+                  {QUICK_STARTERS.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => void send(item.prompt)}
+                        className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/60 hover:bg-card/90 hover:shadow-glow"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                            <Icon className="size-4" />
+                          </span>
+                          <div>
+                            <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
+                              {item.title}
+                            </h4>
+                            <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-1">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
+            {/* Conversation Messages */}
             {messages.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "flex justify-start" : "flex justify-end"}>
+              <div
+                key={i}
+                className={`flex gap-3 ${m.role === "user" ? "justify-start flex-row-reverse" : "justify-start"}`}
+              >
+                {/* Avatar */}
+                <div className="shrink-0 pt-1">
+                  {m.role === "assistant" ? (
+                    <div className="relative flex size-8 items-center justify-center rounded-full bg-cine text-primary-foreground shadow-glow">
+                      <DelvaiLogo className="size-5" />
+                    </div>
+                  ) : (
+                    <div className="flex size-8 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-xs font-bold text-primary">
+                      أنت
+                    </div>
+                  )}
+                </div>
+
+                {/* Message Bubble */}
                 <div
-                  className={`group max-w-[88%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-7 ${
+                  className={`group relative max-w-[85%] sm:max-w-[80%] rounded-3xl p-4 text-sm leading-7 shadow-sm ${
                     m.role === "user"
-                      ? "bg-primary/15 text-foreground"
-                      : "bg-background/70 text-foreground"
+                      ? "rounded-tr-sm bg-primary/20 text-foreground border border-primary/40"
+                      : "rounded-tl-sm bg-card/90 text-foreground border border-border/80 shadow-float"
                   }`}
                 >
+                  {/* Attached Images */}
                   {m.images && m.images.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-2">
+                    <div className="mb-3 flex flex-wrap gap-2">
                       {m.images.map((src, j) => (
                         <img
                           key={j}
                           src={src}
                           alt="صورة مرفقة"
-                          className="size-24 rounded-lg border border-border object-cover"
+                          className="size-28 rounded-xl border border-border/80 object-cover shadow-sm"
                         />
                       ))}
                     </div>
                   )}
-                  {m.content ||
-                    (streaming && i === messages.length - 1 ? (
-                      <DelvaiThinkingLoader size="sm" text="دلفاي برايم يفكّر ويبحث…" />
-                    ) : null)}
+
+                  {/* Message Text or Thinking State */}
+                  {m.content ? (
+                    <div className="whitespace-pre-wrap font-sans text-sm">{m.content}</div>
+                  ) : streaming && i === messages.length - 1 ? (
+                    <div className="py-1">
+                      <DelvaiThinkingLoader size="sm" text="دلفاي برايم يفكّر ويبحث في البيانات…" inline />
+                    </div>
+                  ) : null}
+
+                  {/* Assistant Footer Actions */}
                   {m.role === "assistant" && m.content && !(streaming && i === messages.length - 1) && (
-                    <div className="mt-2 flex gap-1 opacity-0 transition group-hover:opacity-100">
+                    <div className="mt-3 flex items-center gap-1 border-t border-border/40 pt-2 text-xs text-muted-foreground opacity-80 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
-                        onClick={() => void copy(m.content)}
-                        className="rounded-md p-1 text-muted-foreground hover:text-foreground"
+                        onClick={() => void copy(m.content, i)}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 hover:bg-card hover:text-foreground transition-colors"
                         aria-label="نسخ الرد"
                       >
-                        <Copy className="size-3.5" />
+                        {copiedIndex === i ? (
+                          <Check className="size-3.5 text-emerald-400" />
+                        ) : (
+                          <Copy className="size-3.5" />
+                        )}
+                        <span className="text-[11px]">{copiedIndex === i ? "تم النسخ" : "نسخ"}</span>
                       </button>
+
                       {i === messages.length - 1 && (
                         <button
                           type="button"
                           onClick={() => void regenerate()}
-                          className="rounded-md p-1 text-muted-foreground hover:text-foreground"
-                          aria-label="إعادة توليد الرد"
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 hover:bg-card hover:text-foreground transition-colors"
+                          aria-label="إعادة التفكير والتوليد"
                         >
                           <RefreshCw className="size-3.5" />
+                          <span className="text-[11px]">إعادة التوليد</span>
                         </button>
                       )}
+
+                      <span className="ms-auto text-[10px] text-muted-foreground/60 font-mono">
+                        {activeMode.label} · {activePersona.label}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -402,98 +548,104 @@ function ChatTool() {
           </div>
 
           {error && (
-            <p className="mt-3 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm">
-              {error}
-            </p>
-          )}
-
-          {images.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {images.map((src, i) => (
-                <div key={i} className="relative">
-                  <img
-                    src={src}
-                    alt="معاينة الصورة"
-                    className="size-20 rounded-lg border border-border object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setImages((prev) => prev.filter((_, j) => j !== i))}
-                    className="absolute -top-2 -end-2 rounded-full bg-destructive p-1 text-destructive-foreground"
-                    aria-label="إزالة الصورة"
-                  >
-                    <X className="size-3" />
-                  </button>
-                </div>
-              ))}
+            <div className="mt-3 rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs text-destructive flex items-center justify-between">
+              <span>{error}</span>
+              <Button size="sm" variant="ghost" onClick={() => void regenerate()} className="text-xs h-7">
+                إعادة المحاولة
+              </Button>
             </div>
           )}
 
-          <div className="mt-5 flex items-end gap-2">
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => void addFiles(e.target.files)}
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => fileRef.current?.click()}
-              disabled={streaming || images.length >= MAX_IMAGES}
-              aria-label="إرفاق صورة"
-            >
-              <ImagePlus className="size-4" />
-            </Button>
-            <Textarea
-              rows={2}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void send();
-                }
-              }}
-              onPaste={(e) => {
-                const files = Array.from(e.clipboardData?.items ?? [])
-                  .filter((it) => it.kind === "file" && it.type.startsWith("image/"))
-                  .map((it) => it.getAsFile())
-                  .filter((f): f is File => Boolean(f));
-                if (files.length > 0) {
-                  e.preventDefault();
-                  void addFiles(files);
-                }
-              }}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                const files = Array.from(e.dataTransfer?.files ?? []).filter((f) =>
-                  f.type.startsWith("image/"),
-                );
-                if (files.length > 0) {
-                  e.preventDefault();
-                  void addFiles(files);
-                }
-              }}
-              placeholder="اكتب رسالتك… Enter للإرسال، Shift+Enter لسطر جديد"
-              className="resize-none bg-background/60"
-            />
-
-            {streaming ? (
-              <Button variant="outline" onClick={stop} aria-label="إيقاف">
-                <Square className="size-4" />
-              </Button>
-            ) : (
-              <Button
-                onClick={() => void send()}
-                disabled={!input.trim() && images.length === 0}
-                className="bg-cine text-primary-foreground"
-              >
-                <Send className="size-4" />
-              </Button>
+          {/* ================= FLOATING COMMAND INPUT DECK ================= */}
+          <div className="mt-4 rounded-2xl border border-border/80 bg-background/80 p-2.5 shadow-float backdrop-blur-xl transition-all focus-within:border-primary/60 focus-within:ring-glow">
+            {/* Uploaded Images Preview */}
+            {images.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-2 border-b border-border/40 pb-2 px-2">
+                {images.map((src, i) => (
+                  <div key={i} className="relative group">
+                    <img
+                      src={src}
+                      alt="معاينة الصورة"
+                      className="size-16 rounded-xl border border-primary/40 object-cover shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setImages((prev) => prev.filter((_, j) => j !== i))}
+                      className="absolute -top-1.5 -end-1.5 rounded-full bg-destructive p-1 text-destructive-foreground shadow hover:scale-110 transition-transform"
+                      aria-label="إزالة الصورة"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
+
+            <div className="flex items-end gap-2">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => void addFiles(e.target.files)}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => fileRef.current?.click()}
+                disabled={streaming || images.length >= MAX_IMAGES}
+                className="rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                aria-label="إرفاق صورة"
+                title="إرفاق صور للتحليل"
+              >
+                <ImagePlus className="size-5" />
+              </Button>
+
+              <Textarea
+                ref={textareaRef}
+                rows={1}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void send();
+                  }
+                }}
+                onPaste={(e) => {
+                  const files = Array.from(e.clipboardData?.items ?? [])
+                    .filter((it) => it.kind === "file" && it.type.startsWith("image/"))
+                    .map((it) => it.getAsFile())
+                    .filter((f): f is File => Boolean(f));
+                  if (files.length > 0) {
+                    e.preventDefault();
+                    void addFiles(files);
+                  }
+                }}
+                placeholder="اسأل دلفاي برايم أي شيء… (Enter للإرسال، Shift+Enter لسطر جديد)"
+                className="min-h-12 max-h-40 flex-1 resize-none bg-transparent px-3 py-3 text-sm outline-none border-none focus-visible:ring-0 placeholder:text-muted-foreground/60 leading-6"
+              />
+
+              {streaming ? (
+                <Button
+                  variant="outline"
+                  onClick={stop}
+                  aria-label="إيقاف التفكير"
+                  className="rounded-xl border-destructive/40 text-destructive hover:bg-destructive/10 shrink-0"
+                >
+                  <Square className="size-4 me-1" /> إيقاف
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => void send()}
+                  disabled={!input.trim() && images.length === 0}
+                  className="rounded-xl bg-cine text-primary-foreground shadow-glow shrink-0 transition-transform hover:scale-105"
+                >
+                  <Send className="size-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
