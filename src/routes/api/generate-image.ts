@@ -8,6 +8,10 @@ type Body = {
   negative?: string;
   quality?: string;
   model?: string;
+  lighting?: string;
+  camera?: string;
+  mood?: string;
+  seed?: number;
 };
 
 const ALLOWED_MODELS = new Set([
@@ -33,9 +37,13 @@ export const Route = createFileRoute("/api/generate-image")({
 
         const directives = [
           prompt.trim(),
-          body.aspect ? `Aspect ratio: ${body.aspect} (compose and frame exactly for this ratio).` : "",
-          body.quality ? `Quality: ${body.quality}.` : "",
-          body.negative ? `Avoid: ${body.negative}.` : "",
+          body.lighting ? `Lighting: ${body.lighting}.` : "",
+          body.camera ? `Camera & Lens: ${body.camera}.` : "",
+          body.mood ? `Atmosphere & Color Grade: ${body.mood}.` : "",
+          body.aspect ? `Aspect ratio: ${body.aspect} (frame composition precisely to match this aspect ratio).` : "",
+          body.quality ? `Render Quality: ${body.quality}, 8k ultra high resolution masterpiece.` : "",
+          body.negative ? `Avoid / Negative elements: ${body.negative}.` : "",
+          typeof body.seed === "number" ? `Seed: ${body.seed}.` : "",
         ]
           .filter(Boolean)
           .join("\n");
@@ -60,7 +68,6 @@ export const Route = createFileRoute("/api/generate-image")({
             modalities: ["image", "text"],
           }),
         });
-
 
         if (!upstream.ok) {
           const text = await upstream.text().catch(() => "");

@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Aperture,
   Brain,
   Camera,
   Check,
   ChevronDown,
   Copy,
+  Cpu,
   Download,
   Eraser,
   Expand,
@@ -15,13 +17,16 @@ import {
   Image as ImageIcon,
   ImagePlus,
   Layers,
+  Maximize2,
   Mic,
   MicOff,
   Palette,
+  Radio,
   RefreshCw,
   Rocket,
   Sliders,
   Sparkles,
+  Sun,
   Upload,
   Wand2,
   X,
@@ -45,12 +50,12 @@ export const Route = createFileRoute("/image")({
       {
         name: "description",
         content:
-          "استوديو دلفاي للصور الفائقة: توليد صور واقعية وسينمائية، إزالة واستبدال الخلفية، رفع الدقة 4K، توسيع الإطار وتصميم بوسترات احترافية.",
+          "استوديو دلفاي للصور الفائقة: توليد صور واقعية وسينمائية بأحدث نماذج الذكاء الاصطناعي Gemini 3 Pro & Flash، إضاءات ذكية، وعدسات تصوير احترافية بدقة 4K.",
       },
       { property: "og:title", content: "استوديو الصور الفائق — Delvai Image Studio" },
       {
         property: "og:description",
-        content: "توليد وتحرير الصور باحترافية استثنائية بدقة 4K وأنماط سينمائية مستقبلية.",
+        content: "توليد وتحرير الصور باحترافية استثنائية بدقة 4K وأنماط سينمائية مستقبلية متصلة بأحدث محركات الذكاء الاصطناعي.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -58,6 +63,31 @@ export const Route = createFileRoute("/image")({
   }),
   component: ImageTool,
 });
+
+/* ================= AI ENGINES & PROVIDERS ================= */
+const ENGINES = [
+  {
+    id: "google/gemini-3-pro-image",
+    name: "Gemini 3 Pro (Imagen 3)",
+    tag: "دقة 4K فائقة",
+    badge: "الأقوى عالمياً",
+    hint: "أعلى دقة وواقعية سينمائية، تفاصيل دقيقة، معالجة استثنائية للإضاءة والتكستشر",
+  },
+  {
+    id: "google/gemini-3.1-flash-image",
+    name: "Gemini 3.1 Flash",
+    tag: "بث لحظي فائق السرعة",
+    badge: "سرعة البرق",
+    hint: "توليد فوري بأحدث معمارية لحظية مع سرعة فائقة وجودة ممتازة",
+  },
+  {
+    id: "google/gemini-2.5-flash-image",
+    name: "Gemini 2.5 Flash",
+    tag: "كفاءة وتوازن",
+    badge: "متوازن",
+    hint: "توليد سريع ومتوازن ومثالي للمسودات والتصميمات السريعة",
+  },
+] as const;
 
 const STYLES = [
   { id: "photo", label: "تصوير واقعي", icon: Camera, hint: "photorealistic, 50mm lens, natural daylight, ultra detailed skin texture, raw photo, 8k" },
@@ -70,6 +100,22 @@ const STYLES = [
   { id: "logo", label: "شعار وأيقونة", icon: Rocket, hint: "flat vector logo mark, modern minimalist icon, high contrast, clean vector curves" },
 ] as const;
 
+const LIGHTING_MODES = [
+  { id: "auto", label: "إضاءة تلقائية ذكية", hint: "natural balanced studio lighting" },
+  { id: "golden", label: "شروق/غروب ذهبي", hint: "golden hour sunlight, warm atmospheric glow, soft long shadows" },
+  { id: "studio", label: "سوفت بوكس استوديو", hint: "high-end commercial studio softbox lighting, perfectly balanced exposure" },
+  { id: "cyber", label: "نيون سايبربانك", hint: "vibrant neon rim light, purple and cyan backlight, reflective futuristic glow" },
+  { id: "dramatic", label: "درامي مظلم", hint: "dramatic chiaroscuro lighting, moody high contrast, subtle deep shadows" },
+] as const;
+
+const CAMERA_MODES = [
+  { id: "auto", label: "زاوية تلقائية", hint: "cinematic medium shot" },
+  { id: "portrait", label: "بورتريه 85mm", hint: "85mm f/1.4 portrait lens, beautiful bokeh, shallow depth of field" },
+  { id: "wide", label: "عدسة عريضة 24mm", hint: "24mm wide angle lens, expansive perspective, dramatic field of view" },
+  { id: "macro", label: "ماكرو دقيق 100mm", hint: "100mm macro lens, extreme close-up, microscopic crisp details" },
+  { id: "drone", label: "لقطة درون علوية", hint: "aerial drone photography, bird's eye view, vast landscape scale" },
+] as const;
+
 const RATIOS = [
   { id: "1:1", label: "مربّع 1:1", desc: "سوشيال ميديا", box: "aspect-square" },
   { id: "16:9", label: "عريض 16:9", desc: "يوتيوب وشاشات", box: "aspect-video" },
@@ -77,11 +123,6 @@ const RATIOS = [
   { id: "4:5", label: "إنستغرام 4:5", desc: "منشورات عمودية", box: "aspect-[4/5]" },
   { id: "3:2", label: "كلاسيكي 3:2", desc: "كاميرا فوتوغرافية", box: "aspect-[3/2]" },
   { id: "21:9", label: "سينما 21:9", desc: "شاشة بانورامية", box: "aspect-[21/9]" },
-] as const;
-
-const QUALITY = [
-  { id: "fast", label: "سريع فوري", model: "google/gemini-3.1-flash-image", hint: "fast render" },
-  { id: "pro", label: "فائق الدقة 4K", model: "google/gemini-3-pro-image", hint: "maximum fidelity, 4k detail, professional masterpiece finish" },
 ] as const;
 
 const EDIT_ACTIONS = [
@@ -99,29 +140,40 @@ const INSPIRATION_STARTERS = [
     desc: "زجاجة عطر ذهبية راقية على قاعدة رخامية سوداء مع انعكاسات مائية ناعمة وإضاءة درامية.",
     style: "product",
     ratio: "4:5",
+    lighting: "studio",
   },
   {
     title: "شخصية خيال علمي في مدينة نيوم",
     desc: "رائد فضاء يرتدي بذلة سايبر متطورة ذات خطوط نيون ذهبية ينظر إلى أفق مدينة مستقبلية ليلاً بدقة 8K.",
     style: "cinematic",
     ratio: "16:9",
+    lighting: "cyber",
   },
   {
     title: "شعار ثلاثي الأبعاد لشركة ذكاء اصطناعي",
     desc: "شعار معدني ذهبي ومضيء على شكل نواة عصبية ثلاثية الأبعاد يطفو على خلفية داكنة فاخرة.",
     style: "3d",
     ratio: "1:1",
+    lighting: "dramatic",
   },
   {
     title: "مشهد طبيعي ساحر وقت الغروب",
     desc: "جبال شاهقة مغطاة بالضباب مع بحيرة كريستالية تعكس ألوان شفق الغروب البنفسجية والذهبية.",
     style: "photo",
     ratio: "16:9",
+    lighting: "golden",
   },
 ];
 
 type Tab = "generate" | "edit";
 type Shot = { url: string; prompt: string; ratio?: string };
+
+const GENERATION_PHASES = [
+  "📡 استقبال وتحليل الوصف وهندسته بالذكاء الاصطناعي…",
+  "🧠 بناء الشبكة البصرية وضبط المنظور والعدسة…",
+  "🎨 توزيع الإضاءة السينمائية ورسم تفاصيل 4K…",
+  "✨ المعالجة النهائية وضبط الألوان والتصدير…",
+];
 
 function ImageTool() {
   const save = useServerFn(saveGeneration);
@@ -134,9 +186,11 @@ function ImageTool() {
   const [prompt, setPrompt] = useState("");
   const [negative, setNegative] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [model, setModel] = useState<string>(ENGINES[0].id);
   const [style, setStyle] = useState<string>(STYLES[0].id);
+  const [lighting, setLighting] = useState<string>("auto");
+  const [camera, setCamera] = useState<string>("auto");
   const [ratio, setRatio] = useState<string>(RATIOS[0].id);
-  const [quality, setQuality] = useState<string>("pro");
   const [count, setCount] = useState(1);
   const [action, setAction] = useState<string>(EDIT_ACTIONS[0].id);
 
@@ -144,11 +198,25 @@ function ImageTool() {
   const [shots, setShots] = useState<Shot[]>([]);
   const [active, setActive] = useState<Shot | null>(null);
   const [busy, setBusy] = useState(false);
+  const [phaseIndex, setPhaseIndex] = useState(0);
   const [enhancing, setEnhancing] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   const ratioBox = RATIOS.find((r) => r.id === (active?.ratio ?? ratio))?.box ?? "aspect-square";
+
+  // Cycle through live progress phases during generation
+  useEffect(() => {
+    if (!busy) {
+      setPhaseIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setPhaseIndex((prev) => (prev + 1) % GENERATION_PHASES.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, [busy]);
 
   const addFiles = (files: FileList | File[] | null | undefined) => {
     if (!files) return;
@@ -234,28 +302,39 @@ function ImageTool() {
     setPrompt(starter.desc);
     setStyle(starter.style);
     setRatio(starter.ratio);
+    if (starter.lighting) setLighting(starter.lighting);
     toast.success(`تم اختيار قالب: ${starter.title}`);
   };
 
-  const run = async () => {
+  const generateVariations = async () => {
+    if (!active || busy) return;
+    setRefs([active.url]);
+    toast.info("جارٍ توليد 4 تنويعات بصرية من الصورة…");
+    setCount(4);
+    await run(active.prompt);
+  };
+
+  const run = async (overridePrompt?: string) => {
     if (busy) return;
     const isEdit = tab === "edit";
     if (isEdit && refs.length === 0) {
       setError("يرجى إرفاق صورة أولاً لتطبيق التعديل عليها.");
       return;
     }
-    if (!isEdit && !prompt.trim()) {
+    const currentPrompt = overridePrompt ?? prompt;
+    if (!isEdit && !currentPrompt.trim()) {
       setError("يرجى كتابة وصف الصورة التي ترغب في توليدها.");
       return;
     }
 
     const styleHint = STYLES.find((s) => s.id === style)?.hint ?? "";
-    const q = QUALITY.find((x) => x.id === quality) ?? QUALITY[1];
+    const lightHint = LIGHTING_MODES.find((l) => l.id === lighting)?.hint ?? "";
+    const camHint = CAMERA_MODES.find((c) => c.id === camera)?.hint ?? "";
     const editPrompt = EDIT_ACTIONS.find((a) => a.id === action)?.prompt ?? "";
 
     const finalPrompt = isEdit
-      ? `${editPrompt}${prompt.trim() ? ` Additional specs: ${prompt.trim()}.` : ""} ${q.hint}.`
-      : `${prompt.trim()}. Style: ${styleHint}. ${q.hint}.`;
+      ? `${editPrompt}${currentPrompt.trim() ? ` Additional specs: ${currentPrompt.trim()}.` : ""}`
+      : `${currentPrompt.trim()}. Style: ${styleHint}.`;
 
     setBusy(true);
     setError(null);
@@ -270,9 +349,11 @@ function ImageTool() {
               prompt: finalPrompt,
               images: refs,
               aspect: isEdit ? undefined : ratio,
+              lighting: lightHint,
+              camera: camHint,
               negative: negative.trim() || undefined,
-              quality: q.label,
-              model: q.model,
+              quality: "4k ultra high fidelity",
+              model,
             }),
           }).then(async (r) => (await r.json()) as { url?: string; message?: string }),
         ),
@@ -280,7 +361,7 @@ function ImageTool() {
 
       const ok = results
         .filter((r) => r.url)
-        .map((r) => ({ url: r.url as string, prompt: prompt || editPrompt, ratio }));
+        .map((r) => ({ url: r.url as string, prompt: currentPrompt || editPrompt, ratio }));
       if (ok.length === 0) {
         setError(results[0]?.message ?? "تعذّر توليد الصورة، حاول مجدداً.");
         return;
@@ -290,7 +371,7 @@ function ImageTool() {
       toast.success("تم توليد الصورة بنجاح!");
       if (user)
         ok.forEach((s) =>
-          void save({ data: { tool: "صورة", prompt: prompt || editPrompt, result_url: s.url } }),
+          void save({ data: { tool: "صورة", prompt: currentPrompt || editPrompt, result_url: s.url } }),
         );
     } catch {
       setError("تعذّر الاتصال بخادم التوليد. حاول مجددًا.");
@@ -299,14 +380,16 @@ function ImageTool() {
     }
   };
 
+  const activeEngine = ENGINES.find((e) => e.id === model) || ENGINES[0];
+
   return (
     <ToolShell
       title="استوديو الصور الفائق — Delvai Image Studio"
-      subtitle="عقل التوليد والتصميم البصري لمنصة Delvai — دقة 4K سينمائية، أنماط تصوير واقعية، إزالة واستبدال الخلفيات، وتوسيع الإطار."
+      subtitle="عقل التوليد والتصميم البصري لمنصة Delvai — متصل بأحدث محركات الذكاء الاصطناعي اللحظية (Gemini 3 Pro & Flash) بدقة 4K وإضاءات سينمائية."
     >
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
-        {/* ================= STUDIO MODE SELECTOR & TOP HUD ================= */}
-        <div className="relative overflow-hidden rounded-2xl glass p-3 sm:p-4 shadow-float border-primary/25 ring-glow">
+        {/* ================= AI ENGINES & PROVIDERS HUD ================= */}
+        <div className="relative overflow-hidden rounded-3xl glass p-3 sm:p-4 shadow-float border-primary/25 ring-glow">
           <div className="relative flex flex-wrap items-center justify-between gap-3">
             {/* Mode Switcher */}
             <div className="flex items-center gap-2">
@@ -333,22 +416,27 @@ function ImageTool() {
               })}
             </div>
 
-            {/* Quality Pill */}
-            <div className="ms-auto flex items-center gap-1 rounded-full border border-border/70 bg-card/40 p-1">
-              {QUALITY.map((q) => {
-                const isSelected = quality === q.id;
+            {/* AI Model Engine Selector */}
+            <div className="ms-auto flex items-center gap-1.5 rounded-2xl border border-primary/30 bg-card/60 p-1">
+              <span className="ps-2 pe-1 text-[10px] font-bold text-muted-foreground font-mono uppercase">
+                المحرك:
+              </span>
+              {ENGINES.map((e) => {
+                const isSelected = model === e.id;
                 return (
                   <button
-                    key={q.id}
+                    key={e.id}
                     type="button"
-                    onClick={() => setQuality(q.id)}
-                    className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-all ${
+                    onClick={() => setModel(e.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-semibold transition-all ${
                       isSelected
-                        ? "bg-primary text-primary-foreground shadow-sm font-bold"
+                        ? "bg-primary text-primary-foreground shadow-sm font-bold scale-105"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
+                    title={e.hint}
                   >
-                    {q.label}
+                    <Zap className="size-3" />
+                    <span>{e.name}</span>
                   </button>
                 );
               })}
@@ -468,6 +556,49 @@ function ImageTool() {
                       </button>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* AI Lighting & Camera Lenses HUD */}
+            {tab === "generate" && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-border/40 pt-3">
+                {/* Lighting Mode */}
+                <div>
+                  <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                    <Sun className="size-3.5 text-primary" />
+                    الإضاءة والأجواء:
+                  </span>
+                  <select
+                    value={lighting}
+                    onChange={(e) => setLighting(e.target.value)}
+                    className="w-full rounded-xl border border-border/80 bg-background/80 px-3 py-2 text-xs text-foreground outline-none focus:border-primary/80"
+                  >
+                    {LIGHTING_MODES.map((l) => (
+                      <option key={l.id} value={l.id} className="bg-card text-foreground">
+                        {l.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Camera Framing */}
+                <div>
+                  <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                    <Aperture className="size-3.5 text-primary" />
+                    العدسة والمنظور:
+                  </span>
+                  <select
+                    value={camera}
+                    onChange={(e) => setCamera(e.target.value)}
+                    className="w-full rounded-xl border border-border/80 bg-background/80 px-3 py-2 text-xs text-foreground outline-none focus:border-primary/80"
+                  >
+                    {CAMERA_MODES.map((c) => (
+                      <option key={c.id} value={c.id} className="bg-card text-foreground">
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             )}
@@ -614,12 +745,12 @@ function ImageTool() {
               {busy ? (
                 <div className="flex items-center gap-2">
                   <DelvaiThinkingLoader size="xs" inline />
-                  <span>جارٍ التوليد والرسم بدقة فائقة…</span>
+                  <span>{GENERATION_PHASES[phaseIndex]}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   {tab === "edit" ? <Wand2 className="size-4" /> : <Rocket className="size-4" />}
-                  <span>{tab === "edit" ? "تطبيق التعديل الذكي" : "إطلاق توليد الصورة"}</span>
+                  <span>{tab === "edit" ? "تطبيق التعديل الذكي" : "إطلاق توليد الصورة بدقة 4K"}</span>
                 </div>
               )}
             </Button>
@@ -643,8 +774,8 @@ function ImageTool() {
               {busy ? (
                 <div className="relative z-10 p-6 text-center">
                   <DelvaiThinkingLoader size="lg" text="دلفاي يفكّر ويرسم بدقة فائقة…" />
-                  <p className="mt-3 text-xs text-muted-foreground animate-pulse">
-                    معالجة الإضاءة والظلال والتفاصيل السينمائية…
+                  <p className="mt-3 text-xs text-primary font-mono font-bold animate-pulse">
+                    {GENERATION_PHASES[phaseIndex]}
                   </p>
                 </div>
               ) : active ? (
@@ -652,11 +783,20 @@ function ImageTool() {
                   <img
                     src={active.url}
                     alt={active.prompt}
-                    className="size-full object-contain transition-transform duration-500 group-hover:scale-105"
+                    className="size-full object-contain transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+                    onClick={() => setFullscreenImage(active.url)}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end pointer-events-none">
                     <p className="text-xs text-white/90 line-clamp-2">{active.prompt}</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setFullscreenImage(active.url)}
+                    className="absolute top-3 end-3 rounded-full bg-black/60 p-2 text-white/80 hover:text-white backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="تكبير الصورة كاملة"
+                  >
+                    <Maximize2 className="size-4" />
+                  </button>
                 </div>
               ) : (
                 <div className="relative z-10 p-6 text-center my-auto">
@@ -681,14 +821,14 @@ function ImageTool() {
 
             {/* Viewport Action Controls */}
             {active && !busy && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <a
                   href={active.url}
                   download={`delvai-image-${Date.now()}.png`}
                   className="w-full"
                 >
                   <Button variant="outline" size="sm" className="w-full rounded-xl text-xs gap-1.5">
-                    <Download className="size-3.5" /> تنزيل بدقة 4K
+                    <Download className="size-3.5" /> تنزيل 4K
                   </Button>
                 </a>
 
@@ -702,7 +842,17 @@ function ImageTool() {
                   }}
                   className="rounded-xl text-xs gap-1.5"
                 >
-                  <Wand2 className="size-3.5" /> تحرير الصورة
+                  <Wand2 className="size-3.5" /> تحرير
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={generateVariations}
+                  className="rounded-xl text-xs gap-1.5"
+                  title="توليد تنويعات بصرية جديدة"
+                >
+                  <Sparkles className="size-3.5 text-primary" /> تنويعات
                 </Button>
 
                 <Button
@@ -712,7 +862,7 @@ function ImageTool() {
                     void navigator.clipboard.writeText(active.url);
                     toast.success("تم نسخ رابط الصورة");
                   }}
-                  className="rounded-xl text-xs gap-1.5 col-span-2 sm:col-span-1"
+                  className="rounded-xl text-xs gap-1.5"
                 >
                   <Copy className="size-3.5" /> نسخ الرابط
                 </Button>
@@ -769,6 +919,27 @@ function ImageTool() {
             )}
           </div>
         </div>
+
+        {/* Fullscreen Lightbox Modal */}
+        {fullscreenImage && (
+          <div
+            onClick={() => setFullscreenImage(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md cursor-zoom-out"
+          >
+            <button
+              type="button"
+              onClick={() => setFullscreenImage(null)}
+              className="absolute top-4 end-4 rounded-full bg-card p-2 text-foreground"
+            >
+              <X className="size-6" />
+            </button>
+            <img
+              src={fullscreenImage}
+              alt="معاينة كاملة"
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl"
+            />
+          </div>
+        )}
       </div>
     </ToolShell>
   );
