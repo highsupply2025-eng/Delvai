@@ -391,7 +391,7 @@ function Home() {
                 <div className="space-y-4">
                   <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1 text-xs text-primary font-bold">
                     <Clapperboard className="size-3.5" />
-                    محرك Veo 3.1 السينمائي
+                    محرك Delvai Cinema Quantum السينمائي
                   </div>
                   <h3 className="text-2xl font-black">تحويل النص إلى فيديو فائق الواقعية</h3>
                   <p className="text-sm leading-7 text-muted-foreground">
@@ -418,8 +418,8 @@ function Home() {
                     <span className="rounded-md bg-black/60 px-2.5 py-1 text-[11px] font-mono text-primary border border-primary/30">
                       REC · 4K 60FPS
                     </span>
-                    <span className="rounded-md bg-black/60 px-2.5 py-1 text-[11px] text-muted-foreground">
-                      Veo 3.1
+                    <span className="rounded-md bg-black/60 px-2.5 py-1 text-[11px] text-primary/80 font-bold">
+                      Delvai Cinema 4K
                     </span>
                   </div>
                   <div className="my-auto text-center space-y-2 z-10">

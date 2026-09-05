@@ -62,8 +62,8 @@ export const Route = createFileRoute("/docs")({
 });
 
 const ENGINES = [
-  { id: "google/gemini-3.7-flash", label: "Gemini 3.7 اللحظي", tag: "بث فوري ⚡" },
-  { id: "google/gemini-3.7-pro", label: "Gemini 3.7 تفكير عميق", tag: "تحليل استراتيجي 🧠" },
+  { id: "google/gemini-3.7-flash", label: "Delvai Doc Fast ⚡", tag: "بث فوري ⚡" },
+  { id: "google/gemini-3.7-pro", label: "Delvai Doc Deep Analysis 🧠", tag: "تحليل استراتيجي 🧠" },
 ];
 
 const PRESETS = [
@@ -423,7 +423,7 @@ function DocsStudio() {
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3.5 py-1 text-xs font-bold text-primary shadow-[0_0_15px_oklch(0.82_0.14_82/0.25)]">
                 <Sparkles className="size-3.5 animate-pulse" />
-                <span>محرك Multimodal Gemini 3.7 لتحليل الوثائق متصل</span>
+                <span>محرك Delvai Quantum لتحليل الوثائق والبيانات متصل ⚡</span>
               </span>
             </div>
 

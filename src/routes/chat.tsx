@@ -473,7 +473,7 @@ function ChatTool() {
         signal: controller.signal,
         body: JSON.stringify({
           system: systemPrompt,
-          model: "google/gemini-3.7-flash",
+          model: deepThinking ? "google/gemini-3.7-pro" : "google/gemini-3.7-flash",
           messages: history,
         }),
       });

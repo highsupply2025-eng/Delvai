@@ -14,7 +14,7 @@ const CreateInput = z.object({
   prompt: z.string().min(3).max(4000),
   negativePrompt: z.string().max(1000).optional(),
   model: z.enum(MODELS).default("google/veo-3.1-lite"),
-  durationSeconds: z.union([z.literal(4), z.literal(6), z.literal(8)]).default(8),
+  durationSeconds: z.union([z.literal(4), z.literal(6), z.literal(8)]).default(4),
   resolution: z.enum(["720p", "1080p", "4k"]).default("720p"),
   aspectRatio: z.enum(["16:9", "9:16"]).default("16:9"),
   generateAudio: z.boolean().default(true),
@@ -27,7 +27,7 @@ const CreateInput = z.object({
 
 function gatewayMessage(status: number, fallback: string) {
   if (status === 429) return "الطلبات كثيرة الآن أو هناك فيديو قيد التوليد. انتظر قليلًا ثم أعد المحاولة.";
-  if (status === 402) return "لا يوجد رصيد كافٍ لتوليد الفيديو. يرجى إضافة رصيد ثم المحاولة.";
+  if (status === 402) return "لا يوجد رصيد كافٍ لتوليد الفيديو. يرجى مراجعة الاشتراك أو إضافة رصيد.";
   if (status === 401 || status === 403) return "خدمة الفيديو غير مفعّلة لهذا المشروع.";
   return fallback;
 }
@@ -145,7 +145,12 @@ export const getVideoJob = createServerFn({ method: "POST" })
     }
 
     if (job.status !== "completed") {
-      return { ok: true as const, done: false as const, progress: job.progress ?? 0 };
+      return {
+        ok: true as const,
+        done: false as const,
+        status: job.status ?? "processing",
+        progress: job.progress ?? 0,
+      };
     }
 
     const contentRes = await fetch(`${GATEWAY}/${job.id}/content`, {
@@ -154,16 +159,26 @@ export const getVideoJob = createServerFn({ method: "POST" })
     });
     const location = contentRes.headers.get("location");
     if (location) {
-      return { ok: true as const, done: true as const, progress: 100, url: location };
+      return {
+        ok: true as const,
+        done: true as const,
+        status: "succeeded" as const,
+        progress: 100,
+        url: location,
+        videoUrl: location,
+      };
     }
 
     const bytes = new Uint8Array(await contentRes.arrayBuffer());
     let binary = "";
     for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]!);
+    const dataUrl = `data:video/mp4;base64,${btoa(binary)}`;
     return {
       ok: true as const,
       done: true as const,
+      status: "succeeded" as const,
       progress: 100,
-      url: `data:video/mp4;base64,${btoa(binary)}`,
+      url: dataUrl,
+      videoUrl: dataUrl,
     };
   });

@@ -46,16 +46,16 @@ import { DelvaiThinkingLoader, DelvaiLogo } from "@/components/DelvaiThinkingLoa
 export const Route = createFileRoute("/image")({
   head: () => ({
     meta: [
-      { title: "استوديو الصور الفائق (Delvai Image Studio) | توليد وتحرير بالذكاء الاصطناعي" },
+      { title: "استوديو الصور الفائق (Delvai Image Studio) | توليد صور بدقة 4K" },
       {
         name: "description",
         content:
-          "استوديو دلفاي للصور الفائقة: توليد صور واقعية وسينمائية بأحدث نماذج الذكاء الاصطناعي Gemini 3 Pro & Flash، إضاءات ذكية، وعدسات تصوير احترافية بدقة 4K.",
+          "استوديو دلفاي للصور الفائقة: توليد صور واقعية وسينمائية بأحدث تقنيات المعالجة البصرية، إضاءات ذكية، وعدسات تصوير احترافية بدقة 4K.",
       },
       { property: "og:title", content: "استوديو الصور الفائق — Delvai Image Studio" },
       {
         property: "og:description",
-        content: "توليد وتحرير الصور باحترافية استثنائية بدقة 4K وأنماط سينمائية مستقبلية متصلة بأحدث محركات الذكاء الاصطناعي.",
+        content: "توليد وتحرير الصور باحترافية استثنائية بدقة 4K وأنماط سينمائية مستقبلية متصلة بأحدث محركات المعالجة البصرية.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -68,21 +68,21 @@ export const Route = createFileRoute("/image")({
 const ENGINES = [
   {
     id: "google/gemini-3-pro-image",
-    name: "Gemini 3 Pro (Imagen 3)",
+    name: "Delvai Ultra Vision 4K 🎨",
     tag: "دقة 4K فائقة",
     badge: "الأقوى عالمياً",
     hint: "أعلى دقة وواقعية سينمائية، تفاصيل دقيقة، معالجة استثنائية للإضاءة والتكستشر",
   },
   {
     id: "google/gemini-3.1-flash-image",
-    name: "Gemini 3.1 Flash",
+    name: "Delvai Vision Fast ⚡",
     tag: "بث لحظي فائق السرعة",
     badge: "سرعة البرق",
     hint: "توليد فوري بأحدث معمارية لحظية مع سرعة فائقة وجودة ممتازة",
   },
   {
     id: "google/gemini-2.5-flash-image",
-    name: "Gemini 2.5 Flash",
+    name: "Delvai Creative Pulse 💡",
     tag: "كفاءة وتوازن",
     badge: "متوازن",
     hint: "توليد سريع ومتوازن ومثالي للمسودات والتصميمات السريعة",
@@ -385,7 +385,7 @@ function ImageTool() {
   return (
     <ToolShell
       title="استوديو الصور الفائق — Delvai Image Studio"
-      subtitle="عقل التوليد والتصميم البصري لمنصة Delvai — متصل بأحدث محركات الذكاء الاصطناعي اللحظية (Gemini 3 Pro & Flash) بدقة 4K وإضاءات سينمائية."
+      subtitle="عقل التوليد والتصميم البصري لمنصة Delvai — معالجة بصرية فائقة الدقة بدقة 4K وعدسات تصوير وإضاءات سينمائية."
     >
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
         {/* ================= AI ENGINES & PROVIDERS HUD ================= */}

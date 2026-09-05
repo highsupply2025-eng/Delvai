@@ -579,7 +579,7 @@ function VoiceStudio() {
                         : "border border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    GPT-4o Mini (فائق السرعة ⚡)
+                    Delvai Voice Fast ⚡ (فائق السرعة)
                   </button>
                   <button
                     type="button"
@@ -590,7 +590,7 @@ function VoiceStudio() {
                         : "border border-border/70 bg-card/40 text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    GPT-4o (دقة قصوى 🎯)
+                    Delvai Voice Quantum 🎯 (دقة قصوى)
                   </button>
                 </div>
               </div>

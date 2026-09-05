@@ -39,7 +39,7 @@ export const Route = createFileRoute("/write")({
       {
         name: "description",
         content:
-          "استوديو كتابة متكامل فائق السرعة: صياغة إعلانات تسويقية فيروسية، مقالات SEO، أوصاف منتجات، خطابات بريد إلكتروني، تدقيق لغوي وتحليل معدل التحويل بأحدث محركات Gemini 3.7 اللحظية.",
+          "استوديو كتابة متكامل فائق السرعة: صياغة إعلانات تسويقية فيروسية، مقالات SEO، أوصاف منتجات، خطابات بريد إلكتروني، تدقيق لغوي وتحليل معدل التحويل ببث لحظي فوري.",
       },
       { property: "og:title", content: "استوديو كتابة المحتوى وصناعة الإعلانات — Delvai Copy" },
       {
@@ -64,9 +64,9 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 const ENGINES = [
-  { id: "google/gemini-3.7-flash", label: "Gemini 3.7 فائق السرعة", tag: "بث فوري لحظي" },
-  { id: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash", tag: "توليد سريع جداً" },
-  { id: "google/gemini-3.7-pro", label: "Gemini 3.7 تفكير عميق", tag: "تحليل استراتيجي" },
+  { id: "google/gemini-3.7-flash", label: "Delvai Copy Instant ⚡", tag: "بث فوري لحظي" },
+  { id: "google/gemini-2.5-flash", label: "Delvai Copy Pro ✍️", tag: "توليد سريع متقن" },
+  { id: "google/gemini-3.7-pro", label: "Delvai Strategic Copy 🧠", tag: "تحليل واستراتيجية" },
 ];
 
 const KINDS = [

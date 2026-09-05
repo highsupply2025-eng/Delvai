@@ -46,16 +46,16 @@ import { saveGeneration } from "@/lib/history.functions";
 export const Route = createFileRoute("/video")({
   head: () => ({
     meta: [
-      { title: "استوديو الفيديو السينمائي (Delvai Cinema) | توليد فيديو فائق السرعة Veo 3.1" },
+      { title: "استوديو الفيديو السينمائي الفائق — Delvai Cinema Quantum | جودة 4K" },
       {
         name: "description",
         content:
-          "استوديو دلفاي للفيديو السينمائي: توليد مشاهد سينمائية مذهلة بنموذج Google Veo 3.1 بسرعة فائقة وبث حي للمراحل بدقة تصل إلى 4K مع حركة كاميرا ذكية ومؤثرات صوتية.",
+          "استوديو دلفاي للفيديو السينمائي: توليد مشاهد سينمائية مذهلة فائقة السرعة بدقة تصل إلى 4K مع حركة كاميرا ذكية ومؤثرات صوتية محيطية وتمديد المشاهد.",
       },
-      { property: "og:title", content: "استوديو الفيديو السينمائي — Delvai Cinema" },
+      { property: "og:title", content: "استوديو الفيديو السينمائي — Delvai Cinema Quantum" },
       {
         property: "og:description",
-        content: "حوّل الوصف أو الصورة إلى فيديو سينمائي بالحركة والصوت فائق السرعة بجودة 4K ونموذج Veo 3.1.",
+        content: "حوّل الوصف أو الصورة إلى فيديو سينمائي بالحركة والصوت فائق السرعة بجودة 4K.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -95,9 +95,9 @@ const LIGHTS = [
 ];
 
 const MODELS = [
-  { id: "google/veo-3.1-lite" as const, label: "Veo 3.1 فائق السرعة ⚡", note: "أسرع رندرة وتوليد فوري للمشاهد" },
-  { id: "google/veo-3.1-fast" as const, label: "Veo 3.1 متوازن 🌟", note: "سرعة عالية وجودة سينمائية مذهلة" },
-  { id: "google/veo-3.1" as const, label: "Veo 3.1 Cinema 4K 🎬", note: "أعلى دقة إخراج وتفاصيل سينمائية قصوى" },
+  { id: "google/veo-3.1-lite" as const, label: "Delvai Cinema Lite 🚀", note: "أسرع رندرة وتوليد فوري للمشاهد" },
+  { id: "google/veo-3.1-fast" as const, label: "Delvai Cinema Fluid ⚡", note: "سرعة عالية وجودة سينمائية مذهلة" },
+  { id: "google/veo-3.1" as const, label: "Delvai Cinema 4K 🎬", note: "أعلى دقة إخراج وتفاصيل سينمائية قصوى" },
 ];
 
 const RATIOS = [
@@ -149,11 +149,11 @@ const INSPIRATION_CLIPS = [
 ];
 
 const VIDEO_PHASES = [
-  "📡 إرسال المشهد إلى محرك Google Veo 3.1…",
-  "🧠 تخطيط الحركة والفيزياء البصرية للقطة…",
-  "🎨 رندرة الإطارات السينمائية وحساب الإضاءة…",
-  "🎵 توليد المؤثرات الصوتية والموسيقى المحيطية…",
-  "✨ التجميع النهائي وضبط الألوان والتصدير…",
+  "📡 تهيئة المشهد في محرك Delvai Cinema Quantum…",
+  "🧠 تخطيط مسار الكاميرا والحركة والفيزياء البصرية…",
+  "🎨 رندرة الإطارات السينمائية وحساب الإضاءة والظلال…",
+  "🎵 توليد المؤثرات الصوتية والموسيقى التصويرية المحيطية…",
+  "✨ التجميع النهائي وضبط ألوان 4K والتصدير…",
 ];
 
 function readFile(file: File): Promise<{ bytesBase64Encoded: string; mimeType: string; preview: string }> {
@@ -219,7 +219,7 @@ function VideoTool() {
     }
     const interval = setInterval(() => {
       setPhaseIndex((prev) => (prev + 1) % VIDEO_PHASES.length);
-    }, 3000);
+    }, 2800);
     return () => clearInterval(interval);
   }, [busy]);
 
@@ -229,9 +229,9 @@ function VideoTool() {
     const interval = setInterval(() => {
       setProgress((p) => {
         if (p >= 92) return p;
-        return p + 1.5;
+        return p + 1.2;
       });
-    }, 800);
+    }, 700);
     return () => clearInterval(interval);
   }, [busy]);
 
@@ -246,7 +246,7 @@ function VideoTool() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           system:
-            "أنت مخرج سينمائي وخبير في هندسة أوامر الفيديو بالذكاء الاصطناعي (Google Veo 3.1). حوّل فكرة المستخدم إلى سيناريو تصويري سينمائي إنجليزي فائق الدقة (الموضوع، حركة الكاميرا والعدسة، الإضاءة، الحركة، الأجواء، جودة 4K السينمائية) في فقرة واحدة سلسة بدون أي مقدمات.",
+            "أنت مخرج سينمائي وخبير في هندسة أوامر الفيديو السينمائي ثلاثي الأبعاد. حوّل فكرة المستخدم إلى سيناريو تصويري سينمائي إنجليزي فائق الدقة (الموضوع، حركة الكاميرا والعدسة، الإضاءة، الحركة، الأجواء، جودة 4K السينمائية) في فقرة واحدة سلسة بدون أي مقدمات.",
           model: "google/gemini-3.7-flash",
           messages: [{ role: "user", content: prompt.trim() }],
         }),
@@ -356,26 +356,29 @@ function VideoTool() {
         setError(res.message);
         return;
       }
-      if (res.status === "succeeded" && res.videoUrl) {
+      const videoResultUrl = (res as any).url || (res as any).videoUrl;
+      if (res.done && videoResultUrl) {
         setBusy(false);
         setProgress(100);
-        const clip: Clip = { id, url: res.videoUrl, prompt: fullPrompt, ratio };
+        const clip: Clip = { id, url: videoResultUrl, prompt: fullPrompt, ratio };
         setClips((prev) => [clip, ...prev.filter((c) => c.id !== id)]);
         setActive(clip);
-        toast.success("تم توليد الفيديو السينمائي بنجاح! 🎬");
+        toast.success("تم إنتاج وتصدير الفيديو السينمائي بنجاح! 🎬");
         if (user) {
-          void save({ data: { tool: "فيديو", prompt: fullPrompt, result_url: res.videoUrl } });
+          void save({ data: { tool: "فيديو", prompt: fullPrompt, result_url: videoResultUrl } });
         }
         return;
       }
-      if (res.status === "failed") {
+      if ((res as any).status === "failed") {
         setBusy(false);
-        setError(res.error || "تعذّر إكمال توليد الفيديو.");
+        setError((res as any).error || (res as any).message || "تعذّر إكمال توليد الفيديو.");
         return;
       }
-      if (typeof res.progress === "number") setProgress(Math.max(15, Math.min(95, res.progress)));
+      if (typeof res.progress === "number") {
+        setProgress(Math.max(15, Math.min(95, res.progress)));
+      }
 
-      // Responsive fast polling at 1.5s
+      // Fast polling at 1.5s
       timer.current = setTimeout(() => void pollJob(id, fullPrompt), 1500);
     } catch {
       timer.current = setTimeout(() => void pollJob(id, fullPrompt), 1500);
@@ -439,14 +442,14 @@ function VideoTool() {
       return;
     }
 
-    toast.info("بدأت معالجة المشهد في محرك Veo 3.1…");
+    toast.info("بدأت معالجة المشهد في محرك Delvai Cinema…");
     timer.current = setTimeout(() => void pollJob(res.id, finalPrompt), 1500);
   };
 
   return (
     <ToolShell
-      title="استوديو الفيديو السينمائي — Delvai Cinema"
-      subtitle="محرك الإنتاج البصري لمنصة Delvai — توليد مشاهد سينمائية فائقة السرعة بنموذج Google Veo 3.1 بدقة 4K وحركة كاميرا ومؤثرات صوتية محيطية."
+      title="استوديو الفيديو السينمائي — Delvai Cinema Quantum"
+      subtitle="محرك الإنتاج البصري لمنصة Delvai — توليد مشاهد سينمائية فائقة السرعة والدقة بدقة تصل إلى 4K مع حركة كاميرا ومؤثرات صوتية محيطية."
     >
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
         {/* ================= TOP CYBER HUD BAR ================= */}
@@ -855,7 +858,7 @@ function VideoTool() {
               {busy ? (
                 <div className="flex items-center gap-2">
                   <DelvaiThinkingLoader size="xs" inline />
-                  <span>دلفاي يرندر المشهد السينمائي بسرعة فائقة…</span>
+                  <span>دلفاي يرندر المشهد السينمائي الفائق…</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
@@ -904,7 +907,7 @@ function VideoTool() {
                 <div className="flex flex-col items-center justify-center p-6 text-center">
                   <DelvaiThinkingLoader size="lg" text="رندرة المشهد ومطابقة حركة الكاميرا والفيزياء…" />
                   <p className="mt-3 text-xs text-muted-foreground animate-pulse">
-                    توليد فائق السرعة عبر محرك Google Veo 3.1
+                    إنتاج سينمائي فائق السرعة عبر محرك Delvai Cinema Quantum
                   </p>
                 </div>
               ) : (
