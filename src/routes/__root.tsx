@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@Delvai" },
     ],
     links: [
       {
@@ -129,6 +129,70 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    // Automatically locate and remove any injected 'Edit with Lovable' badges or buttons
+    const removeLovableBadges = () => {
+      if (typeof document === "undefined") return;
+
+      const selectors = [
+        "#lovable-badge",
+        ".lovable-badge",
+        "#lovable-badge-root",
+        ".lovable-badge-root",
+        "[data-lovable-badge]",
+        "[data-lovable-edit-button]",
+        ".lovable-edit-button",
+        "#lovable-edit-button",
+        'a[href*="lovable.dev"]',
+        'a[href*="lovable.app"]',
+        'a[href*="lovableproject.com"]',
+        "lovable-badge",
+      ];
+
+      selectors.forEach((sel) => {
+        try {
+          document.querySelectorAll(sel).forEach((el) => {
+            el.remove();
+          });
+        } catch {
+          // ignore
+        }
+      });
+
+      try {
+        const floatingElements = document.querySelectorAll("div, button, a, span");
+        floatingElements.forEach((el) => {
+          const text = el.textContent?.trim() || "";
+          if (
+            text.includes("Edit with Lovable") ||
+            text.includes("Edit with 🧡 Lovable") ||
+            text.toLowerCase() === "edit with lovable"
+          ) {
+            el.remove();
+          }
+        });
+      } catch {
+        // ignore
+      }
+    };
+
+    removeLovableBadges();
+    const interval = setInterval(removeLovableBadges, 800);
+
+    let observer: MutationObserver | null = null;
+    if (typeof MutationObserver !== "undefined" && document.body) {
+      observer = new MutationObserver(() => {
+        removeLovableBadges();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    return () => {
+      clearInterval(interval);
+      observer?.disconnect();
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

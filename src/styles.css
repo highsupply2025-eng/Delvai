@@ -334,3 +334,38 @@
     transform: none;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Complete Suppression of 'Edit with Lovable' and related floating badges    */
+/* -------------------------------------------------------------------------- */
+#lovable-badge,
+.lovable-badge,
+#lovable-badge-root,
+.lovable-badge-root,
+[data-lovable-badge],
+[data-lovable-edit-button],
+.lovable-edit-button,
+#lovable-edit-button,
+[id*="lovable-badge"],
+[class*="lovable-badge"],
+[id*="lovable-edit"],
+[class*="lovable-edit"],
+lovable-badge,
+a[href*="lovable.dev"],
+a[href*="lovable.app"],
+a[href*="lovableproject.com"],
+div:has(> a[href*="lovable.dev"]),
+div:has(> a[href*="lovable.app"]),
+div:has(> a[href*="lovableproject.com"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -99999px !important;
+  top: -99999px !important;
+  z-index: -9999 !important;
+}
+
