@@ -113,7 +113,7 @@ export function SiteHeader() {
                 >
                   <Languages className="size-4 text-primary" />
                   <span className="font-semibold text-xs">
-                    {SUPPORTED_LANGUAGES.find((l) => l.code === lang)?.nativeName ?? "العربية"}
+                    {SUPPORTED_LANGUAGES.find((l) => l.code === lang)?.nativeName ?? "English"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>

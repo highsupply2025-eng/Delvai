@@ -10,9 +10,8 @@ import {
 } from "react";
 
 import { AR_EN } from "./i18n-dict";
-import { MULTI_DICT } from "./multilingual-dict";
 
-export type Lang = "ar" | "en" | "fr" | "es" | "de" | "tr" | "zh" | "ja";
+export type Lang = "en" | "ar";
 
 export interface LanguageOption {
   code: Lang;
@@ -23,14 +22,8 @@ export interface LanguageOption {
 }
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
-  { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇸🇦", dir: "rtl" },
   { code: "en", name: "English", nativeName: "English", flag: "🇺🇸", dir: "ltr" },
-  { code: "fr", name: "French", nativeName: "Français", flag: "🇫🇷", dir: "ltr" },
-  { code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸", dir: "ltr" },
-  { code: "de", name: "German", nativeName: "Deutsch", flag: "🇩🇪", dir: "ltr" },
-  { code: "tr", name: "Turkish", nativeName: "Türkçe", flag: "🇹🇷", dir: "ltr" },
-  { code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳", dir: "ltr" },
-  { code: "ja", name: "Japanese", nativeName: "日本語", flag: "🇯🇵", dir: "ltr" },
+  { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇸🇦", dir: "rtl" },
 ];
 
 const STORAGE_KEY = "app.lang";
@@ -41,13 +34,9 @@ const norm = (s: string) => s.replace(/\s+/g, " ").trim();
 const MAP = new Map<string, string>();
 for (const [ar, en] of Object.entries(AR_EN)) MAP.set(norm(ar), en);
 
-function lookup(k: string, targetLang: Lang): string | null {
+function lookup(k: string): string | null {
   const normK = norm(k);
   if (!normK) return null;
-  if (targetLang !== "en" && targetLang !== "ar") {
-    const direct = MULTI_DICT[targetLang]?.[normK];
-    if (direct) return direct;
-  }
   const enDirect = MAP.get(normK);
   if (enDirect) return enDirect;
 
@@ -57,23 +46,18 @@ function lookup(k: string, targetLang: Lang): string | null {
     .replace(/[\s•✦✨*—\-–"”»….:!?,،؟]+$/u, "")
     .trim();
   if (stripped && stripped !== normK) {
-    if (targetLang !== "en" && targetLang !== "ar") {
-      const strippedHit = MULTI_DICT[targetLang]?.[stripped];
-      if (strippedHit) return strippedHit;
-    }
     const enStrippedHit = MAP.get(stripped);
     if (enStrippedHit) return enStrippedHit;
   }
   return null;
 }
 
-function translate(value: string, targetLang: Lang = "en"): string | null {
+function translate(value: string): string | null {
   const key = norm(value);
   if (!key) return null;
-  if (targetLang === "ar") return null;
 
   // 1. Direct or stripped lookup
-  const simple = lookup(key, targetLang);
+  const simple = lookup(key);
   if (simple) return simple;
 
   // 2. Composed strings (with bullets, dashes, colons, ellipses)
@@ -84,7 +68,7 @@ function translate(value: string, targetLang: Lang = "en"): string | null {
   const core = norm(value.slice(lead.length, value.length - (trail ? trail.length : 0)));
 
   if (core) {
-    const coreHit = lookup(core, targetLang);
+    const coreHit = lookup(core);
     if (coreHit) {
       return lead + coreHit + trail;
     }
@@ -97,7 +81,7 @@ function translate(value: string, targetLang: Lang = "en"): string | null {
     const rebuilt = parts.map((part) => {
       if (/^[—:|·]$/.test(part)) return part === ":" ? ": " : ` ${part} `;
       const normPart = norm(part);
-      const piece = lookup(normPart, targetLang);
+      const piece = lookup(normPart);
       if (piece) translated = true;
       return piece ?? part;
     });
@@ -110,7 +94,7 @@ function translate(value: string, targetLang: Lang = "en"): string | null {
     let translatedLines = false;
     const transformedLines = lines.map((line) => {
       if (/^\n+$/.test(line)) return line;
-      const hit = lookup(line, targetLang);
+      const hit = lookup(line);
       if (hit) {
         translatedLines = true;
         return hit;
@@ -132,24 +116,26 @@ type Ctx = {
 };
 
 const LangContext = createContext<Ctx>({
-  lang: "ar",
-  dir: "rtl",
+  lang: "en",
+  dir: "ltr",
   setLang: () => {},
   toggle: () => {},
-  t: (ar) => ar,
+  t: (ar) => translate(ar) ?? ar,
 });
 
 export const useLang = () => useContext(LangContext);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("ar");
+  const [lang, setLangState] = useState<Lang>("en");
   const textNodes = useRef(new Map<Text, string>());
   const attrNodes = useRef(new Map<Element, Record<string, string>>());
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as Lang | null;
-    if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
+    if (saved && (saved === "en" || saved === "ar")) {
       setLangState(saved);
+    } else {
+      setLangState("en");
     }
   }, []);
 
@@ -174,7 +160,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           node.nodeValue = original;
         }
       } else {
-        const next = translate(original, currentLang);
+        const next = translate(original);
         if (next) {
           const lead = /^\s*/.exec(original)?.[0] ?? "";
           const trail = /\s*$/.exec(original)?.[0] ?? "";
@@ -208,7 +194,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             el.setAttribute(attr, original);
           }
         } else {
-          const next = translate(original, currentLang);
+          const next = translate(original);
           if (next && current !== next) {
             el.setAttribute(attr, next);
           }
@@ -282,8 +268,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       lang,
       dir: lang === "ar" ? "rtl" : "ltr",
       setLang,
-      toggle: () => setLang(lang === "ar" ? "en" : "ar"),
-      t: (ar: string) => (lang === "ar" ? ar : (translate(ar, lang) ?? ar)),
+      toggle: () => setLang(lang === "en" ? "ar" : "en"),
+      t: (ar: string) => (lang === "ar" ? ar : (translate(ar) ?? ar)),
     }),
     [lang, setLang],
   );
